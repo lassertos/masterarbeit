@@ -1,0 +1,73 @@
+% === Art der Arbeit ==========================================================
+% von den nachfolgenden Blöcken bitte den richtigen auswählen und die anderen auskommentieren/löschen
+
+% --- Diplom ----------
+%\newcommand{\settingsDegree}{{Diplom}}
+%\newcommand{\settingsDegreeName}{{Diplominformatiker}}
+%\newcommand{\settingsDegreeName}{{Diplomingenieur}}
+
+% --- Bachelor ----------
+% \newcommand{\settingsDegree}{{Bachelor}}
+% \newcommand{\settingsDegreeName}{{Bachelor of Science}}
+
+% --- Master ----------
+\newcommand{\settingsDegree}{{Master}}
+\newcommand{\settingsDegreeName}{{Master of Science}}
+
+% === Name, Abgabedatum und Sprache der Arbeit ================================
+\newcommand{\settingsName}{{Pierre Helbing}}
+\newcommand{\settingsFinishDate}{{DD.MM.YYYY}}
+\newcommand{\settingsLanguage}{german}   		% german / american
+
+% === Weitere Einstellungen ===================================================
+% --- Suchpfad (Unterverzeichnis) für eingebundene Grafiken ----------
+\newcommand{\settingsGraphicsPath}{image/}
+
+% --- Hinweiskapitel ----------
+\newbool{settingsWithHints}
+\setbool{settingsWithHints}{false}				% true / false
+
+% --- Zeilennummern ----------
+\newbool{settingsWithLineNumbers}
+\setbool{settingsWithLineNumbers}{false}			% true / false
+
+% --- Todos ----------
+\newbool{settingsWithTodos}
+\setbool{settingsWithTodos}{false}				% true / false
+
+% --- Anzahl an Nummerierungsebenen im Text und Inhaltsverzeichnis ----------
+% 1: \section
+% 2: \section + \subsection
+% Achtung: 3 oder 4 nur nach Absprache mit Betreuer !
+% 3: \section + \subsection + \subsubsection
+% 4: \section + \subsection + \subsubsection + \paragraph
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+
+% --- Anforderungen ----------
+
+\usepackage{tabularx}
+\usepackage{multicol}
+\newenvironment{myreq}[1]{%
+    \setlist[description]{font=\normalfont\color{darkgray}}%
+    \begin{tcolorbox}[colframe=black,colback=white, sharp corners, boxrule=1pt]%
+        \bfseries\color{blue}%
+        \begin{description}#1}%
+            {\end{description}\end{tcolorbox}}
+
+\newcommand{\threeinline}[3]{\begin{multicols}{3}#1 #2 #3\end{multicols}}
+\newcommand{\twoinline}[2]{\begin{multicols}{2}#1 #2\end{multicols}}
+
+\newcommand{\reqno}{\item[Requirement \#:]}
+\newcommand{\reqtype}{\item[Requirement Type:]}
+\newcommand{\reqevent}{\item[Event/BUC/PUC \#:]}
+\newcommand{\reqdesc}{\item[Description:]}
+\newcommand{\reqrat}{\item[Rationale:]}
+\newcommand{\reqorig}{\item[Originator:]}
+\newcommand{\reqfit}{\item[Fit Criterion:]}
+\newcommand{\reqsatis}{\item[Customer Satisfaction:]}
+\newcommand{\reqdissat}{\item[Customer Dissatisfaction:]}
+\newcommand{\reqdep}{\item[Dependencies:]}
+\newcommand{\reqconf}{\item[Conflicts:]}
+\newcommand{\reqmater}{\item[Materials:]}
+\newcommand{\reqhist}{\item[History:]}

@@ -1,0 +1,298 @@
+% === Dokumentklasse ==========================================================
+\documentclass[%
+	a4paper,							% A4
+	12pt,								% Schriftgröße 12
+	twoside,							% zweiseitig
+	fleqn								% Formeln linksbündig ausrichten
+]{book}
+
+
+% === Grundlegende Pakete =====================================================
+\usepackage{etoolbox}					% portiert viele nützliche Sachen aus e-TeX (z.B. booleans, ifs)
+\usepackage[							% erweiterte Angabe von Farben
+	pdftex,								% Farbtreiber auswählen
+	dvipsnames							% vordefinierte Farben laden
+]{xcolor}								% erweiterte Angabe von Farben
+\usepackage{xparse}						% high-level Interface für Dokumentbefehle wie \NewDocument(Command,Environment)
+
+\usepackage[utf8]{inputenc}				% Kodierung der *.tex Dateien ist UTF-8 nicht ISO-8859-1
+\usepackage{cmap}						% character map tables -> pdf Inhalt wird besser durchsuch- und kopierbar
+\usepackage[T1]{fontenc}				% OT1 encoding für deutsche Sonderzeichen -> pdf Inhalt kann Sonderzeichen durchsucht werden
+\usepackage{lmodern}					% Latin-Modern-Schriftart (Computer Modern in Verbindung mit OT1 führt zu Bitmap-Fonts auf Windows)
+\usepackage{microtype}					% mikrotypografische Einstellungen, die den gesetzten Text nochmals wesentlich verbessern (weniger badboxes)
+
+
+% === Benutzerdefinierte Einstellungen ========================================
+\input{include/NIKR_settings.tex}
+\usepackage{multicol}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+
+% === Übersetzungen ===========================================================
+% Definitionen je nach \mylanguage (siehe NIKR_settings.tex)
+\ifdefstring{\settingsLanguage}{german}{%
+	\newcommand{\acroname}{Abkürzungsverzeichnis}	% Name für Abkürzungsverzeichnis
+	\newcommand{\todoname}{Todo Liste}	% Name für Todo-Liste
+	\newcommand{\pagename}{Seite}		% Name für Seite
+}%
+{%
+	\newcommand{\acroname}{Acronyms}	% Name für Abkürzungsverzeichnis
+	\newcommand{\todoname}{Todo list}	% Name für Todo-Liste
+	\newcommand{\pagename}{page}		% Name für Seite
+}%
+
+
+% === Wichtige Pakete und Einstellungen =======================================
+\usepackage{calc}						% ermöglicht Arithmetik in den Argumenten von Befehlen
+
+% Einstellungen je nach \mylanguage (siehe NIKR_settings.tex)
+\ifdefstring{\settingsLanguage}{german}{%
+	\usepackage[ngerman]{babel}			% Spracheinstellungen (für deutsch z.B. Contents -> Inhaltsverzeichnis, etc.)
+	\usepackage{bibgerm}            	% Stylefile für deutsche Literaturstellenangabe
+	\bibliographystyle{gerapali}		% Stil für Literaturangaben festlegen
+}%
+{%
+	\usepackage[american]{babel}		% Spracheinstellungen (für deutsch z.B. Contents -> Inhaltsverzeichnis, etc.)
+	\bibliographystyle{apalike}			% Stil für Literaturangaben festlegen
+	\frenchspacing						% einfaches Leerzeiches nach Satzende (für deutsch bereits Standard)
+}%
+\usepackage[%
+	noadjust							% noadjust verhindert automatische Leerzeichen um die Referenz, was am Zeilenanfang zu Problemen führt
+]{cite}     							% erlaubt Zeilenumbruch innerhalb von Zitierungen
+
+\usepackage{graphicx}					% erweiterte Argumente in \in­clude­graph­ics
+\graphicspath{{\settingsGraphicsPath}}	% Standard-Pfad für Bilder siehe NIKR_settings.tex
+
+\usepackage[bf]{caption}				% erlaubt erweiterte Formatierungen in \caption (siehe unten)
+\usepackage{subcaption}					% mehrere Abbildungen nebeneinander
+
+\usepackage{amsmath}					% ermöglicht \DeclareMathOperator
+\usepackage{amssymb}					% mathmatische Symbole und Sonderzeichen
+\usepackage{nicefrac}					% für \nicefrac
+\usepackage{nccmath}					% für \mfrac
+
+\usepackage{icomma}						% intelligentes Komma (macht Verwendung von {,} überflüssig)
+\usepackage{siunitx}					% für einheitliche Angabe von Einheiten
+
+\usepackage{fancyhdr}					% Kopf- und Fußzeilen (siehe unten)
+
+\usepackage{hhline}						% erweitere Rahmengestaltung in Tabellen
+
+\usepackage[%							% Einbettung von Links im Dokument und erlaubt die Nutzugn von \url
+	hyperfootnotes=false,				% keine Fußnoten als Link im Dokument (geht nicht mit footmisc)
+	pagebackref=true					% Backrefs im Literaturverzeichnis
+]{hyperref}           					% Einbettung von Links im Dokument und erlaubt die Nutzugn von \url
+\renewcommand*{\backref}[1]{\textit{(\pagename:~#1)}}   % Format für backrefs
+
+\usepackage[%							% erlaubt erweiterte Formatierungen von Fußnoten (siehe unten)
+	multiple,							% mehrere mit Komma abtrennen
+	hang								% linksbündig, \footnotemargin entscheidet über Einrückung
+]{footmisc}								% erlaubt erweiterte Formatierungen von Fußnoten (siehe unten)
+\patchcmd{\footref}{\ref}{\ref*}{}{}	% Hyperlink in \footref entfernen
+
+\usepackage[nohyperlinks]{acronym}		% Abkürzungsverzeichnis
+
+\usepackage{setspace}					% für \setstretch (ändern Zeilenabstand, aber nicht floating Umgebungen)
+
+\usepackage[%							% Todos
+	colorinlistoftodos,					% farbige Markierungen in Todo-Liste
+	prependcaption,						% caption=val
+	textsize=tiny,						% Schriftgröße
+	linecolor=red,						% Standard-Linienfarbe für \todo
+	backgroundcolor=red!25,				% Standard-Hintergrundfarbe für \todo
+	bordercolor=red,					% Standard-Rahmenfarbe für \todo
+	textwidth=2cm,						% Standard-Breite für \todo
+]{todonotes}							% Todos
+\ifbool{settingsWithTodos}{%
+	\setlength{\marginparwidth}{2cm}	% sonst werden Notes am Rand nicht richtig angezeigt
+	\NewDocumentCommand{\todoaddref}{O{} m}{%
+		\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}%
+	}
+	\NewDocumentCommand{\todouncertain}{O{} m}{%
+		\todo[linecolor=green,backgroundcolor=green!25,bordercolor=green,#1]{#2}%
+	}
+	\NewDocumentCommand{\todooptional}{O{} m}{%
+		\todo[linecolor=cyan,backgroundcolor=cyan!25,bordercolor=cyan,#1]{#2}%
+	}
+	\pretocmd{\mainmatter}{\listoftodos[\todoname]{\markboth{\MakeUppercase{\todoname}}{\MakeUppercase{\todoname}}}}{}{}
+}{
+	\presetkeys{todonotes}{disable}{}	% disable \todo
+	\NewDocumentCommand{\todoaddref}{O{} m}{}
+	\NewDocumentCommand{\todouncertain}{O{} m}{}
+	\NewDocumentCommand{\todooptional}{O{} m}{}
+}
+
+\usepackage[switch*,pagewise]{lineno}	% Zeilennummern
+\ifbool{settingsWithLineNumbers}{%
+	\renewcommand\linenumberfont{\textbf\sffamily\color{black!50}\footnotesize}
+	\apptocmd{\mainmatter}{\linenumbers}{}{}
+	\pretocmd{\backmatter}{\nolinenumbers}{}{}
+}{}
+
+\usepackage{placeins}					% FloatBarriers
+
+\usepackage{enumitem}					% erweiterte Formatierung von \enumerate, \itemize und \description
+
+\usepackage[linewidth=0.5pt]{mdframed}	% für Boxen in Hinweisen
+
+\usepackage[ddmmyyyy]{datetime}			% Datumsangabe
+\renewcommand{\dateseparator}{.}		% Punkt als Trennzeichen in Datumsangabe
+
+
+% === Längen und Abstände =====================================================
+% horizontales Layout
+\setlength{\oddsidemargin}{0.2in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{\paperwidth - 2.2in}
+
+% vertikales Layout
+%\setlength{\topskip}{0.0cm}
+\setlength{\headheight}{15.1pt}
+%\setlength{\headsep}{0.0cm}
+\setlength{\topmargin}{0.0cm}
+\setlength{\footskip}{0.6in}
+\setlength{\textheight}{\paperheight - 2.0in}
+\addtolength{\textheight}{-1.0\headheight}
+\addtolength{\textheight}{-1.0\headsep}
+\addtolength{\textheight}{-1.0\footskip}
+
+% Zeilenabstand
+\setstretch{1.3}
+\AtBeginEnvironment{tabular}{\setstretch{1.3}}
+
+% Einrückung von Formeln
+\setlength{\mathindent}{1.0cm}
+
+% Absätze
+\setlength{\parindent}{0.0cm}
+
+% Fußnoten
+\renewcommand{\footnotelayout}{\setstretch{1.2}}
+\setlength\footnotemargin{10pt}
+
+% Listen (noitemsep, nosep, ...)
+\setlist{noitemsep}
+
+\setlength{\topsep}{0.3cm}
+
+
+% === Bild- und Tabellenunterschrift ==========================================
+\renewcommand{\captionfont}{\small \setstretch{1.3}}
+\newcommand{\NIcaption}[2]{\caption[#1]{#1\protect\\ \emph{#2}}}
+\setcaptionmargin{0.75cm}
+
+
+% === Abkürzungsverzeichnis ===================================================
+% Verwendung vor jedem Kapitel zurücksetzen
+\pretocmd{\chapter}{\acresetall}{}{}
+
+
+% === Seitenstil ==============================================================
+% Pagestyle plain überschreiben
+\pagestyle{fancy}
+% Kapitel- und Abschnittangaben ohne Punkt
+\renewcommand{\sectionmark}[1]{\markright{\uppercase{\thesection~~#1}}}
+\renewcommand{\chaptermark}[1]{\markboth{\uppercase{\chaptername\ \thechapter~~#1}}{}}
+\fancypagestyle{plain}{%
+	\fancyhead[ER]{\itshape\leftmark}%
+	\fancyhead[OL]{\itshape\rightmark}%
+	\fancyhead[EL,OR]{\thepage}%
+	\fancyfoot[EL,OL]{}%
+	\fancyfoot[EC,OC]{}%
+	\renewcommand{\headrulewidth}{0.4pt}%
+	\renewcommand{\footrulewidth}{0.4pt}%
+}
+
+
+% === Verweise ================================================================
+% Klammern in Formel-Referenzen entfernen
+\makeatletter
+\renewcommand\tagform@[1]{\maketag@@@{\ignorespaces#1\unskip\@@italiccorr}}
+\makeatother
+
+
+% === Angabe von Einheiten ====================================================
+\ifdefstring{\settingsLanguage}{german}{%
+	\sisetup{locale=DE}		% deutsche Lokalisierung (konvertiert 1.00 automatisch zu 1,00)
+}%
+{%
+	\sisetup{locale=US}		% englische Lokalisierung (konvertiert 1,00 automatisch zu 1.00)
+}%
+
+
+% === Mathematische Definitionen ==============================================
+% Darstellung von Vektoren und Matrizen
+\renewcommand{\vec}[1]{\underline{\mathbf{\MakeLowercase{#1}}}}		% Vektoren
+\newcommand{\veci}[1]{\underline{\MakeLowercase{#1}}}				% Vektoren als Indizes
+\newcommand{\mat}[1]{\underline{\mathbf{\MakeUppercase{#1}}}}		% Matrizen
+\newcommand{\mati}[1]{\underline{\MakeUppercase{#1}}}				% Matrizen als Indizes
+% zusätzliche mathematische Operatoren (damit sie nicht als Formelzeichen geschrieben werden)
+\DeclareMathOperator{\step}{step}									% Stufenfunktion
+\DeclareMathOperator{\sign}{sign}									% Vorzeichen
+
+
+% === Manuelle Definition von Worttrennungen ==================================
+\hyphenation{
+	Convolutional
+	Neural
+	Net-work
+	Net-works
+	Ko-ef-fi-zi-ent
+	Ko-ef-fi-zi-ent-en
+	Drop-out
+	pixel-genaue
+	Patch
+	Patch-größen
+}
+
+
+% === Pseudocode-Darstellung ==================================================
+% Import nicht oben, weil \parindent zuvor gesetzt werden muss!
+% siehe: https://ctan.org/pkg/algorithm2e?lang=de
+\ifdefstring{\settingsLanguage}{german}{%
+	\usepackage[%						% Pseudocode
+		linesnumbered,					% mit Zeilennummern
+		noend,							% Ende von Befehlen, wie etwa While, unterdrücken
+		ruled,							% Layout
+		german,							% deutsche Bezeichnung und deutsches Verzeichnis
+		%onelanguage,					% Keywords übersetzen
+		algochapter						% Nummerierung analog zu Abbildungen
+	]{algorithm2e}						% Pseudocode
+}{%
+	\usepackage[%						% Pseudocode
+		linesnumbered,					% mit Zeilennummern
+		noend,							% Ende von Befehlen, wie etwa While, unterdrücken
+		ruled,							% Layout
+		algochapter						% Nummerierung analog zu Abbildungen
+	]{algorithm2e}						% Pseudocode
+}%
+
+\newenvironment{NIalgorithm}{%
+	% Algorithmus um 1.5em einrücken, damit Zeilennummern nicht im Rand sind
+	\setlength{\algomargin}{1.5em}%
+	% Padding oben und unten für Caption
+	\setlength{\interspacetitleruled}{\smallskipamount}%
+	% Padding oben und unten für Algorithmus
+	\SetAlgoInsideSkip{smallskip}%
+	% Kommentarstyle ändern
+	\newcommand\NIcommentstyle[1]{\ttfamily\textcolor{black!60}{##1}}
+	\SetCommentSty{NIcommentstyle}%
+	% zweiten Teil in NIcaption unterdrücken (falls NIcaption genutzt wird)
+	\renewcommand{\NIcaption}[2]{\caption[##1]{##1}}%
+	\begin{algorithm}%
+		% Zeilenabstand minimal vergrößern
+		\setstretch{1.1}%
+		% kleine Schrift
+		\small%
+		% Semikolon unterdrücken
+		\DontPrintSemicolon%
+		% korrekt ausgerichtete mehrzeilige Input- bzw. Outputdefinitionen mittels \Input und \Output
+		\SetKwInOut{Input}{Input}%
+		\SetKwInOut{Output}{Output}%
+		% Abschnitt für In- und Outputs zurückrücken
+		\pretocmd{\Input}{\Indentp{-1.5em}}{}{}%
+		\apptocmd{\Output}{\Indentp{1.5em}}{}{}%
+		}{%
+	\end{algorithm}%
+}

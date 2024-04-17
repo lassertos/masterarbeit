@@ -1,0 +1,29 @@
+\chapter{Konzeption} \label{konzeption}
+
+Im Fokus dieser Arbeit liegt die Programmierung von Mikrocontrollern im Rahmen des GOLDi Remotelab. Bei den verwendeten Microcontrollern handelt es sich um ATmega2560-16AU. Damit diese mit der CrossLab Infrastruktur kommunizieren können sind sie über einen FPGA mit einem Raspberry Pi Compute Module 4 verbunden. Dabei übernimmt der FPGA die Kommunikation zwischen dem CM und dem Microcontroller, während das CM die Kommunikationsschnittstelle zur CrossLab Infrastruktur übernimmt.
+
+\section{Debugging}
+
+Das Debuggen von Programmen auf den vorhandenen Microcontrollern gestaltet sich schwierig. Eine Möglichkeit ist die Nutzung der Bibliothek avr\_debug. Diese wird zusammen mit dem Programm kompiliert und auf den Microcontroller hochgeladen. Dort erstellt sie ein Interface für den Debugger gdb. Dieses Interface nutzt die Serielle Schnittstelle des Microcontrollers zur Kommunikation mit gdb. Das CM agiert in diesem Szenario als Schnittstelle zwischen gdb und unserer IDE. Ein Nachteil dieses Vorgehens ist der hohe Speicherverbrauch der Bibliothek, welcher die Anzahl möglicher Programme einschränkt. Allerdings ist ein Vorteil dieses Ansatzes, dass keine zusätzlichen Kosten durch die Anschaffung externe Debugger entstehen.
+
+Ein weiteres Problem, was beim Debuggen eines laufenden Experimentes beachtet werden muss, ist die fortlaufende Ansteuerung von weiteren Geräten. Nehmen wir als Beispiel ein einfaches Experiment bestehend aus einem Microcontroller und einem 3-Achs-Portal. Wenn wir das Program des Microcontrollers unterbrechen, während dieser den Portalkran aktiv nach rechts bewegt, so wird diese Bewegung nicht unterbrochen. Um sicherzustellen, dass die Signale von Aktoren während eines Breakpoints nicht an andere Geräte weitergeleitet werden müssen die anderen Geräte entsprechend benachrichtigt werden.
+
+\section{Language Server}
+
+Eine Möglichkeit zur Einbindung von Language Servern ist es, diese auf dem CM zu installieren und sich dann zu diesen zu verbinden. Allerdings ist das Language Server Protokoll nur auf einen einzigen Client pro Server ausgelegt. Daher müsste in einem Experiment mit mehreren Nutzern für jeden dieser Nutzer eine eigene Instanz des Language Server erstellt werden. Eine spezielle Alternative könnte die Verwendung des zu WebAssembly kompilerten Language Servers clangd darstellen. Dieser könnte im Browser des jeweiligen Nutzers instanziiert werden, wodurch keine zusätzliche Last auf dem CM entsteht. Allerdings muss hierbei die neu entstandene Last auf dem Rechner des Nutzers in Betracht gezogen werden. Eine weitere Möglichkeit ist die Bereitstellung weiterer Server zur Bereitstellung der Language Server.
+
+\section{Kompilierung}
+
+Die Kompilierung des Quellcodes kann vom CM übernommen werden. Alternativ steht auch hier die Möglichkeit eines externen Servers zur Verfügung. Weiterhin kann auch die Möglichkeit der Kompilierung innerhalb des Browsers des Nutzers erforscht werden. Hierbei gibt es bereits eine Version des C-Compilers clang in WebAssembly. Diese ermöglicht jedoch in der aktuellen Form nur die Kompilierung von C/C++ Code zu WebAssembly. Im Falle des GOLDi Remotelab müsste allerdings eine Kompilierung des Quellcodes für die verwendeten Microcontroller erfolgen. Diese wird normalerweise mit Hilfe des Compilers avr-gcc durchgeführt. Allerdings bietet auch der clang Compiler ein avr Ziel an, welches jedoch einen experimentellen Status hat.
+
+\section{Kollaboratives Zusammenarbeiten}
+
+Die Studenten sollen in der Lage sein gemeinsam an Dateien arbeiten zu können. Hierbei könnte auf bereits bestehende Lösungen zurückgegriffen werden. Allerdings muss hierbei beachtet werden, dass Studenten auch in der Lage sein sollten Debug-Sessions zu teilen. Die Extension Live Share von Microsoft ermöglicht das kollaborative Editieren von Dateien und das Teilen von Debug-Sessions. Allerdings wird für die Nutzung des Services ein Microsoft bzw. ein Github Account benötigt. Es wäre vom Vorteil eine Lösung zu finden, die es den Studenten ermöglicht zusammen an einem Projekt zu arbeiten, ohne dafür einen neuen Account anlegen zu müssen. Für eine derartige Implementierung können bereits vorhandene Software-Bibliotheken wie z.B. YJS genutzt werden.
+
+\section{Datenspeicherung}
+
+Um sicherzustellen, dass die IDE komplett im Browser verwendet werden kann, müssen auch die Dateien der Nutzer im Browser gespeichert werden können. Dafür kann die IndexedDB verwendet werden. Diese ermöglicht die persistente Speicherung von größeren Datenmengen im Browser. Um die Speicherung der Daten in der IndexedDB zu ermöglichen muss eine entsprechende Erweiterung entwickelt werden. Für derartige Erweiterungen steht die FileSystemProvider API zur Verfügung. Um allerdings auch die Durchsuchbarkeit der Dateien sowie deren Inhalts zu ermöglichen müssen die FileSearchProvider und TextSearchProvider APIs eingesetzt werden. Diese befinden sich allerdings noch in einem proposed Stadium. Dies bedeutet, dass sie sich noch verändern können. Erweiterung, die derartige APIs nutzen können nicht auf dem Marketplace angeboten werden. Jedoch sollte dies für die Zwecke des GOLDi Remotelab kein Problem darstellen.
+
+\section{CrossLab Kompatibilität}
+
+Zur Herstellung der CrossLab Kompatibilität müssen zunächst die benötigten Schnittstellen definiert werden. Darauf aufbauend können dann entsprechende Services definiert werden. Hierbei gilt es auch zu beachten, dass diese Schnittstellen möglichst wiederverwendbar gestaltet sind.

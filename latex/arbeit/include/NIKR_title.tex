@@ -1,0 +1,91 @@
+% Buchstaben für Seitennummerierung verwenden 
+% (verhindert "destination with the same identifier (name{page.X})" Warnung)
+\pagenumbering{alph}
+
+% === Titelblatt ==============================================================
+\begin{titlepage}
+	\hspace{0.2cm}
+	\begin{minipage}{3.5cm}
+		\includegraphics[width=0.8\textwidth]{logo}
+	\end{minipage}
+	\hspace{0.2cm}
+	\begin{minipage}{11cm}
+		\vspace{0.7cm}
+		\large
+		{\bf Technische Universität Ilmenau}\newline
+		Fakultät für Informatik und Automatisierung\newline
+		Fachgebiet Neuroinformatik und Kognitive Robotik
+	\end{minipage}
+	\begin{center}
+		\vspace{0.8cm}
+		{\Large\bfseries Entwicklung einer CrossLab-kompatiblen integrierten Entwicklungsumgebung für das GOLDi-Remotelab\\}
+		\vspace{0.8cm}
+		\settingsDegree arbeit zur Erlangung des akademischen Grades \settingsDegreeName\\[0.5cm]
+		{\Large \bfseries \settingsName\\[1.0cm]}
+		\begin{table}[ht]
+			\centering
+			\begin{tabular}{ll}
+				Betreuer: & Dr. Detlef Streitferdt                    \\[2mm]
+				\multicolumn{2}{l}{Verantwortlicher Hochschullehrer:} \\
+				          & Prof. Dr.-Ing. habil. Daniel Ziener       \\[2cm]
+				\multicolumn{2}{p{13cm}}{Die \settingsDegree arbeit wurde am \settingsFinishDate \ bei der Fakultät für Informatik und Automatisierung der Technischen Universität Ilmenau eingereicht.}
+			\end{tabular}
+		\end{table}
+		% Hinweis für Entwurfsversion ausgeben (Variablen aus NIKR_settings.tex prüfen)
+		\ifboolexpr{bool{settingsWithTodos} or bool{settingsWithLineNumbers} or bool{settingsWithHints}}{%
+		{\color{red} Entwurf: \today \\[2mm]
+		\textbf{Dies ist nicht die finale Druckvorlage.}\\[2mm]
+		{\small%
+		\ifbool{settingsWithHints}{%
+			Hinweiskapitel aktiviert (siehe \texttt{settingsWithHints} in \texttt{NIKR\_settings.tex})\\%
+		}{}%					
+		\ifbool{settingsWithLineNumbers}{%
+			Zeilennummern aktiviert (siehe \texttt{settingsWithLineNumbers} in \texttt{NIKR\_settings.tex})\\%
+		}{}%
+		\ifbool{settingsWithTodos}{%
+			Todo-Markierungen aktiviert (siehe \texttt{settingsWithTodos} in \texttt{NIKR\_settings.tex})\\%
+		}{}%
+		}%
+		}%
+		}{}
+	\end{center}
+\end{titlepage}
+
+\cleardoublepage
+
+% === Danksagung ==============================================================
+% Sollten Sie diesen Abschnitt nicht nutzen wollen, kommentieren Sie alle Zeilen
+% bis zur Einverstaendniserklaerung (inkl. \cleardoublepage) aus
+\vspace*{5cm}
+
+Danksagung
+
+Dieser Abschnitt {\bf kann} genutzt werden, um denjenigen Personen Dank auszusprechen, die Sie bei der Erstellung der Arbeit unterstützt haben.
+
+\cleardoublepage
+
+% === Einverstaendniserklaerung ================================================
+\vspace*{16cm}
+
+\begin{tabular}{lp{12.5cm}}
+	{Erklärung:} & {"`Hiermit versichere ich, dass ich diese wissenschaftliche Arbeit selbständig verfasst und nur die angegebenen
+
+			
+			
+			
+			Quellen und Hilfsmittel verwendet habe. Alle von mir aus anderen
+			Veröffentlichungen übernommenen Passagen sind als solche gekennzeichnet."'}
+\end{tabular}
+\vspace*{1.5cm}
+
+\begin{tabular}{l}
+	Ilmenau, \settingsFinishDate \\
+	\\
+\end{tabular}
+\hfill
+\begin{tabular}{c}
+	{\makebox[6.0cm]{\dotfill}} \\
+	\settingsName               \\
+\end{tabular}
+
+\cleardoublepage

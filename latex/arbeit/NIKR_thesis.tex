@@ -1,0 +1,54 @@
+\input{include/NIKR_header}
+
+\begin{document}
+% --- Titelseite, Danksagung, Einverständniserklärung --------------------------
+\pagestyle{empty}
+\input{include/NIKR_title}
+
+% --- Inhalts- und Abkürzungsverzeichnis ---------------------------------------
+\frontmatter
+\pagestyle{plain}
+% Inhaltsverzeichnis
+\tableofcontents
+% Abkürzungsverzeichnis
+\chapter*{\acroname}
+\markboth{\MakeUppercase{\acroname}}{\MakeUppercase{\acroname}}
+\input{include/NIKR_acronym}
+
+% --- Inhalt -------------------------------------------------------------------
+\mainmatter
+
+% Hinweiskapitel
+\ifbool{settingsWithHints}{\input{content/hinweise}}{}
+
+% Kapitel
+\input{content/01_einleitung.tex}
+\input{content/02_grundlagen.tex}
+\input{content/03_systematische_literaturrecherche.tex}
+\input{content/04_anforderungsanalyse.tex}
+\input{content/05_stand_der_technik.tex}
+\input{content/06_konzeption.tex}
+\input{content/07_implementierung.tex}
+\input{content/08_auswertung.tex}
+\input{content/09_zusammenfassung_und_fazit.tex}
+
+% opt: zusätzliche Anhänge
+\begin{appendix}
+	% \input{content/anhang1}
+\end{appendix}
+
+% --- Abbildungs-, Tabellen-, Algorithmen- und Literaturverzeichnis ------------
+\backmatter
+% Abbildungsverzeichnis
+\listoffigures
+% Tabellenverzeichnis
+\listoftables
+% Algorithmenverzeichnis
+\listofalgorithms
+% Literaturverzeichnis
+\cleardoublepage	% Literaturverzeichnis immer auf ungerader Seite
+\phantomsection		% Anker für Sprungmarke im Inhaltsverzeichnis korrigieren
+\cite{badrinarayanan2015segnet}
+\addcontentsline{toc}{chapter}{\bibname}
+\bibliography{NIKR_bibliography}
+\end{document}

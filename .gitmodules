@@ -1,0 +1,9 @@
+[submodule "code/WIDEr"]
+	path = code/WIDEr
+	url = https://github.com/lassertos/WIDEr
+[submodule "code/vscode"]
+	path = code/vscode
+	url = https://github.com/microsoft/vscode.git
+[submodule "code/vscode-extension-samples"]
+	path = code/vscode-extension-samples
+	url = https://github.com/microsoft/vscode-extension-samples.git
