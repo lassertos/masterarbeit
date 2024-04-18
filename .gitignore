@@ -1,3 +1,5 @@
 *:Zone.Identifier
+*.log
 dist
 node_modules
+*.gz

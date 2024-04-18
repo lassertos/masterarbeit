@@ -1,17 +1,17 @@
 % === Dokumentklasse ==========================================================
 \documentclass[%
-	a4paper,							% A4
-	12pt,								% Schriftgröße 12
-	twoside,							% zweiseitig
-	fleqn								% Formeln linksbündig ausrichten
+    a4paper,							% A4
+    12pt,								% Schriftgröße 12
+    twoside,							% zweiseitig
+    fleqn								% Formeln linksbündig ausrichten
 ]{book}
 
 
 % === Grundlegende Pakete =====================================================
 \usepackage{etoolbox}					% portiert viele nützliche Sachen aus e-TeX (z.B. booleans, ifs)
 \usepackage[							% erweiterte Angabe von Farben
-	pdftex,								% Farbtreiber auswählen
-	dvipsnames							% vordefinierte Farben laden
+    pdftex,								% Farbtreiber auswählen
+    dvipsnames							% vordefinierte Farben laden
 ]{xcolor}								% erweiterte Angabe von Farben
 \usepackage{xparse}						% high-level Interface für Dokumentbefehle wie \NewDocument(Command,Environment)
 
@@ -25,6 +25,7 @@
 % === Benutzerdefinierte Einstellungen ========================================
 \input{include/NIKR_settings.tex}
 \usepackage{multicol}
+\usepackage{multirow}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{enumitem}
 \usepackage{tcolorbox}
@@ -32,14 +33,14 @@
 % === Übersetzungen ===========================================================
 % Definitionen je nach \mylanguage (siehe NIKR_settings.tex)
 \ifdefstring{\settingsLanguage}{german}{%
-	\newcommand{\acroname}{Abkürzungsverzeichnis}	% Name für Abkürzungsverzeichnis
-	\newcommand{\todoname}{Todo Liste}	% Name für Todo-Liste
-	\newcommand{\pagename}{Seite}		% Name für Seite
+    \newcommand{\acroname}{Abkürzungsverzeichnis}	% Name für Abkürzungsverzeichnis
+    \newcommand{\todoname}{Todo Liste}	% Name für Todo-Liste
+    \newcommand{\pagename}{Seite}		% Name für Seite
 }%
 {%
-	\newcommand{\acroname}{Acronyms}	% Name für Abkürzungsverzeichnis
-	\newcommand{\todoname}{Todo list}	% Name für Todo-Liste
-	\newcommand{\pagename}{page}		% Name für Seite
+    \newcommand{\acroname}{Acronyms}	% Name für Abkürzungsverzeichnis
+    \newcommand{\todoname}{Todo list}	% Name für Todo-Liste
+    \newcommand{\pagename}{page}		% Name für Seite
 }%
 
 
@@ -48,17 +49,17 @@
 
 % Einstellungen je nach \mylanguage (siehe NIKR_settings.tex)
 \ifdefstring{\settingsLanguage}{german}{%
-	\usepackage[ngerman]{babel}			% Spracheinstellungen (für deutsch z.B. Contents -> Inhaltsverzeichnis, etc.)
-	\usepackage{bibgerm}            	% Stylefile für deutsche Literaturstellenangabe
-	\bibliographystyle{gerapali}		% Stil für Literaturangaben festlegen
+    \usepackage[ngerman]{babel}			% Spracheinstellungen (für deutsch z.B. Contents -> Inhaltsverzeichnis, etc.)
+    \usepackage{bibgerm}            	% Stylefile für deutsche Literaturstellenangabe
+    \bibliographystyle{gerapali}		% Stil für Literaturangaben festlegen
 }%
 {%
-	\usepackage[american]{babel}		% Spracheinstellungen (für deutsch z.B. Contents -> Inhaltsverzeichnis, etc.)
-	\bibliographystyle{apalike}			% Stil für Literaturangaben festlegen
-	\frenchspacing						% einfaches Leerzeiches nach Satzende (für deutsch bereits Standard)
+    \usepackage[american]{babel}		% Spracheinstellungen (für deutsch z.B. Contents -> Inhaltsverzeichnis, etc.)
+    \bibliographystyle{apalike}			% Stil für Literaturangaben festlegen
+    \frenchspacing						% einfaches Leerzeiches nach Satzende (für deutsch bereits Standard)
 }%
 \usepackage[%
-	noadjust							% noadjust verhindert automatische Leerzeichen um die Referenz, was am Zeilenanfang zu Problemen führt
+    noadjust							% noadjust verhindert automatische Leerzeichen um die Referenz, was am Zeilenanfang zu Problemen führt
 ]{cite}     							% erlaubt Zeilenumbruch innerhalb von Zitierungen
 
 \usepackage{graphicx}					% erweiterte Argumente in \in­clude­graph­ics
@@ -80,14 +81,14 @@
 \usepackage{hhline}						% erweitere Rahmengestaltung in Tabellen
 
 \usepackage[%							% Einbettung von Links im Dokument und erlaubt die Nutzugn von \url
-	hyperfootnotes=false,				% keine Fußnoten als Link im Dokument (geht nicht mit footmisc)
-	pagebackref=true					% Backrefs im Literaturverzeichnis
+    hyperfootnotes=false,				% keine Fußnoten als Link im Dokument (geht nicht mit footmisc)
+    pagebackref=true					% Backrefs im Literaturverzeichnis
 ]{hyperref}           					% Einbettung von Links im Dokument und erlaubt die Nutzugn von \url
 \renewcommand*{\backref}[1]{\textit{(\pagename:~#1)}}   % Format für backrefs
 
 \usepackage[%							% erlaubt erweiterte Formatierungen von Fußnoten (siehe unten)
-	multiple,							% mehrere mit Komma abtrennen
-	hang								% linksbündig, \footnotemargin entscheidet über Einrückung
+    multiple,							% mehrere mit Komma abtrennen
+    hang								% linksbündig, \footnotemargin entscheidet über Einrückung
 ]{footmisc}								% erlaubt erweiterte Formatierungen von Fußnoten (siehe unten)
 \patchcmd{\footref}{\ref}{\ref*}{}{}	% Hyperlink in \footref entfernen
 
@@ -96,38 +97,38 @@
 \usepackage{setspace}					% für \setstretch (ändern Zeilenabstand, aber nicht floating Umgebungen)
 
 \usepackage[%							% Todos
-	colorinlistoftodos,					% farbige Markierungen in Todo-Liste
-	prependcaption,						% caption=val
-	textsize=tiny,						% Schriftgröße
-	linecolor=red,						% Standard-Linienfarbe für \todo
-	backgroundcolor=red!25,				% Standard-Hintergrundfarbe für \todo
-	bordercolor=red,					% Standard-Rahmenfarbe für \todo
-	textwidth=2cm,						% Standard-Breite für \todo
+    colorinlistoftodos,					% farbige Markierungen in Todo-Liste
+    prependcaption,						% caption=val
+    textsize=tiny,						% Schriftgröße
+    linecolor=red,						% Standard-Linienfarbe für \todo
+    backgroundcolor=red!25,				% Standard-Hintergrundfarbe für \todo
+    bordercolor=red,					% Standard-Rahmenfarbe für \todo
+    textwidth=2cm,						% Standard-Breite für \todo
 ]{todonotes}							% Todos
 \ifbool{settingsWithTodos}{%
-	\setlength{\marginparwidth}{2cm}	% sonst werden Notes am Rand nicht richtig angezeigt
-	\NewDocumentCommand{\todoaddref}{O{} m}{%
-		\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}%
-	}
-	\NewDocumentCommand{\todouncertain}{O{} m}{%
-		\todo[linecolor=green,backgroundcolor=green!25,bordercolor=green,#1]{#2}%
-	}
-	\NewDocumentCommand{\todooptional}{O{} m}{%
-		\todo[linecolor=cyan,backgroundcolor=cyan!25,bordercolor=cyan,#1]{#2}%
-	}
-	\pretocmd{\mainmatter}{\listoftodos[\todoname]{\markboth{\MakeUppercase{\todoname}}{\MakeUppercase{\todoname}}}}{}{}
+    \setlength{\marginparwidth}{2cm}	% sonst werden Notes am Rand nicht richtig angezeigt
+    \NewDocumentCommand{\todoaddref}{O{} m}{%
+        \todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}%
+    }
+    \NewDocumentCommand{\todouncertain}{O{} m}{%
+        \todo[linecolor=green,backgroundcolor=green!25,bordercolor=green,#1]{#2}%
+    }
+    \NewDocumentCommand{\todooptional}{O{} m}{%
+        \todo[linecolor=cyan,backgroundcolor=cyan!25,bordercolor=cyan,#1]{#2}%
+    }
+    \pretocmd{\mainmatter}{\listoftodos[\todoname]{\markboth{\MakeUppercase{\todoname}}{\MakeUppercase{\todoname}}}}{}{}
 }{
-	\presetkeys{todonotes}{disable}{}	% disable \todo
-	\NewDocumentCommand{\todoaddref}{O{} m}{}
-	\NewDocumentCommand{\todouncertain}{O{} m}{}
-	\NewDocumentCommand{\todooptional}{O{} m}{}
+    \presetkeys{todonotes}{disable}{}	% disable \todo
+    \NewDocumentCommand{\todoaddref}{O{} m}{}
+    \NewDocumentCommand{\todouncertain}{O{} m}{}
+    \NewDocumentCommand{\todooptional}{O{} m}{}
 }
 
 \usepackage[switch*,pagewise]{lineno}	% Zeilennummern
 \ifbool{settingsWithLineNumbers}{%
-	\renewcommand\linenumberfont{\textbf\sffamily\color{black!50}\footnotesize}
-	\apptocmd{\mainmatter}{\linenumbers}{}{}
-	\pretocmd{\backmatter}{\nolinenumbers}{}{}
+    \renewcommand\linenumberfont{\textbf\sffamily\color{black!50}\footnotesize}
+    \apptocmd{\mainmatter}{\linenumbers}{}{}
+    \pretocmd{\backmatter}{\nolinenumbers}{}{}
 }{}
 
 \usepackage{placeins}					% FloatBarriers
@@ -195,13 +196,13 @@
 \renewcommand{\sectionmark}[1]{\markright{\uppercase{\thesection~~#1}}}
 \renewcommand{\chaptermark}[1]{\markboth{\uppercase{\chaptername\ \thechapter~~#1}}{}}
 \fancypagestyle{plain}{%
-	\fancyhead[ER]{\itshape\leftmark}%
-	\fancyhead[OL]{\itshape\rightmark}%
-	\fancyhead[EL,OR]{\thepage}%
-	\fancyfoot[EL,OL]{}%
-	\fancyfoot[EC,OC]{}%
-	\renewcommand{\headrulewidth}{0.4pt}%
-	\renewcommand{\footrulewidth}{0.4pt}%
+    \fancyhead[ER]{\itshape\leftmark}%
+    \fancyhead[OL]{\itshape\rightmark}%
+    \fancyhead[EL,OR]{\thepage}%
+    \fancyfoot[EL,OL]{}%
+    \fancyfoot[EC,OC]{}%
+    \renewcommand{\headrulewidth}{0.4pt}%
+    \renewcommand{\footrulewidth}{0.4pt}%
 }
 
 
@@ -214,10 +215,10 @@
 
 % === Angabe von Einheiten ====================================================
 \ifdefstring{\settingsLanguage}{german}{%
-	\sisetup{locale=DE}		% deutsche Lokalisierung (konvertiert 1.00 automatisch zu 1,00)
+    \sisetup{locale=DE}		% deutsche Lokalisierung (konvertiert 1.00 automatisch zu 1,00)
 }%
 {%
-	\sisetup{locale=US}		% englische Lokalisierung (konvertiert 1,00 automatisch zu 1.00)
+    \sisetup{locale=US}		% englische Lokalisierung (konvertiert 1,00 automatisch zu 1.00)
 }%
 
 
@@ -234,16 +235,16 @@
 
 % === Manuelle Definition von Worttrennungen ==================================
 \hyphenation{
-	Convolutional
-	Neural
-	Net-work
-	Net-works
-	Ko-ef-fi-zi-ent
-	Ko-ef-fi-zi-ent-en
-	Drop-out
-	pixel-genaue
-	Patch
-	Patch-größen
+    Convolutional
+    Neural
+    Net-work
+    Net-works
+    Ko-ef-fi-zi-ent
+    Ko-ef-fi-zi-ent-en
+    Drop-out
+    pixel-genaue
+    Patch
+    Patch-größen
 }
 
 
@@ -251,48 +252,48 @@
 % Import nicht oben, weil \parindent zuvor gesetzt werden muss!
 % siehe: https://ctan.org/pkg/algorithm2e?lang=de
 \ifdefstring{\settingsLanguage}{german}{%
-	\usepackage[%						% Pseudocode
-		linesnumbered,					% mit Zeilennummern
-		noend,							% Ende von Befehlen, wie etwa While, unterdrücken
-		ruled,							% Layout
-		german,							% deutsche Bezeichnung und deutsches Verzeichnis
-		%onelanguage,					% Keywords übersetzen
-		algochapter						% Nummerierung analog zu Abbildungen
-	]{algorithm2e}						% Pseudocode
+    \usepackage[%						% Pseudocode
+        linesnumbered,					% mit Zeilennummern
+        noend,							% Ende von Befehlen, wie etwa While, unterdrücken
+        ruled,							% Layout
+        german,							% deutsche Bezeichnung und deutsches Verzeichnis
+        %onelanguage,					% Keywords übersetzen
+        algochapter						% Nummerierung analog zu Abbildungen
+    ]{algorithm2e}						% Pseudocode
 }{%
-	\usepackage[%						% Pseudocode
-		linesnumbered,					% mit Zeilennummern
-		noend,							% Ende von Befehlen, wie etwa While, unterdrücken
-		ruled,							% Layout
-		algochapter						% Nummerierung analog zu Abbildungen
-	]{algorithm2e}						% Pseudocode
+    \usepackage[%						% Pseudocode
+        linesnumbered,					% mit Zeilennummern
+        noend,							% Ende von Befehlen, wie etwa While, unterdrücken
+        ruled,							% Layout
+        algochapter						% Nummerierung analog zu Abbildungen
+    ]{algorithm2e}						% Pseudocode
 }%
 
 \newenvironment{NIalgorithm}{%
-	% Algorithmus um 1.5em einrücken, damit Zeilennummern nicht im Rand sind
-	\setlength{\algomargin}{1.5em}%
-	% Padding oben und unten für Caption
-	\setlength{\interspacetitleruled}{\smallskipamount}%
-	% Padding oben und unten für Algorithmus
-	\SetAlgoInsideSkip{smallskip}%
-	% Kommentarstyle ändern
-	\newcommand\NIcommentstyle[1]{\ttfamily\textcolor{black!60}{##1}}
-	\SetCommentSty{NIcommentstyle}%
-	% zweiten Teil in NIcaption unterdrücken (falls NIcaption genutzt wird)
-	\renewcommand{\NIcaption}[2]{\caption[##1]{##1}}%
-	\begin{algorithm}%
-		% Zeilenabstand minimal vergrößern
-		\setstretch{1.1}%
-		% kleine Schrift
-		\small%
-		% Semikolon unterdrücken
-		\DontPrintSemicolon%
-		% korrekt ausgerichtete mehrzeilige Input- bzw. Outputdefinitionen mittels \Input und \Output
-		\SetKwInOut{Input}{Input}%
-		\SetKwInOut{Output}{Output}%
-		% Abschnitt für In- und Outputs zurückrücken
-		\pretocmd{\Input}{\Indentp{-1.5em}}{}{}%
-		\apptocmd{\Output}{\Indentp{1.5em}}{}{}%
-		}{%
-	\end{algorithm}%
+    % Algorithmus um 1.5em einrücken, damit Zeilennummern nicht im Rand sind
+    \setlength{\algomargin}{1.5em}%
+    % Padding oben und unten für Caption
+    \setlength{\interspacetitleruled}{\smallskipamount}%
+    % Padding oben und unten für Algorithmus
+    \SetAlgoInsideSkip{smallskip}%
+    % Kommentarstyle ändern
+    \newcommand\NIcommentstyle[1]{\ttfamily\textcolor{black!60}{##1}}
+    \SetCommentSty{NIcommentstyle}%
+    % zweiten Teil in NIcaption unterdrücken (falls NIcaption genutzt wird)
+    \renewcommand{\NIcaption}[2]{\caption[##1]{##1}}%
+    \begin{algorithm}%
+        % Zeilenabstand minimal vergrößern
+        \setstretch{1.1}%
+        % kleine Schrift
+        \small%
+        % Semikolon unterdrücken
+        \DontPrintSemicolon%
+        % korrekt ausgerichtete mehrzeilige Input- bzw. Outputdefinitionen mittels \Input und \Output
+        \SetKwInOut{Input}{Input}%
+        \SetKwInOut{Output}{Output}%
+        % Abschnitt für In- und Outputs zurückrücken
+        \pretocmd{\Input}{\Indentp{-1.5em}}{}{}%
+        \apptocmd{\Output}{\Indentp{1.5em}}{}{}%
+        }{%
+    \end{algorithm}%
 }
