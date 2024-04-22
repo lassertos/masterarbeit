@@ -1,0 +1,101 @@
+import { Database } from ".";
+import { AvailableKeyword, keywords } from "../keywords";
+import { Query, QueryOptions, buildQuery } from "../query";
+
+const queryOptions = {
+  operators: {
+    and: " AND ",
+    field: "=",
+    or: " OR ",
+  },
+  prefixes: {
+    and: "(",
+    field: "",
+    or: "(",
+    word: '"',
+  },
+  postfixes: {
+    and: ")",
+    field: "",
+    or: ")",
+    word: '"',
+  },
+};
+
+export const webOfScienceDatabase: Database = {
+  name: "Web of Science",
+  possibleFields: [
+    { name: "Topic", queryString: "TS" },
+    { name: "Title", queryString: "TI" },
+    { name: "Author", queryString: "AU" },
+    { name: "Author Identifiers", queryString: "AI" },
+    { name: "Group Author", queryString: "GP" },
+    { name: "Editor", queryString: "ED" },
+    { name: "Abstract", queryString: "AB" },
+    { name: "Author Keywords", queryString: "AK" },
+    { name: "Keyword Plus ®", queryString: "KP" },
+    { name: "Publication / Source Titles", queryString: "SO" },
+    { name: "DOI", queryString: "DO" },
+    { name: "Publication Date", queryString: "DOP" },
+    { name: "Year Published", queryString: "PY" },
+    { name: "Address", queryString: "AD" },
+    { name: "Research Area", queryString: "SU" },
+    { name: "ISSN/ISBN", queryString: "IS" },
+    { name: "PubMed ID", queryString: "PMID" },
+  ],
+  buildQuery: (keywords, fields) =>
+    buildQuery(buildQueryTemplate(keywords, fields, queryOptions)),
+};
+
+export function buildQueryTemplate(
+  searchterms: AvailableKeyword[],
+  fields: string[],
+  options: QueryOptions
+): Query {
+  return {
+    type: "or",
+    operator: options.operators.or,
+    prefix: options.prefixes.or,
+    postfix: options.postfixes.or,
+    queries: fields.map((field) => {
+      return {
+        type: "field",
+        field,
+        operator: options.operators.field,
+        prefix: options.prefixes.field,
+        postfix: options.postfixes.field,
+        query: {
+          type: "and",
+          operator: options.operators.and,
+          prefix: options.prefixes.and,
+          postfix: options.postfixes.and,
+          queries: searchterms.map((searchterm) => {
+            return {
+              type: "or",
+              operator: options.operators.or,
+              prefix: options.prefixes.or,
+              postfix: options.postfixes.or,
+              queries: [keywords[searchterm], ...keywords[searchterm].synonyms]
+                .flatMap((synonym) => {
+                  const words = [];
+
+                  if (synonym.singular) words.push(synonym.singular);
+                  if (synonym.plural) words.push(synonym.plural);
+
+                  return words;
+                })
+                .map((word) => {
+                  return {
+                    type: "word",
+                    prefix: options.prefixes.word,
+                    postfix: options.postfixes.word,
+                    word: word,
+                  };
+                }),
+            };
+          }),
+        },
+      };
+    }),
+  };
+}
