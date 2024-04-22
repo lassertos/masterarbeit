@@ -29,7 +29,7 @@ function selectFields() {
       name: "fields",
       message: "Choose the fields to search",
       choices: chosenDatabase.possibleFields,
-      pageSize: chosenDatabase.possibleFields.length,
+      loop: false,
     })
     .then((answer: { fields: string[] }) => {
       chosenFields = answer.fields.map(
@@ -49,6 +49,7 @@ function selectKeywords() {
       name: "keywords",
       message: "Choose the keywords to search",
       choices: Object.keys(keywords),
+      loop: false,
     })
     .then((answer: { keywords: AvailableKeyword[] }) => {
       chosenKeywords = answer.keywords;

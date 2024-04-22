@@ -3,15 +3,15 @@ import { Keyword } from ".";
 export const educationKeyword: Keyword = {
   singular: "education",
   synonyms: [
-    {
-      plural: "studies",
-    },
-    {
-      singular: "training",
-    },
-    {
-      singular: "schooling",
-    },
+    // {
+    //   plural: "studies",
+    // },
+    // {
+    //   singular: "training",
+    // },
+    // {
+    //   singular: "schooling",
+    // },
     {
       singular: "university",
       plural: "universities",
