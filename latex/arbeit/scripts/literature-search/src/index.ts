@@ -1,64 +1,15 @@
-import { AvailableDatabase, databases } from "./databases";
-import inquirer from "inquirer";
-import { AvailableKeyword, keywords } from "./keywords";
+import { selectDatabase } from "./actions/select-database";
+import { selectFields } from "./actions/select-fields";
+import { selectKeywords } from "./actions/select-keywords";
 
 console.clear();
 
-let chosenDatabase: (typeof databases)[AvailableDatabase];
-let chosenFields: string[];
-let chosenKeywords: AvailableKeyword[];
-
-function selectDatabase() {
-  inquirer
-    .prompt({
-      type: "list",
-      name: "database",
-      message: "Choose a database",
-      choices: Object.keys(databases),
-    })
-    .then((answer: { database: AvailableDatabase }) => {
-      chosenDatabase = databases[answer.database];
-      selectFields();
-    });
+async function main() {
+  const database = await selectDatabase();
+  const fields = await selectFields(database);
+  const keywords = await selectKeywords();
+  const query = database.buildQuery(keywords, fields);
+  console.log(query);
 }
 
-function selectFields() {
-  inquirer
-    .prompt({
-      type: "checkbox",
-      name: "fields",
-      message: "Choose the fields to search",
-      choices: chosenDatabase.possibleFields,
-      loop: false,
-    })
-    .then((answer: { fields: string[] }) => {
-      chosenFields = answer.fields.map(
-        (field) =>
-          chosenDatabase.possibleFields.find(
-            (possibleField) => possibleField.name === field
-          )!.queryString
-      );
-      selectKeywords();
-    });
-}
-
-function selectKeywords() {
-  inquirer
-    .prompt({
-      type: "checkbox",
-      name: "keywords",
-      message: "Choose the keywords to search",
-      choices: Object.keys(keywords),
-      loop: false,
-    })
-    .then((answer: { keywords: AvailableKeyword[] }) => {
-      chosenKeywords = answer.keywords;
-      const query = chosenDatabase.buildQuery(
-        chosenKeywords,
-        chosenFields as any
-      );
-      console.log(query);
-    });
-}
-
-selectDatabase();
+main();
