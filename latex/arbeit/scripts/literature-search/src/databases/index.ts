@@ -1,4 +1,4 @@
-import { AvailableKeyword } from "../keywords";
+import { Keyword } from "../keywords";
 import { acmDatabase } from "./acm";
 import { ieeeDatabase } from "./ieee";
 import { scopusDatabase } from "./scopus";
@@ -8,7 +8,7 @@ import { zbMathDatabase } from "./zbmath";
 export type Database = {
   name: string;
   possibleFields: { name: string; queryString: string }[];
-  buildQuery: (keywords: AvailableKeyword[], fields: string[]) => string;
+  buildQuery: (keywords: Keyword[], fields: string[]) => string;
 };
 
 export const databases = {

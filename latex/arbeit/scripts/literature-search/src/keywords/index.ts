@@ -1,9 +1,12 @@
-import { advantageKeyword } from "./advantage";
-import { disadvantageKeyword } from "./disadvantage";
-import { educationKeyword } from "./education";
-import { integratedDevelopmentEnvironmentKeyword } from "./integrated-development-environment";
-import { problemKeyword } from "./problem";
-import { requirementKeyword } from "./requirement";
+import { advantageKeyword, vorteilKeyword } from "./advantage";
+import { disadvantageKeyword, nachteilKeyword } from "./disadvantage";
+import { educationKeyword, lehreKeyword } from "./education";
+import {
+  integratedDevelopmentEnvironmentKeyword,
+  integrierteEntwicklungsumgebungKeyword,
+} from "./integrated-development-environment";
+import { problemKeyword, problemKeywordGER } from "./problem";
+import { anforderungKeyword, requirementKeyword } from "./requirement";
 
 export type Synonym =
   | {
@@ -19,13 +22,17 @@ export type Keyword = Synonym & {
   synonyms: Synonym[];
 };
 
-export const keywords = {
-  advantage: advantageKeyword,
-  disadvantage: disadvantageKeyword,
-  education: educationKeyword,
-  "integrated-development-environment": integratedDevelopmentEnvironmentKeyword,
-  problem: problemKeyword,
-  requirement: requirementKeyword,
-};
-
-export type AvailableKeyword = keyof typeof keywords;
+export const keywords = [
+  integratedDevelopmentEnvironmentKeyword,
+  educationKeyword,
+  problemKeyword,
+  advantageKeyword,
+  disadvantageKeyword,
+  requirementKeyword,
+  integrierteEntwicklungsumgebungKeyword,
+  lehreKeyword,
+  problemKeywordGER,
+  vorteilKeyword,
+  nachteilKeyword,
+  anforderungKeyword,
+];

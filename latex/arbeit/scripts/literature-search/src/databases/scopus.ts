@@ -1,5 +1,5 @@
 import { Database } from ".";
-import { AvailableKeyword, keywords } from "../keywords";
+import { Keyword } from "../keywords";
 import { Query, QueryOptions, buildQuery } from "../query";
 
 const queryOptions = {
@@ -43,7 +43,7 @@ export const scopusDatabase: Database = {
 };
 
 export function buildQueryTemplate(
-  searchterms: AvailableKeyword[],
+  keywords: Keyword[],
   fields: string[],
   options: QueryOptions
 ): Query {
@@ -64,13 +64,13 @@ export function buildQueryTemplate(
           operator: options.operators.and,
           prefix: options.prefixes.and,
           postfix: options.postfixes.and,
-          queries: searchterms.map((searchterm) => {
+          queries: keywords.map((keyword) => {
             return {
               type: "or",
               operator: options.operators.or,
               prefix: options.prefixes.or,
               postfix: options.postfixes.or,
-              queries: [keywords[searchterm], ...keywords[searchterm].synonyms]
+              queries: [keyword, ...keyword.synonyms]
                 .flatMap((synonym) => {
                   const words = [];
 

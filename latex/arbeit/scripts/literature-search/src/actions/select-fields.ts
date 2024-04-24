@@ -8,7 +8,7 @@ export async function selectFields(database: Database): Promise<string[]> {
       name: "fields",
       message: "Choose the fields to search",
       choices: database.possibleFields,
-      pageSize: database.possibleFields.length,
+      loop: false,
     })
     .then((answer: { fields: string[] }) => {
       return answer.fields.map(

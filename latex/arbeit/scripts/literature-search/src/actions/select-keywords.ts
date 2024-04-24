@@ -1,15 +1,28 @@
 import inquirer from "inquirer";
-import { AvailableKeyword, keywords } from "../keywords";
+import { Keyword, keywords } from "../keywords";
 
-export async function selectKeywords(): Promise<AvailableKeyword[]> {
+export async function selectKeywords(): Promise<Keyword[]> {
   return inquirer
     .prompt({
       type: "checkbox",
       name: "keywords",
       message: "Choose the keywords to search",
-      choices: Object.keys(keywords),
+      choices: keywords.map((keyword) => {
+        return {
+          name:
+            (keyword.singular ?? keyword.plural) +
+            (keyword.synonyms.length > 0
+              ? ` (${keyword.synonyms
+                  .map((synonym) => synonym.singular ?? synonym.plural)
+                  .join(", ")})`
+              : ""),
+          short: keyword.singular ?? keyword.plural,
+          value: keyword,
+        };
+      }),
+      loop: false,
     })
-    .then((answer: { keywords: AvailableKeyword[] }) => {
+    .then((answer: { keywords: Keyword[] }) => {
       return answer.keywords;
     });
 }
