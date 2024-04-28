@@ -1,24 +1,24 @@
 import { Keyword } from ".";
 
 export const disadvantageKeywords: Keyword[] = [
-  {
-    singular: "Nachteil",
-    plural: "Nachteile",
-    synonyms: [
-      {
-        singular: "negativer Aspekt",
-        plural: "negative Aspekte",
-      },
-      {
-        singular: "Kehrseite",
-        plural: "Kehrseiten",
-      },
-      {
-        singular: "Schwäche",
-        plural: "Schwächen",
-      },
-    ],
-  },
+  // {
+  //   singular: "Nachteil",
+  //   plural: "Nachteile",
+  //   synonyms: [
+  //     {
+  //       singular: "negativer Aspekt",
+  //       plural: "negative Aspekte",
+  //     },
+  //     {
+  //       singular: "Kehrseite",
+  //       plural: "Kehrseiten",
+  //     },
+  //     {
+  //       singular: "Schwäche",
+  //       plural: "Schwächen",
+  //     },
+  //   ],
+  // },
   {
     singular: "disadvantage",
     plural: "disadvantages",

@@ -1,36 +1,40 @@
 import { Keyword } from ".";
 
 export const integratedDevelopmentEnvironmentKeywords: Keyword[] = [
-  {
-    singular: "integrierte Entwicklungsumgebung",
-    plural: "integrierte Entwicklungsumgebungen",
-    synonyms: [
-      {
-        singular: "Code Editor",
-        plural: "Code Editoren",
-      },
-      {
-        singular: "Entwicklungsumgebung",
-        plural: "Entwicklungsumgebungen",
-      },
-      {
-        singular: "Entwicklungswerkzeug",
-        plural: "Entwicklungswerkzeuge",
-      },
-      {
-        singular: "Programmierwerkzeug",
-        plural: "Programmierwerkzeuge",
-      },
-      {
-        singular: "Programmierumgebung",
-        plural: "Programmierumgebungen",
-      },
-    ],
-  },
+  // {
+  //   singular: "integrierte Entwicklungsumgebung",
+  //   plural: "integrierte Entwicklungsumgebungen",
+  //   synonyms: [
+  //     {
+  //       singular: "Code Editor",
+  //       plural: "Code Editoren",
+  //     },
+  //     {
+  //       singular: "Entwicklungsumgebung",
+  //       plural: "Entwicklungsumgebungen",
+  //     },
+  //     {
+  //       singular: "Entwicklungswerkzeug",
+  //       plural: "Entwicklungswerkzeuge",
+  //     },
+  //     {
+  //       singular: "Programmierwerkzeug",
+  //       plural: "Programmierwerkzeuge",
+  //     },
+  //     {
+  //       singular: "Programmierumgebung",
+  //       plural: "Programmierumgebungen",
+  //     },
+  //   ],
+  // },
   {
     singular: "integrated development environment",
     plural: "integrated development environments",
     synonyms: [
+      {
+        singular: "IDE",
+        plural: "IDEs",
+      },
       {
         singular: "code editor",
         plural: "code editors",

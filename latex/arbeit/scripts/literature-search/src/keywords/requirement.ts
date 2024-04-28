@@ -1,24 +1,24 @@
 import { Keyword } from ".";
 
 export const requirementKeywords: Keyword[] = [
-  {
-    singular: "Anforderung",
-    plural: "Anforderungen",
-    synonyms: [
-      {
-        singular: "Erwartung",
-        plural: "Erwartungen",
-      },
-      {
-        singular: "Ziel",
-        plural: "Ziele",
-      },
-      {
-        singular: "Rahmenbedingung",
-        plural: "Rahmenbedingungen",
-      },
-    ],
-  },
+  // {
+  //   singular: "Anforderung",
+  //   plural: "Anforderungen",
+  //   synonyms: [
+  //     {
+  //       singular: "Erwartung",
+  //       plural: "Erwartungen",
+  //     },
+  //     {
+  //       singular: "Ziel",
+  //       plural: "Ziele",
+  //     },
+  //     {
+  //       singular: "Rahmenbedingung",
+  //       plural: "Rahmenbedingungen",
+  //     },
+  //   ],
+  // },
   {
     singular: "requirement",
     plural: "requirements",

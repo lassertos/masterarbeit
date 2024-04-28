@@ -1,5 +1,3 @@
-import { AvailableKeyword, keywords } from "./keywords";
-
 type WordQuery = {
   type: "word";
   prefix: string;

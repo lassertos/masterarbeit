@@ -1,23 +1,23 @@
 import { Keyword } from ".";
 
 export const advantageKeywords: Keyword[] = [
-  {
-    singular: "Vorteil",
-    plural: "Vorteile",
-    synonyms: [
-      {
-        singular: "Nutzen",
-      },
-      {
-        singular: "positiver Aspekt",
-        plural: "positive Aspekte",
-      },
-      {
-        singular: "Stärke",
-        plural: "Stärken",
-      },
-    ],
-  },
+  // {
+  //   singular: "Vorteil",
+  //   plural: "Vorteile",
+  //   synonyms: [
+  //     {
+  //       singular: "Nutzen",
+  //     },
+  //     {
+  //       singular: "positiver Aspekt",
+  //       plural: "positive Aspekte",
+  //     },
+  //     {
+  //       singular: "Stärke",
+  //       plural: "Stärken",
+  //     },
+  //   ],
+  // },
   {
     singular: "advantage",
     plural: "advantages",

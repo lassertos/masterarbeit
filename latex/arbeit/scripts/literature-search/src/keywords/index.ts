@@ -4,6 +4,7 @@ import { educationKeywords } from "./education";
 import { integratedDevelopmentEnvironmentKeywords } from "./integrated-development-environment";
 import { problemKeywords } from "./problem";
 import { requirementKeywords } from "./requirement";
+import { webKeywords } from "./web";
 
 export type Synonym =
   | {
@@ -26,4 +27,5 @@ export const keywords = [
   ...integratedDevelopmentEnvironmentKeywords,
   ...problemKeywords,
   ...requirementKeywords,
+  ...webKeywords,
 ];

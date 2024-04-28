@@ -1,33 +1,33 @@
 import { Keyword } from ".";
 
 export const educationKeywords: Keyword[] = [
-  {
-    singular: "Lehre",
-    synonyms: [
-      {
-        singular: "Ausbildung",
-      },
-      {
-        singular: "Studium",
-      },
-      {
-        singular: "Fortbildung",
-        plural: "Fortbildungen",
-      },
-      {
-        singular: "Weiterbildung",
-        plural: "Weiterbildungen",
-      },
-      {
-        singular: "Universität",
-        plural: "Universitäten",
-      },
-      {
-        singular: "Hochschule",
-        plural: "Hochschulen",
-      },
-    ],
-  },
+  // {
+  //   singular: "Lehre",
+  //   synonyms: [
+  //     {
+  //       singular: "Ausbildung",
+  //     },
+  //     {
+  //       singular: "Studium",
+  //     },
+  //     {
+  //       singular: "Fortbildung",
+  //       plural: "Fortbildungen",
+  //     },
+  //     {
+  //       singular: "Weiterbildung",
+  //       plural: "Weiterbildungen",
+  //     },
+  //     {
+  //       singular: "Universität",
+  //       plural: "Universitäten",
+  //     },
+  //     {
+  //       singular: "Hochschule",
+  //       plural: "Hochschulen",
+  //     },
+  //   ],
+  // },
   {
     singular: "education",
     synonyms: [
