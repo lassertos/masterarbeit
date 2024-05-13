@@ -747,3 +747,293 @@ Notes:
 - allows interaction via chat and forum
 - allows compilation using gcc on server
 - allows execution of programs on server
+
+## An interactive Web-based IDE towards teaching and learning in programming courses
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6654478
+
+Notes:
+
+- describes the development of ideol in more detail
+- client server architecture
+- real time and interactive editor, changes are instantly visible to all team members
+- real time discussion board with tagging mechanism
+- summarization of changes in a project
+- a debugger for c/c++ console programs (gdb)
+- build automation using gnu c/c++ compilers version 4.4.7 
+- interactive execution tool for console applications
+- another evaluation of ideol is given answering the following research questions:
+  - does ideol help students to manage their groups better?
+  - does ideol enhance the interaction among members in a group?
+
+## Distributed Integrated Development Environment for Mobile Platforms
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6553932
+
+Notes:
+
+- client server architecture, one central server and multiple compilation servers
+- text editor with syntax highlighting
+- simple performance evaluation is given (20 concurrent compilation requests)
+- user interface for android devices
+
+## CEclipse: A services composition based online IDE
+
+Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84880011682&partnerID=40&md5=68a75c322726092624a7f5a6b0f406b7
+
+Notes:
+
+- paper seems to be in chinese
+- not really helpful
+
+## Browser based IDE to code in the cloud
+
+Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84872508995&doi=10.1007%2f978-3-642-35461-8_6&partnerID=40&md5=b04dbf30badaf4f655966d11e35ee84e
+
+Notes:
+
+- springer link: not available for tu ilmenau
+
+## Software development environments on the web: A research agenda
+
+Link: https://doi.org/10.1145/2384592.2384603
+
+Notes:
+
+- gives a general overview over ides and their web-based counterparts
+- describes the weblab application, a web-based development environment for scala (in education)
+- uses ace editor
+- client server architecture
+- could be an article worth reading completely
+
+## Elements for a cloud-based development environment: Online collaboration, revision control, and continuous integration
+
+Link: https://doi.org/10.1145/2361999.2362003
+
+Notes:
+
+- description of the proof-of-concept system cored, a collaborative development environment for java
+- real time code editing and social media inspired communication
+- uses the ace editor
+- client server architecture
+- facebook integration
+- uses neil fraser's differential synchronization algorithm for collaboration
+
+## CoRED: Browser-based collaborative real-time editor for java web applications
+
+Link: https://doi.org/10.1145/2145204.2145399
+
+Notes:
+
+- another paper describing the implementation and architecture of cored
+
+## MiDebug: Microcontroller integrated development and debugging environment
+
+Link: https://doi.org/10.1145/2185677.2185714
+
+Notes:
+
+- web-based development environment for programming microcontrollers
+- also allows debugging of microcontrollers
+- client server architecture
+- uses codemirror
+- midebug can access usb hardware directly using jtag and openocd
+
+## Evaluation of a Web-Based Programming Environment
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6354897
+
+Notes:
+
+- describes a web based collaborative development environment called WSDE
+- client server architecture
+- four ways of collaborating described (CDCE,CDSE,SDCE,SDSE)
+- implemented as a java servlet
+- a simple performance evaluation of the system is given
+- does not really seem collaborative in the sense of real-time concurrent file editing
+
+## Program Behavior Analysis and Control for Online IDE
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6341572
+
+Notes:
+
+- this paper focuses on three problems of online ides:
+  - wrong file operations: users may delete system files if allowed
+  - banned method calling: users may execute malicious code if allowed
+  - excessive resource consumption: one user may cause other users to have a worse experience by consuming an excessive amount of resources
+- the first two problems seem irrelevant for the intended use-case of the ide but could be interesting in a container based development environment
+- implemented ceclipse (client server architecture) which includes a program analysis part for the three problems mentioned above
+
+## Web-Based Robot Programming Environment and Control Architecture
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6363314
+
+Notes:
+
+- describes a system where the development environment is hosted on a smartphone
+- used to interface with different robots (e.g. Lego Mindstorms)
+
+## Demo abstract: MiDebug: Microcontroller integrated development and debugging environment
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6920932
+
+Notes:
+
+- duplicate not caught by title filtering
+
+## Components of a Wiki-based software development environment
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6414952
+
+Notes:
+
+- client srever architecture
+- only architecture is described
+- it is shown how already existing components fit into the architecture
+
+## WeScheme: The browser is your programming environment
+
+Link: https://doi.org/10.1145/1999747.1999795
+
+Notes:
+
+- lists a few benefits of web-based programming environments
+- presents wescheme, a web-based programming environment for the scheme and racket programming languages
+- offers syntax-highlighting (CodeMirror), an interactive tool to run programs on-the-fly and a hub for sharing programs
+- client server architecture
+- an evaluation of the system is given
+
+## Java WIDE - java wiki integrated development environment: Nifty tools and assignments
+
+Link: https://dl.acm.org/doi/pdf/10.5555/2379703.2379730
+
+Notes:
+
+- no real description of JavaWIDE, seems more like an advertisement
+
+## Real-time collaborative coding in a web IDE
+
+Link: https://doi.org/10.1145/2047196.2047215
+
+Notes:
+
+- this paper describes the web-based collaborative integrated development environment collabode
+- uses operational transform to enable collaborative editing
+- collaborative editing powered by etherpad
+- client server architecture
+- uses eclipse in the backend
+- an evaluation of the system is given
+
+## CEclipse: An Online IDE for Programing in the Cloud
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6012686
+
+Notes:
+
+- 
+
+## Web-based networked software development environment for programming
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=5974935
+
+Notes:
+
+- 
+
+## Supporting introductory test-driven labs with WebIDE
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=5876137
+
+Notes:
+
+- 
+
+## The learning and productivity benefits to student programmers from real-world development environments
+
+Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84865620372&partnerID=40&md5=866f53f594aaf566cfa4f1ce1ce79fc9
+
+Notes:
+
+- 
+
+## Adinda: A knowledgeable, browser-based IDE
+
+Link: https://doi.org/10.1145/1810295.1810330
+
+Notes:
+
+- 
+
+## JavaWIDE: Innovation in an online IDE
+
+Link: 
+
+Notes:
+
+- abstract only 
+- not really helpful
+
+## JavaWIDE: Innovation in an online IDE: Tutorial presentation
+
+Link: 
+
+Notes:
+
+- duplicate not caught by title filtering
+
+## XYLUS: A virtualized programming environment
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=5625674
+
+Notes:
+
+- 
+
+## A programming environment consisting of web services
+
+Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84862296959&doi=10.2316%2fP.2010.725-027&partnerID=40&md5=6872a91a3393e04d024e6156e6a13369
+
+Notes:
+
+- 
+
+## A web-based programming environment for LEGO mindstorms robots
+
+Link: https://doi.org/10.1145/1167253.1167333
+
+Notes:
+
+- 
+
+## WIPE: A programming environment for novices
+
+Link: https://doi.org/10.1145/1067445.1067479
+
+Notes:
+
+- 
+
+## View/edit/compile/run Web-based programming environment
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=1408552
+
+Notes:
+
+- 
+
+## A web-based distributed programming environment
+
+Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84944029694&doi=10.1007%2f3-540-45492-6_24&partnerID=40&md5=c4267a5a85b9e5a27744799875f06b71
+
+Notes:
+
+- 
+
+## A critical analysis and evaluation of Web-based environments for program development
+
+Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-0034426139&doi=10.1016%2fS1096-7516%2801%2900038-0&partnerID=40&md5=f1c3951e6cfaa127ef40e50bb798cb1b
+
+Notes:
+
+- 
