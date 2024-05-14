@@ -931,7 +931,12 @@ Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6012686
 
 Notes:
 
-- 
+- another paper describing the architecture of ceclipse
+- another evaluation is given to answer the following research questions:
+  - which one is better between black-list strategy and white-list strategy? Whether our black-list strategy will affect the students' programming activities?
+  - In order to avoid the system resources being over consumed, what's the maximum run time should be set for the training online IDE?
+- supports compiling, running, debugging, code completion, etc. for java programs (uses eclipse in backend)
+- client server architecture
 
 ## Web-based networked software development environment for programming
 
@@ -939,7 +944,8 @@ Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=5974935
 
 Notes:
 
-- 
+- paper is in chinese
+- not really helpful
 
 ## Supporting introductory test-driven labs with WebIDE
 
@@ -947,15 +953,22 @@ Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=5876137
 
 Notes:
 
-- 
+- describes a webide built on google web toolkit (GWT)
+- lab specifications are written in a well-defined XML language
+- evaluators can be associated with lab steps to evaluate the students solution
+- used for test driven learning
+- not much more info about the ide
+- a pilot study and analysis is given
 
 ## The learning and productivity benefits to student programmers from real-world development environments
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84865620372&partnerID=40&md5=866f53f594aaf566cfa4f1ce1ce79fc9
+Link: https://files.eric.ed.gov/fulltext/EJ1136657.pdf
 
 Notes:
 
-- 
+- a study trying to find out if students benefit from using commercial ides instead of simple text editors for learning programming
+- the ideal combination seems to be an ide and a simple text editor 
 
 ## Adinda: A knowledgeable, browser-based IDE
 
@@ -963,7 +976,12 @@ Link: https://doi.org/10.1145/1810295.1810330
 
 Notes:
 
-- 
+- describes the system adinda
+- proposes restructuring of traditional ides into a set of cooperating services
+- adinda comprises a thin client connected to a range of different services
+- adinda based on an earlier prototype for a web-based ide called wwworkspace
+- client server architecture (eclipse on the server-side)
+- syntax-highlighting and compilation supported
 
 ## JavaWIDE: Innovation in an online IDE
 
@@ -988,7 +1006,10 @@ Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=5625674
 
 Notes:
 
-- 
+- client server architecture
+- user can compile and execute programs
+- uses vms for program execution (and rdp)
+- a simple evaluation of the system is given
 
 ## A programming environment consisting of web services
 
@@ -996,7 +1017,7 @@ Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84862296959&doi=10.231
 
 Notes:
 
-- 
+- full text seemingly not available for free
 
 ## A web-based programming environment for LEGO mindstorms robots
 
@@ -1004,7 +1025,9 @@ Link: https://doi.org/10.1145/1167253.1167333
 
 Notes:
 
-- 
+- short paper
+- client server architecture
+- allows compiliation and execution
 
 ## WIPE: A programming environment for novices
 
@@ -1012,7 +1035,9 @@ Link: https://doi.org/10.1145/1067445.1067479
 
 Notes:
 
-- 
+- client server architecture
+- allows compilation and execution of pascal like programs with custom pseudo assembly code running on vm
+- an evaluation of the system is given
 
 ## View/edit/compile/run Web-based programming environment
 
@@ -1020,7 +1045,9 @@ Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=1408552
 
 Notes:
 
-- 
+- the VECR system is described
+- client server architecture
+- focused on c and java programming
 
 ## A web-based distributed programming environment
 
@@ -1028,7 +1055,9 @@ Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84944029694&doi=10.100
 
 Notes:
 
-- 
+- client server architecture
+- compilation agents
+- allows compilation and execution of c/c++ programs
 
 ## A critical analysis and evaluation of Web-based environments for program development
 
@@ -1036,4 +1065,7 @@ Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-0034426139&doi=10.1016
 
 Notes:
 
-- 
+- extremely long paper
+- classification and review of different web-based interactive programming environments
+- not sure how useful since it was released in 2001
+- maybe classification categories are important
