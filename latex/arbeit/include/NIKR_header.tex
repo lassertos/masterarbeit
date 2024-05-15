@@ -51,21 +51,21 @@
 \ifdefstring{\settingsLanguage}{german}{%
     \usepackage[ngerman]{babel}			% Spracheinstellungen (für deutsch z.B. Contents -> Inhaltsverzeichnis, etc.)
     \usepackage{bibgerm}            	% Stylefile für deutsche Literaturstellenangabe
-    \bibliographystyle{gerapali}		% Stil für Literaturangaben festlegen
+    \bibliographystyle{unsrt}		    % Stil für Literaturangaben festlegen
 }%
 {%
     \usepackage[american]{babel}		% Spracheinstellungen (für deutsch z.B. Contents -> Inhaltsverzeichnis, etc.)
-    \bibliographystyle{apalike}			% Stil für Literaturangaben festlegen
+    \bibliographystyle{unsrt}			% Stil für Literaturangaben festlegen
     \frenchspacing						% einfaches Leerzeiches nach Satzende (für deutsch bereits Standard)
 }%
 \usepackage[%
-    noadjust							% noadjust verhindert automatische Leerzeichen um die Referenz, was am Zeilenanfang zu Problemen führt
+    noadjust        					% noadjust verhindert automatische Leerzeichen um die Referenz, was am Zeilenanfang zu Problemen führt
 ]{cite}     							% erlaubt Zeilenumbruch innerhalb von Zitierungen
 
 \usepackage{graphicx}					% erweiterte Argumente in \in­clude­graph­ics
 \graphicspath{{\settingsGraphicsPath}}	% Standard-Pfad für Bilder siehe NIKR_settings.tex
 
-\usepackage[bf]{caption}				% erlaubt erweiterte Formatierungen in \caption (siehe unten)
+\usepackage[bf, margin=0.75cm]{caption}				% erlaubt erweiterte Formatierungen in \caption (siehe unten)
 \usepackage{subcaption}					% mehrere Abbildungen nebeneinander
 
 \usepackage{amsmath}					% ermöglicht \DeclareMathOperator
@@ -181,7 +181,7 @@
 % === Bild- und Tabellenunterschrift ==========================================
 \renewcommand{\captionfont}{\small \setstretch{1.3}}
 \newcommand{\NIcaption}[2]{\caption[#1]{#1\protect\\ \emph{#2}}}
-\setcaptionmargin{0.75cm}
+% \setcaptionmargin{0.75cm}
 
 
 % === Abkürzungsverzeichnis ===================================================

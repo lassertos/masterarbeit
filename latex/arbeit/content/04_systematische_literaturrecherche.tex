@@ -21,9 +21,9 @@ Die folgenden Datenbanken wurden für die Literaturrecherche ausgewählt:
 
 Zunächst wurde eine allgemeine Suche nach online IDEs in den genannten Datenbanken vorgenommen. Dazu werden zunächst die in Tabelle \ref{table:search-terms} genannten Stichwörter jeweils mit ihren Synonymen mit einer OR-Operation verknüpft. Danach werden die daraus resultierenden Terme mit einer AND-Operation verbunden. Die so entstehende Suchanfrage werden dann für die Suche in den Datenbanken verwendet. Dabei werden die Titel, Abstracts und Keywords der Publikationen durchsucht.
 
-In Tabelle \ref{table:amount-search-results} ist die Anzahl der Hits für den einzelnen Datenbanken dargelegt. Um die Anzahl der zu betrachtenden Publikationen zu verringern wird eine weitere Filterung der Ergebnisse vorgenommen. Dafür werden nur Publikationen betrachtet, die IDE oder ein entsprechendes Synonym in ihrem Titel oder ihren Keywords enthalten. Dadurch sinkt die Anzahl der Hits auf insgesamt $1136$. Um eine handhabbare Anzahl an Publikationen zu erhalten werden in einem weiteren Schritt die Titel und Abstracts der Publikationen genauer betrachtet. Dabei werden unter anderem Arbeiten herausgefiltert, deren Titel und Abstracts keinen Bezug zu den Forschungsfragen besitzen. Weiterhin werden Publikationen bevorzugt, die sich zudem mit textbasierten Programmiersprachen, Kollaboration oder Lehre auf Universitätsniveau befassen. Aus dieser Filterung resultieren $110$ Publikationen zur weiteren Betrachtung.
+In Tabelle \ref{table:amount-search-results} ist die Anzahl der Hits für den einzelnen Datenbanken dargelegt. Um die Anzahl der zu betrachtenden Publikationen zu verringern wird eine weitere Filterung der Ergebnisse vorgenommen. Dafür werden nur Publikationen betrachtet, die IDE oder ein entsprechendes Synonym in ihrem Titel oder ihren Keywords enthalten. Dadurch sinkt die Anzahl der Hits auf insgesamt $1136$. Um eine handhabbare Anzahl an Publikationen zu erhalten werden in einem weiteren Schritt die Titel und Abstracts der Publikationen genauer betrachtet. Dabei werden unter anderem Arbeiten herausgefiltert, deren Titel und Abstracts keinen Bezug zu den Forschungsfragen besitzen. Weiterhin werden Publikationen bevorzugt, die sich zudem mit textbasierten Programmiersprachen, Kollaboration oder Lehre auf Universitätsniveau befassen. Aus dieser Filterung resultieren $86$ Publikationen zur weiteren Betrachtung.
 
-\begin{table}[]
+\begin{table}[tbp]
     \centering
     \begin{tabularx}{\textwidth}{| >{\hsize=.6\hsize\linewidth=\hsize}X |
             >{\hsize=1.4\hsize\linewidth=\hsize}X |}
@@ -40,7 +40,7 @@ In Tabelle \ref{table:amount-search-results} ist die Anzahl der Hits für den ei
 \end{table}
 
 
-\begin{table}[]
+\begin{table}[tbp]
     \centering
     \begin{tabular}{|c|c|c|c|c|c|}
         \hline
@@ -55,9 +55,68 @@ In Tabelle \ref{table:amount-search-results} ist die Anzahl der Hits für den ei
 
 \section{Ergebnisse}
 
+Die Publikationen beschreiben eine Vielzahl an verschiedenen webbasierten integrierten Entwicklungsumgebungen. Dabei kann eine grobe Unterteilung in die folgenden Kategorien erfolgen:
+
+\begin{itemize}
+    \item \textbf{Client-Server-basierte Lösungen} \hfill (Abschnitt \ref{client-server-based-approaches}) \\
+    Systeme dieser Art zeichnen sich dadurch aus, dass sie eine Client-Server-Archi-tektur verwenden, wobei alle Nutzer auf denselben Server zugreifen.
+    \item \textbf{Browser-basierte Lösungen} \hfill (Abschnitt \ref{browser-based-approaches}) \\
+    Systeme dieser Art zeichnen sich dadurch aus, dass alle Features im Browser ausgeführt werden können, ohne die Hilfe eines separaten Servers.
+    \item \textbf{Cloud-/Container-basierte Lösungen} \hfill (Abschnitt \ref{cloud-container-based-approaches}) \\
+    Systeme dieser Art zeichnen sich dadurch aus, dass sie Cloud-basierte Systeme nutzen oder ihren Nutzern eigene Container zur Ausführung serverseitiger Features bereitstellen.
+\end{itemize}
+
+Zusätzlich zu den oben genannten Kategorien sollen in Abschnitt \ref{collaborative-approaches} auch unterschiedliche kollaborative Ansätze betrachtet werden. Schließlich werden in Abschnitt \ref{challenges-online-ides} die Herausforderungen und in Abschnitt \ref{advantages-online-ides} die Vorteile von online IDEs betrachtet.
+
+\subsection{Client-Server-basierte Lösungen} \label{client-server-based-approaches}
+
+Als Beispiele für Client-Server-basierte Lösungen werden IDEOL \cite{IDEOL-2013}, Collabode \cite{Collabode-2011} und JaguarCode \cite{JaguarCode-2018} betrachtet.
+
+\begin{itemize}
+    \item IDEOL
+    \item collabode
+    \item JaguarCode
+\end{itemize}
+
+\subsection{Browser-basierte Lösungen} \label{browser-based-approaches}
+
+\begin{itemize}
+    \item PyodideU
+    \item WebLinux
+    \item LearnCS!
+\end{itemize}
+
+\subsection{Cloud-/Container-basierte Lösungen} \label{cloud-container-based-approaches}
+
 \begin{itemize}
     \item CS50
-    \item PyodideU
     \item RIDE
-    \item
+    \item MOCSIDE
 \end{itemize}
+
+\subsection{Kollaborative Lösungen} \label{collaborative-approaches}
+
+\begin{itemize}
+    \item ideol
+    \item collabode
+    \item RIDE
+    \item maybe one of the social media inspired systems
+\end{itemize}
+
+\subsection{Herausforderungen von online IDEs} \label{challenges-online-ides}
+
+\begin{itemize}
+    \item Verschiedene Angriffsvektoren
+    \item Skalierbarkeit
+    \item Realitätsnähe
+    \item Onlinezwang
+\end{itemize}
+
+\subsection{Vorteile von online IDEs} \label{advantages-online-ides}
+
+\begin{itemize}
+    \item Einfacher für Studierende
+    \item Gleiche Entwicklungsumgebung für alle
+    \item Ggf. einfacher für Lehrende
+\end{itemize}
+

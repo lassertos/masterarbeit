@@ -1,4 +1,4 @@
-## Providing students with standardized, cloud-based programming environments at term’s start (for free)
+<!-- ## Providing students with standardized, cloud-based programming environments at term’s start (for free)
 
 Link: https://doi.org/10.1145/3626253.3633427
 
@@ -6,7 +6,7 @@ Notes:
 
 - abstract only
 - github codespaces based solution
-- not really helpful
+- not really helpful -->
 
 ## PyodideU: Unlocking python entirely in a browser for CS1
 
@@ -14,7 +14,8 @@ Link: https://doi.org/10.1145/3626252.3630913
 
 Notes:
 
-- print
+- python development environment completely in the browser
+- uses webassembly based python environment pyodide
 
 ## Addressing misconceptions in introductory programming: Automated feedback in integrated development environments
 
@@ -25,23 +26,23 @@ Notes:
 - introduces a coding assistant
 - the assistant seems to be perceived as helpful
 
-## Cloud-based development environment: A case study of teaching a cross-platform mobile app course
+<!-- ## Cloud-based development environment: A case study of teaching a cross-platform mobile app course
 
 Link: https://doi.org/10.1145/3585059.3611429
 
 Notes:
 
 - workshop
-- not really helpful
+- not really helpful -->
 
-## Exploring gaze tracking &amp; code logging in IDEs as a passive way to ask for help in introduction to programming classes
+<!-- ## Exploring gaze tracking &amp; code logging in IDEs as a passive way to ask for help in introduction to programming classes
 
 Link: https://doi.org/10.1145/3545947.3573251
 
 Notes:
 
 - abstract only
-- not really helpful since there is no conclusion or anything
+- not really helpful since there is no conclusion or anything -->
 
 ## Towards Collaborative Coding in RIDE Web IDE
 
@@ -77,14 +78,14 @@ Notes:
 
 - a notebook approach for java education is explored (jupyter + containers)
 
-## Expanding the Concept of Learning Space in Biomedical Engineering Education using Wearable Devices and Cloud-based Collaborative Programming Environments
+<!-- ## Expanding the Concept of Learning Space in Biomedical Engineering Education using Wearable Devices and Cloud-based Collaborative Programming Environments
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10104837
 
 Notes:
 
 - programming environments are not really the focus
-- not really helpful
+- not really helpful -->
 
 ## Exploring the Effectiveness of Web-Based Programming Environments for MOOCs: A Comparative Study of CodeOcean and OpenJupyter
 
@@ -94,13 +95,13 @@ Notes:
 
 - a comparison between codeocean and openjupyter
 
-## Study on Web Based Virtualized Containers for Software Development Lectures in BYOD
+<!-- ## Study on Web Based Virtualized Containers for Software Development Lectures in BYOD
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85177808279&doi=10.1007%2f978-981-99-8296-7_21&partnerID=40&md5=40c5d4d28dcf0dd2581508a2af115b59
 
 Notes:
 
-- full text not available for TU Ilmenau
+- full text not available for TU Ilmenau -->
 
 ## An eFPGA Generation Suite with Customizable Architecture and IDE
 
@@ -187,7 +188,7 @@ Notes:
 
 - this paper focuses on possible attacks using uncontrolled online ides
 
-## FPL Demo: SERVE: Agile Hardware Development Platform with Cloud IDE and Cloud FPGAs
+<!-- ## FPL Demo: SERVE: Agile Hardware Development Platform with Cloud IDE and Cloud FPGAs
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10035240
 
@@ -195,7 +196,7 @@ Notes:
 
 - only one page with introduction
 - cloud ide
-- not really helpful
+- not really helpful -->
 
 ## A study of microcontroller simulator tools for autonomous and online learning
 
@@ -213,7 +214,7 @@ Notes:
 
 - log data of the pyguru platform is analysed (e.g. time spent reading, highlighting, etc.)
 
-## Interactive programming environments for teachers and students
+<!-- ## Interactive programming environments for teachers and students
 
 Link: https://doi.org/10.1145/3408877.3432501
 
@@ -221,7 +222,7 @@ Notes:
 
 - abstract only
 - workshop
-- not really helpful
+- not really helpful -->
 
 ## RIDE: Theia-Based Web IDE for the Reflex Language
 
@@ -250,14 +251,14 @@ Notes:
 - precursor to Theia implementation
 - using eclipse ide
 
-## A Standalone WebAssembly Development Environment for the Internet of Things
+<!-- ## A Standalone WebAssembly Development Environment for the Internet of Things
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85111153954&doi=10.1007%2f978-3-030-74296-6_27&partnerID=40&md5=8fe21a3ae2871520aeb09e2af3e4d658
 
 Notes:
 
 - only abstract available
-- springer source not available for tu ilmenau
+- springer source not available for tu ilmenau -->
 
 ## A pilot experience with software programming environments as a service for teaching activities
 
@@ -276,7 +277,7 @@ Notes:
 
 - describes a webide called kodethon and its evaluation from students
 
-## CodeKey - an online code editor to study code patterns and enhance student performance in CS courses
+<!-- ## CodeKey - an online code editor to study code patterns and enhance student performance in CS courses
 
 Link: https://doi.org/10.1145/3328778.3372680
 
@@ -284,7 +285,7 @@ Notes:
 
 - only one page with the plan to build an online code editor
 - no conclusions
-- not really helpful
+- not really helpful -->
 
 ## Using WebIDE as a distance learning tool for high school programming
 
@@ -295,22 +296,22 @@ Notes:
 - webide implementation based on cloud9 with custom plugins
 - evaluation of the developed system
 
-## Student adoption and perceptions of aweb integrated development environment an experience report
+<!-- ## Student adoption and perceptions of aweb integrated development environment an experience report
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85081534449&doi=10.1145%2f3328778.3366949&partnerID=40&md5=82ce5440f4d0264c0001597c4cfeb0cc
 
 Notes:
 
-- duplicate not caught because of typo
+- duplicate not caught because of typo -->
 
-## Investigating Best Practices in the Design of Automated Feedback to Improve Students' Performance and Learning
+<!-- ## Investigating Best Practices in the Design of Automated Feedback to Improve Students' Performance and Learning
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85092152531&doi=10.1145%2f3372782.3407107&partnerID=40&md5=b645c10eec7405926f9c220b3a1d9f15
 
 Notes:
 
 - just a proposed dissertation topic
-- not really helpful
+- not really helpful -->
 
 ## Analyzing learners’ engagement and behavior in MOOCs on programming with the codeboard IDE
 
@@ -480,14 +481,14 @@ Notes:
 
 - Another evaluation of jaguarcode
 
-## Skramble: An embeddable python programming environment for use in learning systems
+<!-- ## Skramble: An embeddable python programming environment for use in learning systems
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85028329921&doi=10.1007%2f978-3-319-63184-4_11&partnerID=40&md5=ca73c633337e56a95eee3ed750a2377e
 Link: https://link.springer.com/chapter/10.1007/978-3-319-63184-4_11
 
 Notes:
 
-- only available through springer link (not accessible for TU Ilmenau)
+- only available through springer link (not accessible for TU Ilmenau) -->
 
 ## Jimbo: A collaborative IDE with live preview
 
@@ -511,14 +512,14 @@ Notes:
 - each arduino is connected to a raspberry pi
 - raspberry pi is hosting web page and is responsible for programming arduino (using arduino cli)
 
-## Supporting Learners in Online Courses Through Pair Programming and Live Coding
+<!-- ## Supporting Learners in Online Courses Through Pair Programming and Live Coding
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7552098
 
 Notes:
 
 - abstract only
-- not really helpful
+- not really helpful -->
 
 ## Enhancing team collaboration through integrating social interactions in a Web-based development environment
 
@@ -554,13 +555,13 @@ Notes:
 - cloud9 ide is used for programming
 - mini pc is used as network interface
 
-## Integrating computing to stem curriculum via codeboard
+<!-- ## Integrating computing to stem curriculum via codeboard
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84978208779&doi=10.1007%2f978-3-319-42089-9_36&partnerID=40&md5=50296fb5d71490573d69de0d9fc7dbb1
 
 Notes:
 
-- only available through springer link
+- only available through springer link (no access for tu ilmenau) -->
 
 ## An overview of platforms for cloud based development
 
@@ -595,13 +596,13 @@ Notes:
 - not sure how helpful
 - only 1 page
 
-## Beyond Open Source: The Touch Develop Cloud-Based Integrated Development Environment
+<!-- ## Beyond Open Source: The Touch Develop Cloud-Based Integrated Development Environment
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7283033
 
 Notes:
 
-- duplicate not caught by title filtering
+- duplicate not caught by title filtering -->
 
 ## Formal reasoning using an iterative approach with an integrated web IDE
 
@@ -648,14 +649,14 @@ Notes:
 - simple evaluation of the system is given
 - compilation and upload of program is supported
 
-## A cloud-based integrated development environment for robot software development
+<!-- ## A cloud-based integrated development environment for robot software development
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84923643999&doi=10.5302%2fJ.ICROS.2015.14.0059&partnerID=40&md5=b6f51d35f4ae1afa7f7f380b72583fbb
 
 Notes:
 
 - paper is in korean
-- not really helpful
+- not really helpful -->
 
 ## LearnCS! A new, browser-based c programming environment for CS1
 
@@ -719,14 +720,14 @@ Notes:
   - RQ1: Given the exercise that requires them to submit work frequently, how often do students collaborate and do programming work via IDEOL?
   - RQ2: How much are students satisfied with the design of the project, the IDEOL system, and collaboration?
 
-## HTML Educational Node.js System (HENS): An Applied System for Web Development
+<!-- ## HTML Educational Node.js System (HENS): An Applied System for Web Development
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7113660
 
 Notes:
 
 - not really helpful
-- describes a system where the development environment (Notepad++ and additional software) is given to users via an usb-stick
+- describes a system where the development environment (Notepad++ and additional software) is given to users via an usb-stick -->
 
 ## Recording and analyzing in-browser programming sessions
 
@@ -777,22 +778,22 @@ Notes:
 - simple performance evaluation is given (20 concurrent compilation requests)
 - user interface for android devices
 
-## CEclipse: A services composition based online IDE
+<!-- ## CEclipse: A services composition based online IDE
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84880011682&partnerID=40&md5=68a75c322726092624a7f5a6b0f406b7
 
 Notes:
 
 - paper seems to be in chinese
-- not really helpful
+- not really helpful -->
 
-## Browser based IDE to code in the cloud
+<!-- ## Browser based IDE to code in the cloud
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84872508995&doi=10.1007%2f978-3-642-35461-8_6&partnerID=40&md5=b04dbf30badaf4f655966d11e35ee84e
 
 Notes:
 
-- springer link: not available for tu ilmenau
+- springer link: not available for tu ilmenau -->
 
 ## Software development environments on the web: A research agenda
 
@@ -874,13 +875,13 @@ Notes:
 - describes a system where the development environment is hosted on a smartphone
 - used to interface with different robots (e.g. Lego Mindstorms)
 
-## Demo abstract: MiDebug: Microcontroller integrated development and debugging environment
+<!-- ## Demo abstract: MiDebug: Microcontroller integrated development and debugging environment
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6920932
 
 Notes:
 
-- duplicate not caught by title filtering
+- duplicate not caught by title filtering -->
 
 ## Components of a Wiki-based software development environment
 
@@ -938,14 +939,14 @@ Notes:
 - supports compiling, running, debugging, code completion, etc. for java programs (uses eclipse in backend)
 - client server architecture
 
-## Web-based networked software development environment for programming
+<!-- ## Web-based networked software development environment for programming
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=5974935
 
 Notes:
 
 - paper is in chinese
-- not really helpful
+- not really helpful -->
 
 ## Supporting introductory test-driven labs with WebIDE
 
@@ -983,22 +984,22 @@ Notes:
 - client server architecture (eclipse on the server-side)
 - syntax-highlighting and compilation supported
 
-## JavaWIDE: Innovation in an online IDE
+<!-- ## JavaWIDE: Innovation in an online IDE
 
 Link: 
 
 Notes:
 
 - abstract only 
-- not really helpful
+- not really helpful -->
 
-## JavaWIDE: Innovation in an online IDE: Tutorial presentation
+<!-- ## JavaWIDE: Innovation in an online IDE: Tutorial presentation
 
 Link: 
 
 Notes:
 
-- duplicate not caught by title filtering
+- duplicate not caught by title filtering -->
 
 ## XYLUS: A virtualized programming environment
 
@@ -1011,13 +1012,13 @@ Notes:
 - uses vms for program execution (and rdp)
 - a simple evaluation of the system is given
 
-## A programming environment consisting of web services
+<!-- ## A programming environment consisting of web services
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84862296959&doi=10.2316%2fP.2010.725-027&partnerID=40&md5=6872a91a3393e04d024e6156e6a13369
 
 Notes:
 
-- full text seemingly not available for free
+- full text seemingly not available for free -->
 
 ## A web-based programming environment for LEGO mindstorms robots
 

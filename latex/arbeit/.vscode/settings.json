@@ -9,5 +9,7 @@
     "**/*:Zone.Identifier": true,
     "**/dist": true,
     "**/node_modules": true
-  }
+  },
+  "latex-workshop.latex.rootFile.indicator": "\\begin{document}",
+  "latex-workshop.latex.outDir": "%DIR%/dist",
 }
