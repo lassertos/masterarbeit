@@ -7,14 +7,16 @@ Notes:
 - python development environment completely in the browser
 - uses webassembly based python environment pyodide
 
-## Addressing misconceptions in introductory programming: Automated feedback in integrated development environments
+category: browser
+
+<!-- ## Addressing misconceptions in introductory programming: Automated feedback in integrated development environments
 
 Link: https://doi.org/10.1145/3629296.3629297
 
 Notes:
 
 - introduces a coding assistant
-- the assistant seems to be perceived as helpful
+- the assistant seems to be perceived as helpful -->
 
 ## Towards Collaborative Coding in RIDE Web IDE
 
@@ -23,16 +25,17 @@ Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10347731
 Notes:
 
 - collaboration through docker and server based system
-- print
 
-## Design of STEM Teaching Network Publishing Framework Based on Web Interactive Programming Environment
+category: container
+
+<!-- ## Design of STEM Teaching Network Publishing Framework Based on Web Interactive Programming Environment
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10393759
 
 Notes:
 
 - jupyter labs / notebooks based solution
-- not really useful for our goals
+- not really useful for our goals -->
 
 ## Evaluation and technological solutions for a dynamic, unified cloud programming development environment : Ease of use and applicable system for uniformized practices and assessments
 
@@ -42,21 +45,23 @@ Notes:
 
 - container based solution with vscode server
 
-## Browser-based Java Development Environment for Programming Education
+category: container
+
+<!-- ## Browser-based Java Development Environment for Programming Education
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10409780
 
 Notes:
 
-- a notebook approach for java education is explored (jupyter + containers)
+- a notebook approach for java education is explored (jupyter + containers) -->
 
-## Exploring the Effectiveness of Web-Based Programming Environments for MOOCs: A Comparative Study of CodeOcean and OpenJupyter
+<!-- ## Exploring the Effectiveness of Web-Based Programming Environments for MOOCs: A Comparative Study of CodeOcean and OpenJupyter
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10306228
 
 Notes:
 
-- a comparison between codeocean and openjupyter
+- a comparison between codeocean and openjupyter -->
 
 ## An eFPGA Generation Suite with Customizable Architecture and IDE
 
@@ -66,6 +71,8 @@ Notes:
 
 - IDE implemented using NODE-RED dashboard and vscode (code-server)
 
+category:
+
 ## THE ACCEPTANCE OF AN EDUCATIONAL INTEGRATED DEVELOPMENT ENVIRONMENT TO LEARN PROGRAMMING FUNDAMENTALS
 
 Link: https://www.researchgate.net/publication/368909126_THE_ACCEPTANCE_OF_AN_EDUCATIONAL_INTEGRATED_DEVELOPMENT_ENVIRONMENT_TO_LEARN_PROGRAMMING_FUNDAMENTALS
@@ -74,14 +81,16 @@ Notes:
 
 - client server approach for browser based c ide
 
-## Re-imagining computer laboratories for teaching introductory programming concepts using web-based integrated development environments: Opportunities and challenges
+category: client-server
+
+<!-- ## Re-imagining computer laboratories for teaching introductory programming concepts using web-based integrated development environments: Opportunities and challenges
 
 Link: https://doi.org/10.1145/3568364.3568375
 
 Notes:
 
 - this paper compares different web ides
-- criteria: scalability, integration with lms, mobile access and functionality, archiving/saving/exporting data, learning analytics offline access
+- criteria: scalability, integration with lms, mobile access and functionality, archiving/saving/exporting data, learning analytics offline access -->
 
 ## Standardizing students’ programming environments with docker containers: Using visual studio code in the cloud with GitHub codespaces
 
@@ -93,13 +102,15 @@ Notes:
 - cs50
 - github codespaces based solution
 
-## Jupyter in the classroom: An experience report
+category: cloud
+
+<!-- ## Jupyter in the classroom: An experience report
 
 Link: https://doi.org/10.1145/3478431.3499379
 
 Notes:
 
-- yet another paper talking about jupyter notebooks
+- yet another paper talking about jupyter notebooks -->
 
 ## MOCSIDE: An open-source and scalable online IDE and auto-grader for computer science education
 
@@ -111,6 +122,8 @@ Notes:
 - https://mocside.com/ - there are still so many placeholders
 - browser frontend and docker based solution with an autograder
 
+category: container
+
 ## MOCSIDE: an open-source and scalable online IDE and auto-grader for introductory programming courses
 
 Link: https://dl.acm.org/doi/abs/10.5555/3512733.3512734
@@ -120,6 +133,8 @@ Notes:
 - https://mocside.com/ - there are still so many placeholders
 - browser frontend and docker based solution with an autograder
 
+category: container
+
 ## Towards Multi-User Mode in RIDE Web-IDE
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9855114
@@ -127,6 +142,8 @@ Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9855114
 Notes:
 
 - container based approach with server in the middle for connection and creation
+
+category: container
 
 ## A Bad IDEa: Weaponizing uncontrolled online-IDEs in availability attacks
 
@@ -152,6 +169,8 @@ Notes:
 
 - log data of the pyguru platform is analysed (e.g. time spent reading, highlighting, etc.)
 
+category: ?
+
 ## RIDE: Theia-Based Web IDE for the Reflex Language
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9507678
@@ -159,6 +178,8 @@ Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9507678
 Notes:
 
 - this paper describes the development of RIDE using Theia (first iteration was developed using Xtext and Eclipse IDE)
+
+category: ?
 
 ## CodeHelper: A Web-Based Lightweight IDE for E-Mentoring in Online Programming Courses
 
@@ -168,6 +189,8 @@ Notes:
 
 - the paper describes the development of a c++ collaborative editor for pair programming
 - the whole editor seems to be web-based with a server for handling saving, compilation, etc.
+
+category: client-server
 
 ## Developing Reflex IDE Kernel with Xtext Framework
 
@@ -179,6 +202,8 @@ Notes:
 - precursor to Theia implementation
 - using eclipse ide
 
+category: ?
+
 ## A pilot experience with software programming environments as a service for teaching activities
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85098764320&doi=10.3390%2fapp11010341&partnerID=40&md5=f0002aa32f4b03357dc3cc7dc5553296
@@ -188,6 +213,8 @@ Notes:
 - a set of tools to facilitate to the teacher the management of practice lessons in computer science subjects
 - pilot use case uses windows vms with devc++ ide and graphical client for github
 
+category: container-like
+
 ## Student adoption and perceptions of a web integrated development environment: An experience report
 
 Link: https://doi.org/10.1145/3328778.3366949
@@ -195,6 +222,8 @@ Link: https://doi.org/10.1145/3328778.3366949
 Notes:
 
 - describes a webide called kodethon and its evaluation from students
+
+category: ?
 
 ## Using WebIDE as a distance learning tool for high school programming
 
@@ -205,6 +234,8 @@ Notes:
 - webide implementation based on cloud9 with custom plugins
 - evaluation of the developed system
 
+category: cloud
+
 ## Analyzing learners’ engagement and behavior in MOOCs on programming with the codeboard IDE
 
 Link: https://link.springer.com/article/10.1007/s11423-020-09773-6
@@ -212,6 +243,8 @@ Link: https://link.springer.com/article/10.1007/s11423-020-09773-6
 Notes:
 
 - evaluation using the codeboard ide (anonymous vs registered learners)
+
+category: client-server
 
 ## Good-bye localhost: A cloud-based web IDE for teaching java EE web development to non-computer science majors
 
@@ -222,6 +255,8 @@ Notes:
 - Eclipse Che was selected, using the JBoss WildFly application server for Java EE support
 - simple evaluation provided
 
+category: cloud
+
 ## Gamifying the Code Genie Programming Tool
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8833771
@@ -230,6 +265,8 @@ Notes:
 
 - Code Genie is a free web IDE that was developed to integrate art and animation in learning Text-based programming language
 - This paper demonstrates the latest Code Genie update which includes adding several features such as gamification elements, tutorial lessons, user's registration accounts, "Get Link" button that can be used to get a code link to be shared in any platform, sorting the shared code inside the Code Genie development environment, adding the button symbol, and saving the latest written code
+
+category: browser
 
 ## JavaScript Development Environment for Programming Education Using Smartphones
 
@@ -241,6 +278,8 @@ Notes:
 - classification of existing solutions
 - evaluation of JDE is given
 
+category: browser
+
 ## pyiron: An integrated development environment for computational materials science
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85062973139&doi=10.1016%2fj.commatsci.2018.07.043&partnerID=40&md5=c9144d1aef0ee82e393fc2eb45f3e12d
@@ -250,6 +289,8 @@ Notes:
 - python based framework for simulation protocols
 - integrates well with jupyter notebooks
 - can be split into browser-based user-interface and server-based backend for simulation
+
+category: client-server
 
 ## Teachers’ Perspectives on Learning and Programming Environments for Secondary Education
 
@@ -271,6 +312,8 @@ Notes:
 - web-based user-interface with backend for computation
 - performance evaluation given
 
+category: client-server
+
 ## How “Friendly” Integrated Development Environments Are?
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85069822473&doi=10.1007%2f978-3-030-21902-4_7&partnerID=40&md5=7f7bb1d4acada06f0aa26860b788cd91
@@ -289,6 +332,8 @@ Notes:
 - completely browser-based
 - can be run offline once loaded
 
+category: browser
+
 ## Matlab Programming Environment Based on Web
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8740716
@@ -297,6 +342,8 @@ Notes:
 
 - description of an online programming environment for matlab
 - client server architecture with web-based user interface and server for compilation
+
+category: client-server
 
 ## The Code Genie Programming Environment
 
@@ -309,6 +356,8 @@ Notes:
 - aimed at K-12 students, because of that it has a simpler user interface with focus on drawing shapes
 - evaluation of the system is given
 
+category: browser
+
 ## Evaluations of JaguarCode: A web-based object-oriented programming environment with static and dynamic visualization
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85051937366&doi=10.1016%2fj.jss.2018.07.037&partnerID=40&md5=4742d6b5ca9b7abfe5ec5748ce851abd
@@ -319,6 +368,8 @@ Notes:
 - includes static and dynamic visualization of java programs at line level, as well as a full overview of a project under development
 - consists of a web-based user interface and a server for compilation, debugging and visualization
 
+category: client-server
+
 ## A web-based programming environment for introductory programming courses in higher education
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85056321785&partnerID=40&md5=b3d20421d785f1399004cc7e4e05b8de
@@ -327,6 +378,8 @@ Notes:
 
 - lists demands for programming environments
 - describes a proposed programming environment, with a web-based user interface and a server for computation
+
+category: client-server
 
 ## LoIDE: A web-based IDE for logic programming preliminary report
 
@@ -338,6 +391,8 @@ Notes:
 - web-based IDE for logic programming
 - web-based user interface with server for computation
 
+category: client-server
+
 ## WIDE: Centralized and collaborative approach to teaching web development
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85052017251&doi=10.3966%2f160792642018081904004&partnerID=40&md5=ced7a8fd083db40ff88a1fc6490260e8
@@ -346,6 +401,8 @@ Notes:
 
 - a web-based ide for teaching programming with php
 - client server approach with web-based user interface and server for computation
+
+category: client-server
 
 ## A web-based IDE for teaching with any language (abstract only)
 
@@ -356,6 +413,8 @@ Notes:
 - abstract only
 - describes the cloud9 based solution for cs50.io
 
+category: cloud
+
 ## Analyzing the learning process (in Programming) by using data collected from an online IDE
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8067822
@@ -365,6 +424,8 @@ Notes:
 - codeboard ide is used to collect data on e.g. project accesses and compilations/runs/submissions
 - data is then analyzed with the result, that the change in the environment used has a significant relation with respect to the achieved marks (+7% DevC++ to codeboard)
 
+category: client-server
+
 ## Initial Evaluation of JaguarCode: A Web-Based Object-Oriented Programming Environment with Static and Dynamic Visualization
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8166696
@@ -372,6 +433,8 @@ Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8166696
 Notes:
 
 - Another evaluation of jaguarcode
+
+category: client-server
 
 ## Jimbo: A collaborative IDE with live preview
 
@@ -385,6 +448,8 @@ Notes:
 - client server architecture
 - focus on the development of web applications
 
+category: client-server
+
 ## Implementation of a web-based programming tool for distributed, connected Arduino systems
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7732276&tag=1
@@ -394,6 +459,8 @@ Notes:
 - CodeMirror based editor with program upload support
 - each arduino is connected to a raspberry pi
 - raspberry pi is hosting web page and is responsible for programming arduino (using arduino cli)
+
+category: client-server
 
 ## Enhancing team collaboration through integrating social interactions in a Web-based development environment
 
@@ -407,6 +474,8 @@ Notes:
 - multiple social media like features are added
 - evaluation of the whole system is given
 
+category: client-server
+
 ## The TuringLab programming environment an online python programming environment for challenge based learning
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84979582025&doi=10.5220%2f0005802701030113&partnerID=40&md5=e890613e7e3f67c82b90d813d97c72ad
@@ -419,6 +488,8 @@ Notes:
 - webserver and worker server (worker server is used for debugging)
 - an evaluation of the system is given
 
+category: client-server
+
 ## Putting cloud 9 IDE on the wheels for programming Cyber-Physical / Internet of Things Platforms: Providing educational prototypes
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85013116258&doi=10.5220%2f0005985204280435&partnerID=40&md5=f82c024105ca52804a4eca7eccda0ad0
@@ -428,6 +499,8 @@ Notes:
 
 - cloud9 ide is used for programming
 - mini pc is used as network interface
+
+category: cloud
 
 ## An overview of platforms for cloud based development
 
@@ -450,6 +523,8 @@ Notes:
 - debugging, crash logging and coverage collection are supported
 - an evaluation of the system is given
 
+category: ?
+
 ## Detailed recordings of student programming sessions
 
 Link: https://doi.org/10.1145/2729094.2754859
@@ -462,6 +537,8 @@ Notes:
 - not sure how helpful
 - only 1 page
 
+category: ?
+
 ## Formal reasoning using an iterative approach with an integrated web IDE
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84954426284&doi=10.4204%2fEPTCS.187.5&partnerID=40&md5=a347f34f24d7b716b0efe792a8b55e4c
@@ -472,6 +549,8 @@ Notes:
 - does not go into specifics about the ide
 - client server architecture
 
+category: client-server
+
 ## Experience report: Evolution of a web-integrated software development and verification environment
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84927698573&doi=10.1002%2fspe.2259&partnerID=40&md5=d0211c9819bf9ffea760ed38c8c1a7b7
@@ -481,6 +560,8 @@ Notes:
 
 - described the development of a web-based ide from 2009-2012 (in corresponding iterations)
 - client server architecture
+
+category: client-server
 
 ## CodeR: Real-time Code Editor Application for Collaborative Programming
 
@@ -495,6 +576,8 @@ Notes:
 - allows collaborative editing of files with operational transformation
 - seems to use collabode collaborative code editor which uses eclipse as a backend for syntax highlighting, refactoring, compilation, execution etc.
 
+category: client-server
+
 ## Web2Compile-CoT: A web IDE for the cloud of things
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84945557224&doi=10.1007%2f978-3-319-23237-9_3&partnerID=40&md5=2dbef88f126fcd010d109199bfb5305b
@@ -506,6 +589,8 @@ Notes:
 - client server architecture
 - simple evaluation of the system is given
 - compilation and upload of program is supported
+
+category: client-server
 
 ## LearnCS! A new, browser-based c programming environment for CS1
 
@@ -519,6 +604,8 @@ Notes:
 - server component contains a database for research purposes
 - LearnCS! can be instrumented to save button clicks, setting of breakpoints and steps through the program, source code snapshots, and even individual keystrokes and mouse movement, if necessary
 - results of using the system and the corresponding findings are given
+
+category: browser
 
 ## New opportunities for extracting insights from cloud based IDEs
 
@@ -538,6 +625,8 @@ Notes:
 - the ide in question is TouchDevelop
 - seems to be more of an advertisement for TouchDevelop
 
+category: ?
+
 ## EduCo: An integrated social environment for teaching and learning software engineering courses
 
 Link: https://doi.org/10.1145/2684200.2684280
@@ -545,6 +634,8 @@ Link: https://doi.org/10.1145/2684200.2684280
 Notes:
 
 - a more detailed look at the EduCo development environment
+
+category: client-server
 
 ## A cloud-based integrated development environment for embedded systems
 
@@ -558,6 +649,8 @@ Notes:
 - allows programming and debugging embedded hardware
 - does not really go into detail on implementation at first glance
 
+category: client-server
+
 ## Learning and practicing object-oriented programming using a collaborative web-based IDE
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7044141
@@ -569,6 +662,8 @@ Notes:
   - RQ1: Given the exercise that requires them to submit work frequently, how often do students collaborate and do programming work via IDEOL?
   - RQ2: How much are students satisfied with the design of the project, the IDEOL system, and collaboration?
 
+category: client-server
+
 ## Recording and analyzing in-browser programming sessions
 
 Link: https://doi.org/10.1145/2526968.2526970
@@ -577,6 +672,8 @@ Notes:
 
 - focus on collecting and analysing data from a web-based programming environment
 - Python code execution in the environment is done on the client-side, in-browser and is accomplished using the jsrepl library and the C implementation of Python, CPython, compiled into JavaScript via LLVM using the emscripten library. HTML5 web storage feature is used to save and restore the contents of the editor and console including command history of a programming session. HTML5 fullscreen API is used for enabling the environment to occupy the whole screen space not unlike a native application
+
+category: browser
 
 ## WIDE an interactive Web integrated development environment to practice C programming in distance education
 
@@ -588,6 +685,8 @@ Notes:
 - allows interaction via chat and forum
 - allows compilation using gcc on server
 - allows execution of programs on server
+
+category: client-server
 
 ## An interactive Web-based IDE towards teaching and learning in programming courses
 
@@ -601,11 +700,13 @@ Notes:
 - real time discussion board with tagging mechanism
 - summarization of changes in a project
 - a debugger for c/c++ console programs (gdb)
-- build automation using gnu c/c++ compilers version 4.4.7 
+- build automation using gnu c/c++ compilers version 4.4.7
 - interactive execution tool for console applications
 - another evaluation of ideol is given answering the following research questions:
   - does ideol help students to manage their groups better?
   - does ideol enhance the interaction among members in a group?
+
+category: client-server
 
 ## Distributed Integrated Development Environment for Mobile Platforms
 
@@ -618,6 +719,8 @@ Notes:
 - simple performance evaluation is given (20 concurrent compilation requests)
 - user interface for android devices
 
+category: client-server
+
 ## Software development environments on the web: A research agenda
 
 Link: https://doi.org/10.1145/2384592.2384603
@@ -629,6 +732,8 @@ Notes:
 - uses ace editor
 - client server architecture
 - could be an article worth reading completely
+
+category: client-server
 
 ## Elements for a cloud-based development environment: Online collaboration, revision control, and continuous integration
 
@@ -643,6 +748,8 @@ Notes:
 - facebook integration
 - uses neil fraser's differential synchronization algorithm for collaboration
 
+category: client-server
+
 ## CoRED: Browser-based collaborative real-time editor for java web applications
 
 Link: https://doi.org/10.1145/2145204.2145399
@@ -650,6 +757,8 @@ Link: https://doi.org/10.1145/2145204.2145399
 Notes:
 
 - another paper describing the implementation and architecture of cored
+
+category: client-server
 
 ## MiDebug: Microcontroller integrated development and debugging environment
 
@@ -662,6 +771,8 @@ Notes:
 - client server architecture
 - uses codemirror
 - midebug can access usb hardware directly using jtag and openocd
+
+category: client-server
 
 ## Evaluation of a Web-Based Programming Environment
 
@@ -676,6 +787,8 @@ Notes:
 - a simple performance evaluation of the system is given
 - does not really seem collaborative in the sense of real-time concurrent file editing
 
+category: client-server
+
 ## Program Behavior Analysis and Control for Online IDE
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6341572
@@ -689,6 +802,8 @@ Notes:
 - the first two problems seem irrelevant for the intended use-case of the ide but could be interesting in a container based development environment
 - implemented ceclipse (client server architecture) which includes a program analysis part for the three problems mentioned above
 
+category: client-server
+
 ## Web-Based Robot Programming Environment and Control Architecture
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6363314
@@ -697,6 +812,8 @@ Notes:
 
 - describes a system where the development environment is hosted on a smartphone
 - used to interface with different robots (e.g. Lego Mindstorms)
+
+category: client-server
 
 ## Components of a Wiki-based software development environment
 
@@ -707,6 +824,8 @@ Notes:
 - client srever architecture
 - only architecture is described
 - it is shown how already existing components fit into the architecture
+
+category: client-server
 
 ## WeScheme: The browser is your programming environment
 
@@ -720,6 +839,8 @@ Notes:
 - client server architecture
 - an evaluation of the system is given
 
+category: client-server
+
 ## Java WIDE - java wiki integrated development environment: Nifty tools and assignments
 
 Link: https://dl.acm.org/doi/pdf/10.5555/2379703.2379730
@@ -727,6 +848,8 @@ Link: https://dl.acm.org/doi/pdf/10.5555/2379703.2379730
 Notes:
 
 - no real description of JavaWIDE, seems more like an advertisement
+
+category: ?
 
 ## Real-time collaborative coding in a web IDE
 
@@ -741,6 +864,8 @@ Notes:
 - uses eclipse in the backend
 - an evaluation of the system is given
 
+category: client-server
+
 ## CEclipse: An Online IDE for Programing in the Cloud
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6012686
@@ -753,6 +878,8 @@ Notes:
   - In order to avoid the system resources being over consumed, what's the maximum run time should be set for the training online IDE?
 - supports compiling, running, debugging, code completion, etc. for java programs (uses eclipse in backend)
 - client server architecture
+
+category: client-server
 
 ## Supporting introductory test-driven labs with WebIDE
 
@@ -767,6 +894,8 @@ Notes:
 - not much more info about the ide
 - a pilot study and analysis is given
 
+category: ?
+
 ## The learning and productivity benefits to student programmers from real-world development environments
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84865620372&partnerID=40&md5=866f53f594aaf566cfa4f1ce1ce79fc9
@@ -775,7 +904,7 @@ Link: https://files.eric.ed.gov/fulltext/EJ1136657.pdf
 Notes:
 
 - a study trying to find out if students benefit from using commercial ides instead of simple text editors for learning programming
-- the ideal combination seems to be an ide and a simple text editor 
+- the ideal combination seems to be an ide and a simple text editor
 
 ## Adinda: A knowledgeable, browser-based IDE
 
@@ -790,6 +919,8 @@ Notes:
 - client server architecture (eclipse on the server-side)
 - syntax-highlighting and compilation supported
 
+category: client-server
+
 ## XYLUS: A virtualized programming environment
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=5625674
@@ -801,6 +932,8 @@ Notes:
 - uses vms for program execution (and rdp)
 - a simple evaluation of the system is given
 
+category: client-server
+
 ## A web-based programming environment for LEGO mindstorms robots
 
 Link: https://doi.org/10.1145/1167253.1167333
@@ -810,6 +943,8 @@ Notes:
 - short paper
 - client server architecture
 - allows compiliation and execution
+
+category: client-server
 
 ## WIPE: A programming environment for novices
 
@@ -821,6 +956,8 @@ Notes:
 - allows compilation and execution of pascal like programs with custom pseudo assembly code running on vm
 - an evaluation of the system is given
 
+category: client-server
+
 ## View/edit/compile/run Web-based programming environment
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=1408552
@@ -831,6 +968,8 @@ Notes:
 - client server architecture
 - focused on c and java programming
 
+category: client-server
+
 ## A web-based distributed programming environment
 
 Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84944029694&doi=10.1007%2f3-540-45492-6_24&partnerID=40&md5=c4267a5a85b9e5a27744799875f06b71
@@ -840,6 +979,8 @@ Notes:
 - client server architecture
 - compilation agents
 - allows compilation and execution of c/c++ programs
+
+category: client-server
 
 ## A critical analysis and evaluation of Web-based environments for program development
 
