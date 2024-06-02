@@ -1,23 +1,81 @@
 {
   "name": "indexeddb-fsprovider",
   "displayName": "indexeddb-fsprovider",
-  "description": "A FileSystemProvider implementation for indexeddb.",
+  "description": "A FileSystemProvider for IndexedDB.",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.87.0"
+    "vscode": "^1.89.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "enabledApiProposals": [
+    "fileSearchProvider",
+    "textSearchProvider"
+  ],
   "browser": "./dist/web/extension.js",
   "contributes": {
+    "viewsWelcome": [
+      {
+        "view": "explorer",
+        "contents": "You can also open a folder saved in GOLDi.\n[Open Folder (GOLDi)](command:zenfs.workspaceInit)",
+        "when": "workbenchState == empty || workspaceFolderCount == 0"
+      }
+    ],
     "commands": [
       {
-        "command": "indexeddb-fsprovider.helloWorld",
-        "title": "Hello World"
+        "command": "zenfs.workspaceInit",
+        "title": "Setup Workspace",
+        "category": "ZenFS"
+      },
+      {
+        "command": "zenfs.init",
+        "title": "Create Files",
+        "category": "ZenFS"
+      },
+      {
+        "command": "zenfs.reset",
+        "title": "Delete Files",
+        "category": "ZenFS"
+      },
+      {
+        "command": "zenfs.deleteFile",
+        "title": "Delete \"file.txt\"",
+        "category": "ZenFS"
+      },
+      {
+        "command": "zenfs.addFile",
+        "title": "Add \"file.txt\"",
+        "category": "ZenFS"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "zenfs.init",
+          "when": "workbenchState == workspace || workbenchState == folder"
+        },
+        {
+          "command": "zenfs.reset",
+          "when": "workbenchState == workspace || workbenchState == folder"
+        },
+        {
+          "command": "zenfs.deleteFile",
+          "when": "workbenchState == workspace || workbenchState == folder"
+        },
+        {
+          "command": "zenfs.addFile",
+          "when": "workbenchState == workspace || workbenchState == folder"
+        },
+        {
+          "command": "zenfs.workspaceInit",
+          "when": "workbenchState != folder && workbenchState != workspace"
+        }
+      ]
+    }
   },
   "scripts": {
     "test": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/index.js",
@@ -30,20 +88,31 @@
     "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
   },
   "devDependencies": {
-    "@types/vscode": "^1.87.0",
-    "@types/mocha": "^10.0.6",
     "@types/assert": "^1.5.10",
-    "eslint": "^8.56.0",
-    "@typescript-eslint/eslint-plugin": "^7.0.2",
-    "@typescript-eslint/parser": "^7.0.2",
-    "mocha": "^10.3.0",
-    "typescript": "^5.3.3",
-    "@vscode/test-web": "^0.0.52",
-    "ts-loader": "^9.5.1",
-    "webpack": "^5.90.3",
-    "webpack-cli": "^5.1.4",
+    "@types/mocha": "^10.0.6",
+    "@types/vscode": "^1.89.0",
     "@types/webpack-env": "^1.18.4",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
+    "@vscode/test-web": "^0.0.54",
     "assert": "^2.1.0",
-    "process": "^0.11.10"
+    "eslint": "^8.57.0",
+    "mocha": "^10.4.0",
+    "process": "^0.11.10",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@types/diff": "^5.2.1",
+    "@zenfs/core": "^0.9.5",
+    "@zenfs/dom": "0.2.4",
+    "browserfs": "^1.4.3",
+    "diff": "^5.2.0",
+    "fuse.js": "^7.0.0",
+    "path-browserify": "^1.0.1",
+    "y-websocket": "^2.0.3",
+    "yjs": "^13.6.15"
   }
 }
