@@ -7,6 +7,7 @@ import { GOLDiTextSearchProvider } from "./testSearchProvider";
 
 import * as Y from "yjs";
 import { WebsocketProvider } from "y-websocket";
+import { VSCodeBinding } from "./y-vscode-new";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -41,7 +42,7 @@ export async function activate(context: vscode.ExtensionContext) {
   let initialized = false;
 
   const doc = new Y.Doc();
-  const wsProvider = new WebsocketProvider(
+  const provider = new WebsocketProvider(
     "ws://localhost:1234",
     "my-roomname",
     doc
@@ -49,84 +50,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const ytext = doc.getText("test");
 
-  setInterval(async () => {
-    const document = vscode.window.activeTextEditor?.document;
-    if (!document) {
-      return;
-    }
-    await document.save();
-  }, 250);
-
-  await fileSystemProvider.writeFile(
-    vscode.Uri.parse("zenfs:/test"),
-    new TextEncoder().encode(ytext.toJSON())
-  );
-
-  fileSystemProvider.watch(vscode.Uri.parse("zenfs:/test"), {
-    excludes: [],
-    recursive: false,
-  });
-
-  fileSystemProvider.onDidChangeFile(async (events) => {
-    for (const event of events) {
-      console.log(event.uri.path, event.type);
-      if (event.type === vscode.FileChangeType.Changed) {
-        const data = new TextDecoder().decode(
-          await fileSystemProvider.readFile(vscode.Uri.parse("zenfs:/test"))
-        );
-        console.log(data, ytext.toJSON());
-        if (data === ytext.toJSON()) {
-          break;
-        }
-        for (const change of event.changes ?? []) {
-          if (change.type === "insert") {
-            ytext.insert(change.start, change.value);
-          } else if (change.type === "delete") {
-            ytext.delete(change.start, change.value.length);
-          }
-          console.log("new text (1): " + ytext.toJSON().length);
-        }
+  vscode.window.onDidChangeVisibleTextEditors((event) => {
+    event.forEach((editor) => {
+      if (editor.document.uri.path !== "/test") {
+        return;
       }
-    }
+      new VSCodeBinding(ytext, editor, provider.awareness);
+    });
   });
 
-  ytext.observe(async (event, transaction) => {
-    if (transaction.local) {
-      return;
-    }
-    console.log("new text (2): " + ytext.toJSON());
-    fileSystemProvider.writeFile(
-      vscode.Uri.parse("zenfs:/test"),
-      new TextEncoder().encode(doc.getText("test").toJSON()),
-      { create: false, overwrite: true, silent: true }
-    );
-    const testEditor = vscode.window.visibleTextEditors.find(
-      (editor) => editor.document.uri.path === "/test"
-    );
-    if (testEditor) {
-      await testEditor.edit((builder) => {
-        let index = 0;
-        event.delta.forEach((change) => {
-          if (change.retain) {
-            index += change.retain;
-          } else if (change.insert) {
-            const position = testEditor.document.positionAt(index);
-            builder.insert(position, change.insert.toString());
-            index += change.insert.toString().length;
-          } else if (change.delete) {
-            const position = testEditor.document.positionAt(index);
-            const endPosition = testEditor.document.positionAt(
-              index + change.delete
-            );
-            const range = new vscode.Selection(position, endPosition);
-            builder.delete(range);
-          }
-        });
-      });
-    }
-  });
-
-  wsProvider.on(
+  provider.on(
     "status",
     (event: { status: "disconnected" | "connecting" | "connected" }) => {
       console.log(event.status); // logs "connected" or "disconnected"

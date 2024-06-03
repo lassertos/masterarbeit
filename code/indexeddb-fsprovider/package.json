@@ -108,6 +108,7 @@
     "@types/diff": "^5.2.1",
     "@zenfs/core": "^0.9.5",
     "@zenfs/dom": "0.2.4",
+    "async-mutex": "^0.5.0",
     "browserfs": "^1.4.3",
     "diff": "^5.2.0",
     "fuse.js": "^7.0.0",
