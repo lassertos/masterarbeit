@@ -71,17 +71,16 @@ export class VSCodeBinding {
   private _ydoc: Y.Doc;
   private _editor: vscode.TextEditor;
   private _awareness: Awareness | null;
-  private _savedSelection?: RelativeSelection;
   private _mutex: Mutex;
   private _changeHandler: vscode.Disposable;
   private _closeHandler: vscode.Disposable;
-  private _decorations: Map<String, vscode.TextEditorDecorationType[]>;
-  private _beforeTransactionHandler: () => Promise<void>;
+  private _decorations: Map<number, vscode.TextEditorDecorationType[]>;
   private _ytextObserverHandler: (
     event: Y.YTextEvent,
     transaction: Y.Transaction
   ) => Promise<void>;
   private _rerenderDecorationsHandler: () => void;
+  private _numberOfSyncOperations: number;
 
   constructor(
     ytext: Y.Text,
@@ -97,12 +96,11 @@ export class VSCodeBinding {
     this._awareness = awareness;
     this._mutex = new Mutex();
     this._decorations = new Map();
+    this._numberOfSyncOperations = 0;
 
-    this._beforeTransactionHandler = this._beforeTransaction.bind(this);
     this._ytextObserverHandler = this._ytextObserver.bind(this);
     this._rerenderDecorationsHandler = this._rerenderDecorations.bind(this);
 
-    this._ydoc.on("beforeAllTransactions", this._beforeTransactionHandler);
     this._ytext.observe(this._ytextObserverHandler);
 
     const ytextValue = ytext.toJSON();
@@ -127,7 +125,8 @@ export class VSCodeBinding {
         try {
           if (
             event.document !== this._editor.document ||
-            event.document.getText() === this._ytext.toJSON()
+            event.document.getText() === this._ytext.toJSON() ||
+            this._numberOfSyncOperations > 0
           ) {
             return;
           }
@@ -182,28 +181,21 @@ export class VSCodeBinding {
     }
   }
 
-  private async _beforeTransaction() {
-    const release = await this._mutex.acquire();
-
-    try {
-      const relativeSelection = createRelativeSelection(
-        this._editor,
-        this._ytext
-      );
-      if (relativeSelection !== null) {
-        this._savedSelection = relativeSelection;
-      }
-    } finally {
-      release();
-    }
-  }
-
   private _rerenderDecorations() {
     if (!this._awareness) {
       return;
     }
 
-    this._awareness.getStates().forEach((state, clientID) => {
+    const states = this._awareness.getStates();
+
+    for (const [clientID, decorations] of this._decorations.entries()) {
+      if (!states.has(clientID)) {
+        this._editor.setDecorations(decorations[0], []);
+        this._editor.setDecorations(decorations[1], []);
+      }
+    }
+
+    states.forEach((state, clientID) => {
       if (
         clientID !== this._ydoc.clientID &&
         state.selection &&
@@ -228,7 +220,7 @@ export class VSCodeBinding {
           const start = this._editor.document.positionAt(anchorAbsolute.index);
           const end = this._editor.document.positionAt(headAbsolute.index);
 
-          let decorations = this._decorations.get(clientID.toString());
+          let decorations = this._decorations.get(clientID);
           if (!decorations) {
             const color =
               "#" + Math.floor(Math.random() * 16777215).toString(16);
@@ -244,7 +236,7 @@ export class VSCodeBinding {
                 },
               }),
             ];
-            this._decorations.set(clientID.toString(), decorations);
+            this._decorations.set(clientID, decorations);
           }
 
           this._editor.setDecorations(decorations[0], [
@@ -269,24 +261,25 @@ export class VSCodeBinding {
     if (transaction.local) {
       return;
     }
-    const id = crypto.randomUUID();
-    console.log("received", id);
+    console.log(delta, this._ytext.toJSON());
+    this._numberOfSyncOperations++;
     const release = await this._mutex.acquire();
 
     try {
       let index = 0;
       await this._editor.edit((builder) => {
+        const document = this._editor.document;
         delta.forEach((op) => {
           if (op.retain !== undefined) {
             index += op.retain;
           } else if (op.insert !== undefined) {
-            const pos = this._editor.document.positionAt(index);
+            const pos = document.positionAt(index);
+            console.log(index, pos);
             const insert = op.insert as string;
             builder.insert(pos, insert);
-            index += insert.length;
           } else if (op.delete !== undefined) {
-            const pos = this._editor.document.positionAt(index);
-            const endPos = this._editor.document.positionAt(index + op.delete);
+            const pos = document.positionAt(index);
+            const endPos = document.positionAt(index + op.delete);
             const selection = new vscode.Selection(pos, endPos);
             builder.delete(selection);
           } else {
@@ -294,22 +287,11 @@ export class VSCodeBinding {
           }
         });
       });
-      console.log("executed", id);
-      if (this._savedSelection) {
-        const selection = createMonacoSelectionFromRelativeSelection(
-          this._editor,
-          this._ytext,
-          this._savedSelection,
-          this._ydoc
-        );
-        if (selection !== null) {
-          this._editor.selection = selection;
-        }
-      }
 
       this._rerenderDecorations();
     } finally {
       release();
+      this._numberOfSyncOperations--;
     }
   }
 
@@ -317,7 +299,6 @@ export class VSCodeBinding {
     this._changeHandler.dispose();
     this._closeHandler.dispose();
     this._ytext.unobserve(this._ytextObserverHandler);
-    this._ydoc.off("beforeAllTransactions", this._beforeTransactionHandler);
     if (this._awareness) {
       this._awareness.off("change", this._rerenderDecorationsHandler);
     }
