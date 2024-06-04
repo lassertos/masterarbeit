@@ -7,13 +7,9 @@ import { GOLDiTextSearchProvider } from "./testSearchProvider";
 
 import * as Y from "yjs";
 import { WebsocketProvider } from "y-websocket";
-import { VSCodeBinding } from "./y-vscode-new";
+import { VSCodeBinding } from "./y-vscode";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
   console.log(
     'Congratulations, your extension "indexeddb-fsprovider" is now active in the web extension host!'
   );
@@ -48,14 +44,20 @@ export async function activate(context: vscode.ExtensionContext) {
     doc
   );
 
-  const ytext = doc.getText("test");
-
+  const existingBindings: VSCodeBinding[] = [];
   vscode.window.onDidChangeVisibleTextEditors((event) => {
+    while (existingBindings.length > 0) {
+      const binding = existingBindings.pop();
+      binding?.destroy();
+    }
     event.forEach((editor) => {
-      if (editor.document.uri.path !== "/test") {
+      if (typeof editor.document === "string") {
         return;
       }
-      new VSCodeBinding(ytext, editor, provider.awareness);
+      const ytext = doc.getText(editor.document.uri.path);
+      existingBindings.push(
+        new VSCodeBinding(ytext, editor, provider.awareness)
+      );
     });
   });
 
@@ -68,21 +70,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("zenfs.reset", async () => {
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) {
-        throw Error("No editor open");
+      for (const [name] of await fileSystemProvider.readDirectory(
+        vscode.Uri.parse("zenfs:/")
+      )) {
+        await fileSystemProvider.delete(vscode.Uri.parse(`zenfs:/${name}`), {
+          recursive: true,
+        });
       }
-      editor.edit((builder) => {
-        builder.insert(editor.selection.anchor, "--- Hello There! ---");
-      });
-      // for (const [name] of await fileSystemProvider.readDirectory(
-      //   vscode.Uri.parse("zenfs:/")
-      // )) {
-      //   await fileSystemProvider.delete(vscode.Uri.parse(`zenfs:/${name}`), {
-      //     recursive: true,
-      //   });
-      // }
-      // initialized = false;
+      initialized = false;
     })
   );
 

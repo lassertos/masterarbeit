@@ -10,7 +10,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onStartupFinished",
+    "onFileSystem:zenfs"
   ],
   "enabledApiProposals": [
     "fileSearchProvider",
