@@ -3,68 +3,6 @@ import * as vscode from "vscode";
 import * as error from "lib0/error";
 import { Awareness } from "y-protocols/awareness"; // eslint-disable-line
 import { Mutex } from "async-mutex";
-import { diffChars } from "diff";
-
-class RelativeSelection {
-  start: Y.RelativePosition;
-  end: Y.RelativePosition;
-  isReversed: boolean;
-
-  constructor(
-    start: Y.RelativePosition,
-    end: Y.RelativePosition,
-    isReversed: boolean
-  ) {
-    this.start = start;
-    this.end = end;
-    this.isReversed = isReversed;
-  }
-}
-
-const createRelativeSelection = (editor: vscode.TextEditor, type: Y.Text) => {
-  const sel = editor.selection;
-  if (sel !== null) {
-    const startPos = sel.start;
-    const endPos = sel.end;
-    const start = Y.createRelativePositionFromTypeIndex(
-      type,
-      editor.document.offsetAt(startPos)
-    );
-    const end = Y.createRelativePositionFromTypeIndex(
-      type,
-      editor.document.offsetAt(endPos)
-    );
-    return new RelativeSelection(start, end, sel.isReversed);
-  }
-  return null;
-};
-
-const createMonacoSelectionFromRelativeSelection = (
-  editor: vscode.TextEditor,
-  type: Y.Text,
-  relativeSelection: RelativeSelection,
-  doc: Y.Doc
-) => {
-  const start = Y.createAbsolutePositionFromRelativePosition(
-    relativeSelection.start,
-    doc
-  );
-  const end = Y.createAbsolutePositionFromRelativePosition(
-    relativeSelection.end,
-    doc
-  );
-  if (
-    start !== null &&
-    end !== null &&
-    start.type === type &&
-    end.type === type
-  ) {
-    const startPos = editor.document.positionAt(start.index);
-    const endPos = editor.document.positionAt(end.index);
-    return new vscode.Selection(startPos, endPos); // NOTE: maybe we need to consider isReversed property
-  }
-  return null;
-};
 
 export class VSCodeBinding {
   private _ytext: Y.Text;

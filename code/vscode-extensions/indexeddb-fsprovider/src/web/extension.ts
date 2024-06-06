@@ -5,17 +5,12 @@ import { GOLDiFileSystemProvider } from "./fileSystemProvider";
 import { GOLDiFileSearchProvider } from "./fileSearchProvider";
 import { GOLDiTextSearchProvider } from "./testSearchProvider";
 
-import * as Y from "yjs";
-import { WebsocketProvider } from "y-websocket";
-import { VSCodeBinding } from "./y-vscode";
-
 export async function activate(context: vscode.ExtensionContext) {
   console.log(
     'Congratulations, your extension "indexeddb-fsprovider" is now active in the web extension host!'
   );
 
   const fileSystemProvider = new GOLDiFileSystemProvider();
-  // await fileSystemProvider.clear();
   await fileSystemProvider.initialize();
 
   const fileSearchProvider = new GOLDiFileSearchProvider(fileSystemProvider);
@@ -36,37 +31,6 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   let initialized = false;
-
-  const doc = new Y.Doc();
-  const provider = new WebsocketProvider(
-    "ws://localhost:1234",
-    "my-roomname",
-    doc
-  );
-
-  const existingBindings: VSCodeBinding[] = [];
-  vscode.window.onDidChangeVisibleTextEditors((event) => {
-    while (existingBindings.length > 0) {
-      const binding = existingBindings.pop();
-      binding?.destroy();
-    }
-    event.forEach((editor) => {
-      if (typeof editor.document === "string") {
-        return;
-      }
-      const ytext = doc.getText(editor.document.uri.path);
-      existingBindings.push(
-        new VSCodeBinding(ytext, editor, provider.awareness)
-      );
-    });
-  });
-
-  provider.on(
-    "status",
-    (event: { status: "disconnected" | "connecting" | "connected" }) => {
-      console.log(event.status); // logs "connected" or "disconnected"
-    }
-  );
 
   context.subscriptions.push(
     vscode.commands.registerCommand("zenfs.reset", async () => {
