@@ -11,5 +11,5 @@
     "**/node_modules": true
   },
   "latex-workshop.latex.rootFile.indicator": "\\begin{document}",
-  "latex-workshop.latex.outDir": "%DIR%/dist",
+  "latex-workshop.latex.outDir": "%DIR%/dist"
 }
