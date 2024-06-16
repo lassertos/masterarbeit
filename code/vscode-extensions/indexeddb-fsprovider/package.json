@@ -1,13 +1,26 @@
 {
   "name": "indexeddb-fsprovider",
+  "private": true,
   "displayName": "indexeddb-fsprovider",
   "description": "A FileSystemProvider for IndexedDB.",
   "version": "0.0.1",
+  "publisher": "goldi",
+  "keywords": ["goldi", "crosslab"],
+  "license": "MIT",
+  "author": {
+    "email": "pierre.helbing@tu-ilmenau.de",
+    "name": "Pierre Helbing"
+  },
+  "readme": "./README.md",
   "engines": {
     "vscode": "^1.89.0"
   },
   "categories": [
     "Other"
+  ],
+  "extensionKind": [
+    "ui",
+    "workspace"
   ],
   "activationEvents": [
     "onStartupFinished",
@@ -18,6 +31,7 @@
     "textSearchProvider"
   ],
   "browser": "./dist/web/extension.js",
+  "main": "./dist/web/extension.js",
   "contributes": {
     "viewsWelcome": [
       {
@@ -86,7 +100,7 @@
     "watch-web": "webpack --watch",
     "package-web": "webpack --mode production --devtool hidden-source-map",
     "lint": "eslint src --ext ts",
-    "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
+    "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=."
   },
   "devDependencies": {
     "@types/assert": "^1.5.10",

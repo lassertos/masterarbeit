@@ -198,7 +198,11 @@ export class IndexedDBHandler {
     const formattedPath = this.formatPath(path);
 
     const fileStat = this.exists(formattedPath)
-      ? await this.read(formattedPath)
+      ? {
+          ...(await this.read(formattedPath)),
+          mtime: Date.now(),
+          data,
+        }
       : {
           ctime: Date.now(),
           mtime: Date.now(),

@@ -1,4 +1,3 @@
-import Fuse, { FuseResultMatch } from "fuse.js";
 import * as vscode from "vscode";
 import { GOLDiFileSystemProvider } from "./fileSystemProvider";
 

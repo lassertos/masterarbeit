@@ -40,12 +40,26 @@ Allgemein ist noch zu beachten, dass die verantwortlichen Geräte einen entsprec
 
 ## Upload
 
-Der Upload des kompilierten Programs muss im Falle eines realen Microcontrollers über das Compute Module geschehen. Bei einem virtuellen Microcontroller sollte dies direkt mit integriert sein. In beiden Fällen bietet sich ein `FileService` zur Übertragung des Programms an.
+Der Upload des kompilierten Programms muss im Falle eines realen Microcontrollers über das Compute Module geschehen. Bei einem virtuellen Microcontroller sollte dies direkt mit integriert sein. In beiden Fällen bietet sich ein `FileService` zur Übertragung des Programms an. Weiterhin könnte zusätzlich ein `MessageService` eingesetzt werden um den Status eines Uploads an den Nutzer weiterleiten zu können.
 
 ## Debugging
 
 Im Falle eines realen Microcontrollers sollte das Debugging durch das Compute Module bereitgestellt werden. Hierbei könnten die Programme OpenOCD und gdb verwendet werden. Bei virtuellen Microcontrollern ist das Debugging etwas schwieriger. Man könnte einen ähnlichen Ansatz wie Wokwi verfolgen. Diese haben ein eigenes Betriebssystem Image für v86 gebaut, welches gdb beinhaltet. v86 emuliert eine x86-kompatible CPU ("The instruction set is around Pentium 4 level, including full SSE3 support"). Wenn ein Nutzer in Wokwi einen Microcontroller debuggen möchte, so wird ein neues Browser-Fenster mit einer gdb Instanz, welche in v86 ausgeführt wird, geöffnet. Allerdings wäre es für den Nutzer angenehmer, wenn das bereits vorhandene Debugging Frontend von Visual Studio Code verwendet werden könnte. Dazu kann gdb im Debug Adapter Protocol Modus ausgeführt werden. Dabei ist jedoch zu beachten, dass es ggf. zu Performanzproblemen kommen könnte, wenn der Emulationsansatz verfolgt wird. Ansonsten könnte ggf. auch hier eine Server-basierte Lösung genutzt werden. In jedem Fall wird jedoch eine Extension für Visual Studio Code benötigt, die den Debugger anbindet. Dabei muss zunächst noch überprüft werden, ob eine Einbindung einer derartigen Extension in die Web Version von Visual Studio Code überhaupt erfolgen kann. Zudem muss das zuständige Gerät auch einen entsprechenden Service implementieren.
 
+Für Debugging von avr8js muss ein entsprechender gdb-server implementiert werden (siehe z.B. https://github.com/buserror/simavr/blob/master/doc/manual/manual.pdf). Ansonsten besteht auch die Möglichkeit Instanzen von simulavr oder simavr bereitzustellen. Beide dieser Simulationen unterstützen gdb.
+
 ## Language Server
 
 Um einen Language Server anzubinden könnte man einerseits versuchen, eine WebAssembly Version des clangd Language Servers zu verwenden, oder man setzt auch hier auf eine Server-basierte Lösung. In jedem Fall muss aber eine Extension für Visual Studio Code geschrieben werden, die den Language Server einbindet. Außerdem muss das zuständige Gerät noch einen entsprechenden Service bereitstellen.
+
+## Crosslab Kompatibilität
+
+Es sollte noch eine Crosslab Extension entwickelt werden. Diese könnte eine API anbinden, welche es den anderen Extensions ermöglicht ihre Services anzumelden.
+
+## Blockbild Reale Steuereinheit
+
+![image](<../diagrams/block-diagram(real-cu)/real-cu.png>)
+
+## Blockbild Virtuelle Steuereinheit
+
+![image](<../diagrams/block-diagram(virtual-cu)/virtual-cu.png>)
