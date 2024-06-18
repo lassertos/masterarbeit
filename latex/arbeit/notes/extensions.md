@@ -52,6 +52,65 @@ Für Debugging von avr8js muss ein entsprechender gdb-server implementiert werde
 
 Um einen Language Server anzubinden könnte man einerseits versuchen, eine WebAssembly Version des clangd Language Servers zu verwenden, oder man setzt auch hier auf eine Server-basierte Lösung. In jedem Fall muss aber eine Extension für Visual Studio Code geschrieben werden, die den Language Server einbindet. Außerdem muss das zuständige Gerät noch einen entsprechenden Service bereitstellen.
 
+### Instanziierung
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant VS as Visual Studio Code
+    participant LSP as Language Server Manager
+    participant LS as Language Server
+
+    U ->> VS : start
+    VS ->> LSP : connect
+    LSP ->> LSP : create folder for user
+    LSP ->> LS : spawn
+    LSP ->> VS : send folder path
+    VS ->> VS : start communication
+    VS ->> LSP : register existing files
+    LSP ->> LSP : create files in user folder
+```
+
+### Kommunikation
+
+```mermaid
+sequenceDiagram
+    participant VS as Visual Studio Code /<br> Language Server
+    participant LSP as Language Server Manager
+    participant LS as Language Server /<br> Visual Studio Code
+
+    VS ->> LSP : request
+    LSP ->> LS : forward request
+    LS ->> LSP : response
+    LSP ->> VS : forward response
+```
+
+### Datei Events
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant VS as Visual Studio Code
+    participant LSP as Language Server Manager
+
+    U ->> VS : create/change/delete file
+    VS ->> LSP : send create/change/delete file-event
+    LSP ->> LSP : create/change/delete file in user folder
+```
+
+### Verbindungsabbau
+
+```mermaid
+sequenceDiagram
+    participant VS as Visual Studio Code
+    participant LSP as Language Server Manager
+    participant LS as Language Server
+
+    VS ->> LSP : close connection
+    LSP ->> LSP : delete user folder
+    LSP ->> LS : close
+```
+
 ## Crosslab Kompatibilität
 
 Es sollte noch eine Crosslab Extension entwickelt werden. Diese könnte eine API anbinden, welche es den anderen Extensions ermöglicht ihre Services anzumelden.
