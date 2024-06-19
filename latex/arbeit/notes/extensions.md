@@ -1,6 +1,6 @@
 # Extension
 
-Im Verlauf der Arbeit sollen mehrere Extension konzipiert werden, welche die gewünschten Funktionen in Visual Studio Code ermöglichen. Diese Extensions sollen die folgenden Funktionen bereitstellen:
+Im Verlauf der Arbeit sollen mehrere Extensions konzipiert werden, welche die gewünschten Funktionen in Visual Studio Code ermöglichen. Diese Extensions sollen die folgenden Funktionen bereitstellen:
 
 - Nutzer sollen in der Lage sein ihre Projekte im Browser speichern zu können
 - Nutzer sollen in der Lage sein ihren Quellcode kompilieren zu können
@@ -51,6 +51,8 @@ Für Debugging von avr8js muss ein entsprechender gdb-server implementiert werde
 ## Language Server
 
 Um einen Language Server anzubinden könnte man einerseits versuchen, eine WebAssembly Version des clangd Language Servers zu verwenden, oder man setzt auch hier auf eine Server-basierte Lösung. In jedem Fall muss aber eine Extension für Visual Studio Code geschrieben werden, die den Language Server einbindet. Außerdem muss das zuständige Gerät noch einen entsprechenden Service bereitstellen.
+
+Bei einer Server-basierten Lösung müssen die benötigten Bibliotheken, Compiler und der Language Server selbst auf dem System installiert sein. Dann wird ein `LanguageServerManager` verwendet, um die Kommunikation mit Visual Studio Code oder anderen Clients zu übernehmen. Bei der Verwendung des Clangd Language Server ist es wichtig zu beachten, dass nur Uris mit dem Schema `file:` akzeptiert werden. Daher muss ggf. ein Mapping zwischen den in Visual Studio Code verwendeten Pfaden und den vom Language Server genutzten Pfaden aufgebaut werden. Weiterhin erkennt Clangd Dateien für `#include` nur, wenn diese auch in dem entsprechenden Pfad auf dem System vorhanden sind. Daher müssen die für das Projekt benötigten Dateien auf dem Server synchronisiert werden. Dazu muss zunächst Visual Studio Code die bereits vorhandenen Dateien bei dem Language Server Manager anmelden. Dieser erstellt dann einen temporären Ordner, in dem alle für den Language Server wichtigen Dateien des Workspace hinterlegt werden. Im Falle von clangd wären dies zum Beispiel `.c` und `.h` Dateien. Weiterhin müssen auch Änderungen an diesen Dateien dem Server mitgeteilt werden. Dazu kann ein `FileSystemWatcher` für die entsprechenden Dateien erstellt werden. Dieser benachrichtigt Visual Studio Code über die Erstellung, Änderung und Löschung von Dateien. Die Erstellung und Änderung von Dateien kann auch über die bereits im Language Server Protocol vorhandenen Nachrichten erkannt werden. Allerdings muss die Löschung von Dateien über den `FileSystemWatcher` erkannt werden. Die Nachrichten des `FileSystemWatchers` werden dann zum Server weitergeleitet, wo dann die entsprechenden Dateien erstellt, geändert oder gelöscht werden. Wenn die Verbindung zum Client abbricht, so wird dessen Nutzerordner gelöscht und dessen Clangd-Instanz beendet.
 
 ### Instanziierung
 
