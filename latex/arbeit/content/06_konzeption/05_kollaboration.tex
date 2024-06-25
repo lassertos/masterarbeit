@@ -13,12 +13,10 @@ Um den Nutzern des GOLDi Remotelab ein kollaboratives Zusammenarbeiten zu ermög
     \item Nutzer arbeiten zusammen an einem geteilten Projekt
 \end{enumerate}
 
-\subsection{Conflict-free Replicated Data Types}
+\subsection{Ansatz 1}
 
-Durch die Nutzung von Conflict-free Replicated Data Types kann es den Nutzern ermöglicht werden gemeinsam an Projekten zu arbeiten. Dazu
+In Ansatz 1 besitzt nur ein Nutzer das Projekt. Das bedeutet, dass nur bei diesem Nutzer der aktuelle Stand des Projekts gespeichert wird. Bei allen anderen Nutzern werden lediglich die Änderungen während eines Experiments synchronisiert. Sobald das Experiment beendet wurde werden keine weiteren Änderungen am Projekt mehr synchronisiert.
 
-\subsection{Operational Transformation}
+\subsection{Ansatz 2}
 
-\subsection{Notizen}
-
-Wenn ein Nutzer ein Experiment startet wird entweder ein neues Projekt angelegt (ggf. mit einem entsprechenden Template) oder es wird ein Projekt geladen, dass zu dem entsprechenden Experiment passt.
+In Ansatz 2 wird der aktuelle Zustand des Projekts auf einem Server gespeichert. Alle Nutzer mit den entsprechenden Berechtigungen können dementsprechend auf den aktuellen Stand des Projekts zugreifen und Änderungen vornehmen, solange sie eine aktive Verbindung zum Server haben. Sollten sie keine aktive Verbindung zum Server haben, sollten Ihnen keine Änderungen am Projekt erlaubt sein.
