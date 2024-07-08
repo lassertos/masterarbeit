@@ -10,7 +10,7 @@ Jede dieser Komponenten besitzt ihre eigenen Aufgaben. Diese werden in den folge
 
 ## Language Server Manager
 
-Ein Language Server Manager ist dafür zuständig, auf die Anfrage eines Clients eine entsprechende Language Server Instance zu erzeugen. Dazu verwendet der Language Server Manager einen entsprechenden Language Server Provider.
+Ein Language Server Manager ist dafür zuständig, auf die Anfrage eines Clients eine entsprechende Language Server Instance zu erzeugen. Dazu verwendet der Language Server Manager einen entsprechenden Language Server Provider. Diese Komponente ist optional.
 
 ## Language Server Provider
 
@@ -22,4 +22,4 @@ Eine Language Server Instance ist dafür zuständig, die Kommunikation zwischen 
 
 ## CrossLab Kompatibilität
 
-Es könnte ein Cloud-instanziierbares Gerät implementiert werden, welches sich um die Erstellung der benötigten konkreten Geräte kümmert.
+Ein Language Server Provider mit CrossLab Kompatibilität
