@@ -1,61 +1,6 @@
 \chapter{Anforderungsanalyse} \label{anforderungsanalyse}
 
-In diesem Kapitel sollen die Anforderung an die zu entwickelnde integrierte Entwicklungsumgebung dargelegt werden. Diese werden in Gesprächen mit Experten des GOLDi-Remotelab sowie Experten des CrossLab Projekts erhoben. Dazu werden in Abschnitt \ref{szenarien} zunächst Szenarien innerhalb des GOLDi Remotelab beschrieben anhand welcher die in Abschnitt \ref{anforderungen} aufgeführten Anforderungen ermittelt wurden.
+In diesem Kapitel sollen die Anforderung an die zu entwickelnde integrierte Entwicklungsumgebung dargelegt werden. Diese werden in Gesprächen mit Experten des GOLDi-Remotelab sowie Experten des CrossLab Projekts erhoben. Dazu wird in Abschnitt \ref{beispielszenario} zunächst ein Beispielszenario für die Nutzung des GOLDi Remotelab beschrieben, anhand dessen die in Abschnitt \ref{anforderungen} aufgeführten Anforderungen ermittelt werden.
 
-\section{Szenarien} \label{szenarien}
-
-\begin{itemize}
-    \item einzelner/mehrere Nutzer
-    \item reale/simulierte Geräte
-    \item Einsatz in der Lehre (Sicht des Lehrenden)
-    \item Nutzer möchten experimentieren (Sicht der Nutzer)
-\end{itemize}
-
-\subsection{Allgemein Interessierte}
-
-Nehmen wir an, dass ein Nutzer des Remotelab die Programmierung von einer gewissen Steuereinheit üben bzw. ausprobieren möchte. In diesem Fall würde der Nutzer ein Experiment starten, welches die Steuereinheit seiner Wahl sowie ein ansteuerbares Modell beinhaltet. In diesem Experiment sollte ein Code-Editor zusätzlich zur Projektverwaltung und Editierung von Dateien auch weitere Features anbieten. Diese hängen von den im Experiment vorhandenen
-
-\subsection{Einsatz in der Lehre}
-
-Nehmen wir hier als Beispiel ein Praktikum, bei dem die Studierenden einen Microcontroller samt einer Interface-Einheit bekommen, mit der Aufgabe einen Kontrollalgorithmus für ein elektromechanisches Modell zu erstellen. Das elektromechanische Modell bzw. eine Simulation dessen wird über das GOLDi Remotelab bereitgestellt. Die Studierenden können also ein Experiment starten, in dem ihre spezifische Interface-Einheit sowie das entsprechende Modell enthalten sind. Für die Bearbeitung der Aufgabe soll den Studierenden weiterhin ein Code Editor bereitgestellt werden. Wichtig hierbei ist zu beachten, dass ggf. keine Simulation des Modells vorhanden sein könnte. Das bedeutet, dass der Studierende in diesem Fall darauf warten muss, bis das reale Gerät vorhanden ist um an der Aufgabe weiterzuarbeiten. Allerdings ist es in diesem Fall wünschenswert, dass der Student den Code Editor auch ohne weitere Geräte nutzen kann. Weiterhin sollte der Code Editor auch Möglichkeiten zur Kompilierung, Debugging
-
-\section{Anforderungen} \label{anforderungen}
-
-\paragraph{Komplett im Browser nutzbar} \mbox{} \\
-Die IDE soll komplett im Browser nutzbar sein. Dies vereinfacht die Einbindung der IDE in das GOLDi Remotelab. Zudem wird der Aufwand für die Studierenden verringert, weil diese keine zusätzliche Software herunterladen und installieren müssen.
-
-\paragraph{Erweiterbarkeit} \mbox{} \\
-Die IDE soll erweiterbar sein. Das bedeutet, dass z.B. die Unterstützung weiterer Programmiersprachen ermöglicht werden soll.
-
-\paragraph{Kollaboratives Editieren von Dateien} \mbox{} \\
-In der modernen Arbeitswelt ist Teamwork eine wichtige Fähigkeit und daher auch ein bedeutendes Lernziel. Daher soll es den Studierenden ermöglicht werden kollaborativ an Projekten zu arbeiten, indem sie gleichzeitig Änderungen an Dateien vornehmen können. Diese Änderungen sollen dann in Echtzeit zwischen den am Experiment teilnehmenden Studierenden synchronisiert werden.
-
-\paragraph{Kompilieren von C Programmen für Microcontroller} \mbox{} \\
-Die IDE soll das Kompilieren von C Programmen für Microcontroller ermöglichen. Dabei soll die Kompilierung direkt für das entsprechende Zielsystem erfolgen.
-
-\paragraph{Hochladen von kompilierten Programmen auf Microcontroller} \mbox{} \\
-Die IDE soll das Hochladen von kompilierten Programmen auf Microcontroller ermöglichen. Das bedeutet, dass das hochgeladene Programm auf das entsprechende Zielsystem aufgespielt werden soll.
-
-\paragraph{Debuggen von Programmen auf Microcontrollern} \mbox{} \\
-Die IDE soll das Debuggen von Programmen auf Microcontrollern ermöglichen. Dabei ist die im GOLDi Remotelab vorhandene Hardware zu beachten. Den Studierenden soll auch ein entsprechendes Nutzer Interface zur Interaktion mit der Debug Sitzung bereitgestellt werden. Weiterhin soll eine aktive Debug-Sitzung allen Teilnehmern eines Experiments angezeigt werden.
-
-\paragraph{CrossLab-Kompatibilität} \mbox{} \\
-Die IDE soll als Laborgerät in CrossLab einbindbar sein. Dazu müssen die benötigten Services definiert und implementiert werden.
-
-\paragraph{Anbindbarkeit von Language Servern} \mbox{} \\
-Die IDE soll die Anbindung von Language Servern unterstützen.
-
-\paragraph{Kostenlos nutzbar} \mbox{} \\
-Die IDE soll für Studierende kostenlos nutzbar sein.
-
-\paragraph{Standalone nutzbar} \mbox{} \\
-Die IDE soll auch Standalone nutzbar sein. Dies bedeutet, dass die IDE auch ohne weitere Laborgeräte verwendbar sein soll. Dies ermöglicht es den Studierenden die IDE nutzen zu können ohne dafür ggf. auf die Verfügbarkeit anderer Geräte zu warten bzw. diese zu blockieren.
-
-\paragraph{Übertragbarkeit des Wissens im Umgang mit der IDE} \mbox{} \\
-
-
-\paragraph{Einbindbarkeit in Lehrplattformen (z.B. über LTI)} \mbox{} \\
-
-
-\paragraph{Anzeigen der Seriellen Ausgaben} \mbox{} \\
-Die IDE sollte in der Lage sein, die Ausgaben der seriellen Schnittstellen darstellen zu können.
+\input{content/03_anforderungsanalyse/01_beispielszenario.tex}
+\input{content/03_anforderungsanalyse/02_anforderungen.tex}
