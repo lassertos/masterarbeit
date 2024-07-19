@@ -23,7 +23,7 @@ export class GOLDiTextSearchProvider implements vscode.TextSearchProvider {
   ): Promise<vscode.TextSearchComplete> {
     const files = (await this.fs.getAllFiles()).map((file) => {
       return {
-        uri: vscode.Uri.from({ scheme: "zenfs", path: file.path }),
+        uri: vscode.Uri.from({ scheme: "idbfs", path: file.path }),
         content: new TextDecoder().decode(file.file.data),
       };
     });

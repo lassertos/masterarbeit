@@ -31,7 +31,7 @@ export class GOLDiFileSearchProvider implements FileSearchProvider {
     );
 
     return results.map((path) =>
-      Uri.from({ scheme: "zenfs", path: path.item })
+      Uri.from({ scheme: "idbfs", path: path.item })
     );
   }
 }
