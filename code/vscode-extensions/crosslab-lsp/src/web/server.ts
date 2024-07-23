@@ -8,7 +8,7 @@ import {
 } from "vscode-languageserver/browser";
 import { FileEventMessage } from "./types";
 
-console.log("running server lsp-crosslab-arduino");
+console.log("running server lsp-crosslab");
 
 class LanguageServerProvider {
   private messageReader = new BrowserMessageReader(self);

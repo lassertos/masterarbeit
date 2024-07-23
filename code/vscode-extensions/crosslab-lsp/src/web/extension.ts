@@ -7,7 +7,7 @@ import { LanguageClient } from "vscode-languageclient/browser";
 let client: LanguageClient | undefined;
 // this method is called when vs code is activated
 export async function activate(context: ExtensionContext) {
-  console.log("crosslab-arduino-lsp activated!");
+  console.log("crosslab-lsp activated!");
 
   // Options to control the language client
   const clientOptions: LanguageClientOptions = {
@@ -19,7 +19,7 @@ export async function activate(context: ExtensionContext) {
   client = await createWorkerLanguageClient(context, clientOptions);
 
   await client.start();
-  console.log("crosslab-arduino-lsp server is ready");
+  console.log("crosslab-lsp server is ready");
 }
 
 export async function deactivate(): Promise<void> {

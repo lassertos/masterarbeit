@@ -1,6 +1,6 @@
 {
-  "name": "crosslab-arduino-lsp",
-  "displayName": "crosslab-arduino-lsp",
+  "name": "crosslab-lsp",
+  "displayName": "crosslab-lsp",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -16,7 +16,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "crosslab-arduino-lsp.helloWorld",
+        "command": "crosslab-lsp.helloWorld",
         "title": "Hello World"
       }
     ]

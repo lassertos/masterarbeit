@@ -1,6 +1,6 @@
-# crosslab-arduino-lsp README
+# crosslab-lsp README
 
-This is the README for your extension "crosslab-arduino-lsp". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "crosslab-lsp". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 
