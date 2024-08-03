@@ -153,3 +153,25 @@ fs.writeFileSync(
     4
   )
 );
+
+fs.writeFileSync(
+  "merged/merged.csv",
+  "title|abstract|keywords|released|link\n" +
+    // prettier-ignore
+    JSON.parse(fs.readFileSync("merged/merged.json"))
+      .map(
+        (entry) =>
+          `^${
+            entry.title
+          }^|^${
+            entry.abstract ?? ""
+          }^|^${
+            entry.keywords
+          }^|^${
+            entry.released
+          }^|^${
+            entry.link ?? ""
+          }^`
+      )
+      .join("\n")
+);

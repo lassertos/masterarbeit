@@ -73,6 +73,14 @@ Notes:
 
 category:
 
+## Catchword: Language Server Protocol An Introduction to the Protocol, its Use, and Adoption for Web Modeling Tools
+
+Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85172705800&doi=10.18417%2femisa.18.9&partnerID=40&md5=2fc2c46b4f4b4db21547603f0a4e0687
+
+Notes:
+
+- possible source for lsp
+
 ## THE ACCEPTANCE OF AN EDUCATIONAL INTEGRATED DEVELOPMENT ENVIRONMENT TO LEARN PROGRAMMING FUNDAMENTALS
 
 Link: https://www.researchgate.net/publication/368909126_THE_ACCEPTANCE_OF_AN_EDUCATIONAL_INTEGRATED_DEVELOPMENT_ENVIRONMENT_TO_LEARN_PROGRAMMING_FUNDAMENTALS
@@ -992,3 +1000,47 @@ Notes:
 - classification and review of different web-based interactive programming environments
 - not sure how useful since it was released in 2001
 - maybe classification categories are important
+
+## Design and evaluation of a web-based distributed pair programming tool for novice programmers
+
+Link: https://doi.org/10.1145/3649217.3653571
+
+## Containerizing CS50: Standardizing students’ programming environments
+
+Link: https://doi.org/10.1145/3649217.3653567
+
+## Development of Project Management Module for Reflex Cloud IDE
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10515647
+
+## Exploring the Boundaries: Online Compiler Limitations and Capabilities
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10522387
+
+## CodeXchange: Leaping into the Future of AI-Powered Code Editing
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10585043
+
+## CREATOR: An Educational Integrated Development Environment for RISC-V Programming
+
+Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10540579
+
+## How to Run GUI Applications on a Java Development Environment Based on JupyterLab
+
+Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85191349936&doi=10.1007%2f978-3-031-57840-3_26&partnerID=40&md5=deb9aaf19bc66abf7c64bf036c380a9a
+
+## A Collaborative Coding Platform for Both College Students and Teachers
+
+Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85194222149&doi=10.1007%2f978-981-97-1329-5_28&partnerID=40&md5=c393c40be3e8d301d458b601ff050431
+
+## Requirements for an Online Integrated Development Environment for Automated Programming Assessment Systems
+
+Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85193906566&doi=10.5220%2f0012556400003693&partnerID=40&md5=84d84745c4cf0fbaed52ae7e6461ffc3
+
+## LEARNING WEB DEVELOPMENT USING GITHUB COPILOT IN AND OUTSIDE ACADEMIA: A BLESSING OR a CURSE?
+
+Link: ?
+
+## Redprint: Integrating API specific "instant example" and "instant documentation" display interface in IDEs
+
+Link: https://doi.org/10.1145/2046396.2046408
