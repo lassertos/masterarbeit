@@ -1005,21 +1005,61 @@ Notes:
 
 Link: https://doi.org/10.1145/3649217.3653571
 
+Notes:
+
+- introduces a new tool for distributed pair programming
+- may contain interesting sources for arguing for collaborative features
+- problems with existing systems:
+  - lack of features to change roles between students
+  - poor support of activities management by teachers
+  - low data collection preventing advanced features offered by learning analytics
+- an evaluation of the developed tool is given
+
 ## Containerizing CS50: Standardizing students’ programming environments
 
 Link: https://doi.org/10.1145/3649217.3653567
+
+Notes:
+
+- another paper about the CS50 approach used at harvard
+- explains prior approaches and afterwards the current solution based on containers
+- uses Github Codespaces
+- need to think about why this is not a suitable solution for our goals
+- maybe just argue that we do not want to be dependent on external services?
 
 ## Development of Project Management Module for Reflex Cloud IDE
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10515647
 
+Notes:
+
+- continuation of the RIDE papers
+- comparison of project management capabilities of different ides
+- description of custom implementation
+
 ## Exploring the Boundaries: Online Compiler Limitations and Capabilities
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10522387
 
+Notes:
+
+- provides a literature review on online compilers
+- proposes an architecture for online compilers
+- could be used for designing compilation backend
+
 ## CodeXchange: Leaping into the Future of AI-Powered Code Editing
 
 Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10585043
+
+Notes:
+
+- main points:
+  - code translation
+  - auto comment generation
+  - optimizing code
+  - real-time collaborative programming
+- lists chatgpt as a code editor
+- not sure how helpful
 
 ## CREATOR: An Educational Integrated Development Environment for RISC-V Programming
 
@@ -1039,7 +1079,12 @@ Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85193906566&doi=10.522
 
 ## LEARNING WEB DEVELOPMENT USING GITHUB COPILOT IN AND OUTSIDE ACADEMIA: A BLESSING OR a CURSE?
 
-Link: ?
+Link: https://hrcak.srce.hr/file/460172
+
+Notes:
+
+- interesting topic in general
+- not really helpful for thesis
 
 ## Redprint: Integrating API specific "instant example" and "instant documentation" display interface in IDEs
 
