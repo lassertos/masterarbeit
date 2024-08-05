@@ -1,7 +1,9 @@
 import inquirer from "inquirer";
 import { Database } from "../databases";
 
-export async function selectFields(database: Database): Promise<string[]> {
+export async function selectFieldsAction(
+  database: Database
+): Promise<string[]> {
   return inquirer
     .prompt({
       type: "checkbox",

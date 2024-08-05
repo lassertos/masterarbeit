@@ -34,6 +34,7 @@ export const integratedDevelopmentEnvironmentKeywords: Keyword[] = [
       {
         singular: "IDE",
         plural: "IDEs",
+        isCaseSensitive: true,
       },
       {
         singular: "code editor",

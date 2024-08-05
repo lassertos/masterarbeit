@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import { databases, AvailableDatabase, Database } from "../databases";
 
-export async function selectDatabase(): Promise<Database> {
+export async function selectDatabaseAction(): Promise<Database> {
   return inquirer
     .prompt({
       type: "list",

@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import { Keyword, keywords } from "../keywords";
 
-export async function selectKeywords(): Promise<Keyword[]> {
+export async function selectKeywordsAction(): Promise<Keyword[]> {
   return inquirer
     .prompt({
       type: "checkbox",

@@ -1,11 +1,11 @@
-import { selectDatabase } from "./select-database";
-import { selectFields } from "./select-fields";
-import { selectKeywords } from "./select-keywords";
+import { selectDatabaseAction } from "./select-database";
+import { selectFieldsAction } from "./select-fields";
+import { selectKeywordsAction } from "./select-keywords";
 
-export async function createQuery() {
-  const database = await selectDatabase();
-  const fields = await selectFields(database);
-  const keywords = await selectKeywords();
+export async function createQueryAction() {
+  const database = await selectDatabaseAction();
+  const fields = await selectFieldsAction(database);
+  const keywords = await selectKeywordsAction();
   const query = database.buildQuery(keywords, fields);
   console.log(query);
 }

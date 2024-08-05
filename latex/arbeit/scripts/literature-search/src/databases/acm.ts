@@ -1,6 +1,7 @@
 import { Database } from ".";
 import { Keyword } from "../keywords";
 import { Query, QueryOptions, buildQuery } from "../query";
+import { execSync } from "child_process";
 
 const queryOptions = {
   operators: {
@@ -41,6 +42,24 @@ export const acmDatabase: Database = {
   ],
   buildQuery: (keywords, fields) =>
     buildQuery(buildQueryTemplate(keywords, fields, queryOptions)),
+  toJson: (file) => {
+    const jsonData: any[] = JSON.parse(
+      execSync(`pandoc ${file} -t csljson`, {
+        maxBuffer: 1024 * 1024 * 2,
+      }).toString()
+    );
+    return jsonData.map((entry) => {
+      return {
+        title: entry.title,
+        abstract: entry.abstract ?? "",
+        keywords: (entry.keyword?.split(", ") ?? []).join("; "),
+        released: parseInt(entry["issued"]["date-parts"][0][0]),
+        link: entry["DOI"]
+          ? "https://doi.org/" + entry["DOI"]
+          : "https://dl.acm.org/doi/" + entry["id"],
+      };
+    });
+  },
 };
 
 export function buildQueryTemplate(

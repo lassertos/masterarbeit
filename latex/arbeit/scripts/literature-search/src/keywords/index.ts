@@ -10,10 +10,12 @@ export type Synonym =
   | {
       singular: string;
       plural?: string;
+      isCaseSensitive?: boolean;
     }
   | {
       singular?: string;
       plural: string;
+      isCaseSensitive?: boolean;
     };
 
 export type Keyword = Synonym & {
