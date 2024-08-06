@@ -1026,6 +1026,7 @@ Notes:
 - uses Github Codespaces
 - need to think about why this is not a suitable solution for our goals
 - maybe just argue that we do not want to be dependent on external services?
+- maybe one could argue that a user should only need one login?
 
 ## Development of Project Management Module for Reflex Cloud IDE
 

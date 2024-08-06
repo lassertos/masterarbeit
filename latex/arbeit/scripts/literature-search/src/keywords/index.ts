@@ -1,7 +1,10 @@
 import { advantageKeywords } from "./advantage";
+import { approachKeywords } from "./approach";
+import { debuggingKeywords } from "./debugging";
 import { disadvantageKeywords } from "./disadvantage";
 import { educationKeywords } from "./education";
 import { integratedDevelopmentEnvironmentKeywords } from "./integrated-development-environment";
+import { microcontrollerKeywords } from "./microcontroller";
 import { problemKeywords } from "./problem";
 import { requirementKeywords } from "./requirement";
 import { webKeywords } from "./web";
@@ -24,9 +27,12 @@ export type Keyword = Synonym & {
 
 export const keywords = [
   ...advantageKeywords,
+  ...approachKeywords,
+  ...debuggingKeywords,
   ...disadvantageKeywords,
   ...educationKeywords,
   ...integratedDevelopmentEnvironmentKeywords,
+  ...microcontrollerKeywords,
   ...problemKeywords,
   ...requirementKeywords,
   ...webKeywords,
