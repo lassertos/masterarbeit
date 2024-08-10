@@ -49,7 +49,8 @@ class LanguageServerProvider {
     this.webSocket.onclose = () => {
       console.log(`webSocket connection has been closed`);
     };
-    this.webSocket.onerror = () => {
+    this.webSocket.onerror = (error) => {
+      console.error(error);
       console.error(`webSocket: An error has occurred!`);
     };
     this.webSocket.onmessage = (event) => {

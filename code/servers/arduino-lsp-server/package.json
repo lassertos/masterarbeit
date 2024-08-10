@@ -1,7 +1,10 @@
 {
   "name": "arduino-lsp-server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "bin": {
+    "language-server-provider": "dist/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
@@ -16,7 +19,10 @@
   },
   "dependencies": {
     "@types/ws": "^8.5.10",
-    "chalk": "^5.3.0",
-    "ws": "^8.17.1"
+    "messaging-channels": "file:../messaging-channels",
+    "shared-library": "file:../shared-library",
+    "tiny-typed-emitter": "^2.1.0",
+    "ws": "^8.17.1",
+    "zod": "^3.23.8"
   }
 }
