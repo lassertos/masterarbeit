@@ -28,7 +28,16 @@
 \usepackage{multirow}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{enumitem}
-\usepackage{tcolorbox}
+\usepackage[most]{tcolorbox}
+
+\newenvironment{note}
+{
+    \begin{tcolorbox}[boxrule=0pt,frame hidden,sharp corners,enhanced,borderline west={2pt}{0pt}{pink}, colback=black!3,breakable]
+        \textbf{Notiz:} \\
+        }
+        {
+    \end{tcolorbox}
+}
 
 % === Übersetzungen ===========================================================
 % Definitionen je nach \mylanguage (siehe NIKR_settings.tex)

@@ -1,25 +1,41 @@
 \section{Beispielszenario: Praktikumsversuch} \label{beispielszenario}
 
-\begin{itemize}
-    \item Designer
-    \item Entwickler
-    \item Vorbereiter
-    \item Betreuer
-    \item Lernende
-    \item Lehrende
-    \item Administrator
-\end{itemize}
+In diesem Abschnitt soll ein Beispielszenario für den Einsatz der zu entwickelnden integrierten Entwicklungsumgebung beschrieben werden. Bei dem Beispielszenario handelt es sich um einen Praktikumsversuch. \\
 
-\subsection{Designer}
+Bei der Konzipierung eines Praktikumsversuchs sollten die beabsichtigten Lernergebnisse der Studierenden ermittelt werden. Anhand dieser kann dann ein entsprechender Versuchsaufbau entwickelt bzw. ausgewählt werden. Die Entwickler eines CrossLab-kompatiblen Versuchs sind dafür verantwortlich die benötigten Laborgeräte zu implementieren.
 
 \subsection{Entwickler}
 
-\subsection{Vorbereiter}
+Entwickler sind für den Entwurf und die Implementierung neuer Laborgeräte verantwortlich. Gegebenenfalls muss ein neues Laborgerät mit der integrierten Entwicklungsumgebung interagieren. Um dies zu ermöglichen muss die zu entwickelnde integrierte Entwicklungsumgebung entsprechende Services anbieten. Über diese Services können dann entsprechende Laborgeräte verbunden werden. Hierbei wäre es hilfreich, wenn die integrierte Entwicklungsumgebung erweiterbar wäre, ohne das zugrundeliegende Laborgerät anpassen zu müssen.
+
+\begin{note}
+    Eine Idee wäre es in der integrierten Entwicklungsumgebung eine CrossLab-Service Erweiterungen zu erlauben. Wenn ein Experiment konfiguriert wird könnte eine entsprechende Erweiterung als Konfiguration an die integrierte Entwicklungsumgebung übergeben werden. Diese würde die entsprechende Erweiterung dann laden und könnte somit dann die darin implementierten Services anbieten. Hierbei ist allerdings noch zu überlegen, wie genau das in einem Konfigurator umgesetzt werden könnte.
+\end{note}
 
 \subsection{Betreuer}
 
+Betreuer müssen die Lernenden während der Durchführung des Praktikumsversuchs begleiten. Hierbei könnte es dem Betreuer erlaubt werden, einem laufenden Experiment der Lernenden beizutreten. Über ein entsprechendes Rollenmanagement könnte es dem Betreuer somit ermöglicht werden den Code der Lernenden einzusehen und zu bearbeiten. Weiterhin könnte er weitere Features der integrierten Entwicklungsumgebung nutzen, wie zum Beispiel die Kompilierung und das Hochladen von Code.
+
+\begin{note}
+    Hierbei ist interessant, wie das Rollenmanagement implementiert werden muss und wie die entsprechenden Erweiterungen damit umgehen. Weiterhin ist interessant, wie das Beitreten von Nutzern allgemein implementiert werden sollte. Ideen: Betreuer kann Experiment updaten / Betreuer wird erkannt und dynamisch entsprechender Rolle zugeteilt / Optionales Laborgerät für Betreuer ist im Experiment hinterlegt. Wie sollten optionale Laborgeräte implementiert werden?
+\end{note}
+
 \subsection{Lernende}
+
+Lernende müssen den Praktikumsversuch durchführen. Hierbei können sie alle bereitgestellten Hilfsmittel der integrierten Entwicklungsumgebung nutzen. Um die Kollaboration von Lernenden zu ermöglichen sollte die integrierte Entwicklungsumgebung über entsprechende Mechanismen verfügen. So könnten den Lernenden zum Beispiel die Kommunikation über Text und Video, sowie das gleichzeitige Editieren von Dateien ermöglicht werden.
+
+\begin{note}
+    Hierbei könnte auch über weitere Interaktionsmöglichkeiten nachgedacht werden, wie zum Beispiel eine Git-Integration oder ein Kurs-übergreifendes Wiki.
+\end{note}
 
 \subsection{Lehrende}
 
+Lehrende sind für die didaktische Konzipierung des Praktikumsversuchs verantwortlich. Lehrende können sich darauf aufbauend ein Experiment zusammenstellen, welches ihrem didaktischen Konzept entspricht. Weiterhin könnten Lehrenden auch bereits vorkonfigurierte Experimente angezeigt werden, mit denen sie ihre angestrebten Ziele erreichen können.
+
+\begin{note}
+    Dabei ist es allerdings notwendig, dass die Geräte und Experimente mit entsprechenden Meta-Informationen ausgestattet werden, welche die Kategorisierung bzw. das Zusammenstellen von passenden Experimenten vereinfacht.
+\end{note}
+
 \subsection{Administrator}
+
+Administratoren sind für die Verwaltung und Bereitstellung der Laborgeräte verantwortlich. Um den Administrator bei der Einrichtung der Softwarekomponenten zu Unterstützen könnte ein entsprechendes Tool konzipiert werden. Bei diesem könnte der Administrator die benötigten Softwarekomponenten auswählen und würde dann eine Konfiguration in einem passenden Format ausgegeben bekommen (z.B. Dockerfile, Docker-Compose, ...).
