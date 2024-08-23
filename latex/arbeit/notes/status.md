@@ -1,0 +1,58 @@
+# Status
+
+- [ ] Abstract
+- [ ] Einleitung
+- [ ] Grundlagen
+  - [ ] Code Editor
+  - [ ] Compiler
+  - [ ] Debugger
+  - [ ] Language Server Protocol
+  - [ ] Debug Adapter Protocol
+  - [ ] Remote Labore
+  - [ ] GOLDi Remotelab
+  - [ ] CrossLab
+  - [ ] Integrierte Entwicklungsumgebung
+  - [ ] WebAssembly?
+  - [ ] WebRTC?
+  - [ ] WebSocket?
+  - [ ] IndexedDB?
+  - [ ] Container?
+  - [ ] Virtuelle Maschine?
+- [ ] Anforderungsanalyse
+  - [ ] Szenarien beschreiben
+  - [ ] Anforderungen definieren
+- [ ] Literaturrecherche
+  - [ ] Paper durchlesen
+  - [ ] Ergebnisse zusammenfassen
+    - [ ] gefundene Implementierungen kategorisieren
+    - [ ] gefundene Vorteile herausarbeiten
+    - [ ] gefundene Herausforderungen herausarbeiten
+    - [ ] interessante Ansätze beschreiben
+    - [ ] Forschungslücke ausfindig machen
+- [ ] Stand der Technik
+  - [ ] bestehende Softwarelösungen kategorisieren
+  - [ ] bestehende Softwarelösungen vergleichen
+- [ ] Konzeption
+  - [ ] Aufgabenbeschreibung?
+  - [ ] CrossLab-Kompatibilität
+  - [ ] Datenspeicherung
+  - [ ] Anbindung Compiler
+  - [ ] Anbindung Debugger
+  - [ ] Anbindung Language Server
+  - [ ] Anbindung Test Framework
+  - [ ] Kollaboration
+  - [ ] komplett webbasierte Variante
+- [ ] Implementierung
+  - [ ] CrossLab-Kompatibilität
+  - [ ] Datenspeicherung
+  - [ ] Compiler
+  - [ ] Debugger
+  - [ ] Language Server
+  - [ ] Test Framework
+  - [ ] Kollaboration
+  - [ ] webbasierte Variante
+- [ ] Evaluation
+  - [ ] funktionale Evaluation
+  - [ ] Ressourcenverbrauch (Vergleich mit anderen Lösungen)
+  - [ ] Performanz? (z.B. Latenz)
+- [ ] Fazit und Ausblick
