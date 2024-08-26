@@ -391,8 +391,17 @@ Link: https://link.springer.com/article/10.1007/s11423-020-09773-6
 Notes:
 
 - evaluation using the codeboard ide (anonymous vs registered learners)
+- registered learners code is saved and reloaded while anonymous users code is discarded
+- rq1: differences in terms of their level of engagement?
+- rq2: differences in terms of their coding behavior?
+- an overview of the architecture of codeboard is given
+- not all interesting data could be collected (e.g. keystrokes)
+- the results of the evaluation are discussed
+- further research topics are given in the conclusion
 
 category: client-server
+
+interesting: 4/5
 
 ## Good-bye localhost: A cloud-based web IDE for teaching java EE web development to non-computer science majors
 
@@ -402,8 +411,14 @@ Notes:
 
 - Eclipse Che was selected, using the JBoss WildFly application server for Java EE support
 - simple evaluation provided
+- an overview of the developed architecture is given
+- only supports java ee although it could maybe be adapted to other languages
+- target group were non-computer science major students with limited technical knowledge
+- IT management / administration overhead listed as a drawback
 
 category: cloud
+
+interesting: 3/5
 
 ## Gamifying the Code Genie Programming Tool
 
@@ -413,8 +428,13 @@ Notes:
 
 - Code Genie is a free web IDE that was developed to integrate art and animation in learning Text-based programming language
 - This paper demonstrates the latest Code Genie update which includes adding several features such as gamification elements, tutorial lessons, user's registration accounts, "Get Link" button that can be used to get a code link to be shared in any platform, sorting the shared code inside the Code Genie development environment, adding the button symbol, and saving the latest written code
+- gamification idea seems interesting as a general concept
+- aimed at highschool students
+- the used programming language is javascript
 
 category: browser
+
+interesting: 2.5/5
 
 ## JavaScript Development Environment for Programming Education Using Smartphones
 
@@ -423,10 +443,12 @@ Link: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8951653
 Notes:
 
 - description of a development environment for smartphones called JavaScript Development Environmnent (JDE)
-- classification of existing solutions
-- evaluation of JDE is given
+- small evaluation of JDE is given
+- mostly focused on implementation
 
 category: browser
+
+interesting: 2/5
 
 ## pyiron: An integrated development environment for computational materials science
 
@@ -437,8 +459,11 @@ Notes:
 - python based framework for simulation protocols
 - integrates well with jupyter notebooks
 - can be split into browser-based user-interface and server-based backend for simulation
+- does not seem very interesting for our purposes
 
 category: client-server
+
+interesting: 1/5
 
 ## Teachers’ Perspectives on Learning and Programming Environments for Secondary Education
 
@@ -448,7 +473,17 @@ Notes:
 
 - papers on students point of view are given in the introduction
 - teachers point of view on choosing a fitting development environment for teaching is explored
-- multiple ides are evaluated
+- multiple ides are evaluated (bluej, scratch, greenfoot, eclipse, mit app inventor, processing ide, alice)
+- rq1: what influence does the educational oop environment have on students' learning success compared to other factors, according to teachers?
+- rq2: what features should an educational oop environment have, according to teachers?
+- rq3: which educational oop environments are used and preferred for classrooms by teachers?
+- rq4: which benefits and disadvantages exist for selected educational oop environments, according to teachers?
+
+category: comparison
+
+interesting: 2/5
+
+note: some sources in chapter 2 may be interesting
 
 ## OnlineSPARC: A programming environment for answer set programming
 
@@ -459,8 +494,12 @@ Notes:
 - description of an online programming environment for SPARC
 - web-based user-interface with backend for computation
 - performance evaluation given
+- website no longer accessible
+- mostly chapter 3 seems to be of interest (contains architecture, implementation and performance evaluation)
 
 category: client-server
+
+interesting: 2.5/5
 
 ## How “Friendly” Integrated Development Environments Are?
 
@@ -469,6 +508,12 @@ Link: https://www.scopus.com/inward/record.uri?eid=2-s2.0-85069822473&doi=10.100
 Notes:
 
 - Survey focusing on programmer experience for the following ides: DevC++, Eclipse and NetBeans
+- none of the ides achieves a high usability score (highest: D)
+- very specific to the ides under consideration
+
+category: comparison, usability
+
+interesting: 2/5
 
 ## WebLinux: A scalable in-browser and client-side linux and IDE
 
@@ -478,9 +523,13 @@ Notes:
 
 - description of a tool for teaching Linux
 - completely browser-based
+- a fork of jor1k
 - can be run offline once loaded
+- can run gcc in browser
 
 category: browser
+
+interesting: 3/5
 
 ## Matlab Programming Environment Based on Web
 
@@ -490,8 +539,12 @@ Notes:
 
 - description of an online programming environment for matlab
 - client server architecture with web-based user interface and server for compilation
+- many grammatical and spelling errors
+- simple client server architecture
 
 category: client-server
+
+interesting: 1/5
 
 ## The Code Genie Programming Environment
 
