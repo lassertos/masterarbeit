@@ -1,0 +1,24 @@
+# Struktur
+
+- [ ] Abstract
+- [ ] Einleitung
+- [ ] Grundlagen?
+- [ ] Literaturrecherche
+  - Darstellung verschiedenster IDE Implementierungen mit ihren Vor- und Nachteilen, sowie ihren Anwendungsbereichen
+  - Aufzeigen der Tatsache, dass die meisten IDEs sehr anwendungsspezifisch sind
+  - Darlegung von allgemeinen Erkenntnissen zu online IDEs
+  - => System wird benötigt, dass viele verschiedene Anwendungsmöglichkeiten unterstützt + CrossLab-Kompatibilität
+- [ ] Anforderungen
+  - Szenario Microcontroller-Programmierung: Darstellung auf verschiedenen Wissensleveln
+  - Darlegung der verschiedenen Akteure und deren möglichen Anforderungen basierend auf der Literaturrecherche
+  - Editor-Komponente sollte austauschbar sein
+- [ ] Stand der Technik?
+  - Dieser Abschnitt könnte auch mit in die Literaturrecherche eingearbeitet werden
+- [ ] Konzeption
+  - [ ] Client-Server-basierter Ansatz
+  - [ ] Browserbasierter Ansatz
+  - Hierbei ist ggf. auch die Betrachtung von verschiedenen Experimentkonfigurationen interessant
+- [ ] Implementierung
+- [ ] Evaluation
+- [ ] Diskussion?
+- [ ] Fazit und Ausblick
