@@ -803,6 +803,8 @@ note: some sources in chapter 2 may be interesting
 
 **category:** browser
 
+**interesting:** 2.5/5
+
 **Cites / Views:** 5 / 91
 
 ## Evaluations of JaguarCode: A web-based object-oriented programming environment with static and dynamic visualization
@@ -816,6 +818,8 @@ note: some sources in chapter 2 may be interesting
 - consists of a web-based user interface and a server for compilation, debugging and visualization
 
 **category:** client-server
+
+**interesting:** 3/5
 
 **Cites / Views:** 12 / 23
 
@@ -858,6 +862,8 @@ note: some sources in chapter 2 may be interesting
 **category:** client-server
 
 **Cites / Views:** 4 / 23
+
+note: publisher website uses http and is in chinese
 
 ## A web-based IDE for teaching with any language (abstract only)
 

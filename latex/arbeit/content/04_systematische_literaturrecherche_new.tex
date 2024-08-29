@@ -1,0 +1,81 @@
+\chapter{Systematische Literaturrecherche} \label{systematische_literaturrecherche}
+
+Um einen Überblick über den aktuellen Stand der Forschung zu bekommen wird zunächst eine Literaturrecherche vorgenommen. Dabei sollen vorhandene online IDEs gefunden sowie die folgenden Fragen beantwortet werden:
+
+\begin{itemize}
+    \item Welche Anforderungen werden an online IDEs gestellt?
+    \item Welchen Architekturmustern folgen online IDEs?
+    \item Welche Vor- und Nachteile haben die online IDEs?
+\end{itemize}
+
+\section{Vorgehensbeschreibung}
+
+Die folgenden Datenbanken wurden für die Literaturrecherche ausgewählt:
+
+\begin{itemize}
+    \item ACM Digital Library
+    \item IEEE Xplore
+    \item Scopus
+    \item Web of Science
+\end{itemize}
+
+Zunächst wurde eine allgemeine Suche nach online IDEs in den genannten Datenbanken vorgenommen. Dazu werden zunächst die in Tabelle \ref{table:search-terms} genannten Stichwörter jeweils mit ihren Synonymen mit einer OR-Operation verknüpft. Danach werden die daraus resultierenden Terme mit einer AND-Operation verbunden. Die so entstehende Suchanfrage werden dann für die Suche in den Datenbanken verwendet. Dabei werden die Titel, Abstracts und Keywords der Publikationen durchsucht.
+
+In Tabelle \ref{table:amount-search-results} ist die Anzahl der Hits für den einzelnen Datenbanken dargelegt. Um die Anzahl der zu betrachtenden Publikationen zu verringern wird eine weitere Filterung der Ergebnisse vorgenommen. Dafür werden nur Publikationen betrachtet, die IDE oder ein entsprechendes Synonym in ihrem Titel oder ihren Keywords enthalten. Dadurch sinkt die Anzahl der Hits auf insgesamt $1154$. Um eine handhabbare Anzahl an Publikationen zu erhalten werden in einem weiteren Schritt die Titel und Abstracts der Publikationen genauer betrachtet. Dabei werden unter anderem Arbeiten herausgefiltert, deren Titel und Abstracts keinen Bezug zu den Forschungsfragen besitzen. Weiterhin werden Publikationen bevorzugt, die sich zudem mit textbasierten Programmiersprachen, Kollaboration und Lehre auf Universitätsniveau befassen. Aus dieser Filterung resultieren $95$ Publikationen zur weiteren Betrachtung.
+
+\begin{table}[tbp]
+    \centering
+    \begin{tabularx}{\textwidth}{| >{\hsize=.6\hsize\linewidth=\hsize}X |
+            >{\hsize=1.4\hsize\linewidth=\hsize}X |}
+        \hline
+        Stichwort                           & Synonyme                                                                                                     \\
+        \hline
+        integrated development environments & IDEs, code editors, development environments, development tools, programming tools, programming environments \\
+        \hline
+        web                                 & browser, online, cloud                                                                                       \\
+        \hline
+    \end{tabularx}
+    \caption{Suchbegriffe}
+    \label{table:search-terms}
+\end{table}
+
+
+\begin{table}[tbp]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        ACM & IEEE & Scopus & Web of Science \\
+        \hline
+        785 & 1472 & 4661   & 1044           \\
+        \hline
+    \end{tabular}
+    \caption{Anzahl Suchergebnisse}
+    \label{table:amount-search-results}
+\end{table}
+
+\section{Ergebnisse}
+
+Die Publikationen beschreiben eine Vielzahl an verschiedenen webbasierten integrierten Entwicklungsumgebungen. Dabei kann eine Unterteilung in die folgenden zwei Kategorien erfolgen:
+
+\begin{itemize}
+    \item \textbf{Client-Server-basierte Lösungen} \\
+          Systeme dieser Art zeichnen sich dadurch aus, dass sie eine Client-Server-Archi-tektur verwenden. Hierbei werden Features, die nicht innerhalb eines Browsers ausgeführt werden können (z.B. Kompilierung) über einen entsprechenden Server bereitgestellt.
+    \item \textbf{Browser-basierte Lösungen} \\
+          Systeme dieser Art zeichnen sich dadurch aus, dass alle Features im Browser des Nutzers ausgeführt werden können, ohne die Hilfe eines separaten Servers.
+\end{itemize}
+
+
+
+Jefferson et al. (2024) \cite{PyodideU-2024} beschreiben eine IDE, die es Nutzern ermöglicht Python Code im Browser zu schreiben und auszuführen. Dabei wird das Programm des Nutzers lokal in dessem Browser durchgeführt. Dies wird durch den Einsatz von PyodideU erreicht, einer erweiterten Version der WebAssembly-basierten Python Distribution Pyodide \cite{Pyodide}. Zusätzlich wird den Nutzern auch eine Grafikbibliothek angeboten samt eines Debuggers, der es ermöglicht Zeile für Zeile und auch rückwärts durch das Programm zu gehen und die entsprechenden Änderungen an der Grafik zu sehen. Weiterhin wird durch PyodideU auch die synchrone Eingabe von Daten unterstützt, während Python im Main-Thread des Browsers läuft. Zudem wird auch ein Dateisystem bereitgestellt. Insgesamt wurde die IDE sowohl von Studenten als auch von Lehrenden als hilfreich wahrgenommen.
+
+Über mehrere Publikationen wird die Entwicklung der Reflex IDE (RIDE) beschrieben.  Zunächst wird von Bastrykina et al. (2021)
+%\cite{RIDE-Kernel} 
+ein entsprechender Kernel mit dem Xtext Framework entwickelt, welcher in der Eclipse IDE verwendet werden kann, um diese. Darauf aufbauend wird von Gornev und Liakh (2021)
+%\cite{RIDE-Theia}
+die Konzipierung und Implementierung einer auf Theia basierten Web-Variante von RIDE vorgestellt. Gornev et al. (2022)
+%\cite{RIDE-Multi-User}
+beschreiben ein System, welches Docker verwendet um die Web-Version von RIDE für mehrere simultane Nutzer bereitstellen zu können. Gornev und Bondarchuk (2023)
+%\cite{RIDE-Collaboration}
+entwickeln ein Framework, welches es erlaubt Echtzeit-Kollaboration in Single-User Anwendungen zu ermöglichen. Kuznetsov und Zyubin (2024)
+%\cite{RIDE-Project-Management}
+beschreiben die Entwicklung eines Projektmanagement-Systems für RIDE.

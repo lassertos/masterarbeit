@@ -3,17 +3,49 @@
 - [ ] Abstract
 - [ ] Einleitung
 - [ ] Grundlagen?
-- [ ] Literaturrecherche
-  - Darstellung verschiedenster IDE Implementierungen mit ihren Vor- und Nachteilen, sowie ihren Anwendungsbereichen
-  - Aufzeigen der Tatsache, dass die meisten IDEs sehr anwendungsspezifisch sind
-  - Darlegung von allgemeinen Erkenntnissen zu online IDEs
-  - => System wird benötigt, dass viele verschiedene Anwendungsmöglichkeiten unterstützt + CrossLab-Kompatibilität
+- [ ] Stand der Technik
+  - [ ] Methodik
+  - [ ] Literaturrecherche
+    - Darstellung verschiedenster IDE Implementierungen mit ihren Vor- und Nachteilen, sowie ihren Anwendungsbereichen
+    - Aufzeigen der Tatsache, dass die meisten IDEs sehr anwendungsspezifisch sind
+    - Darlegung von allgemeinen Erkenntnissen zu online IDEs
+    - => System wird benötigt, dass viele verschiedene Anwendungsmöglichkeiten unterstützt + CrossLab-Kompatibilität
+    - [ ] Gefundene IDEs
+      - [ ] RIDE
+      - [ ] CS50
+      - [ ] PyodideU
+      - [ ] IDEOL
+      - [ ] Collabode
+      - [ ] JaguarCode
+      - [ ] Code Genie
+      - [ ] CREATOR
+      - [ ] Jupyter Notebooks (Java)
+      - [ ] CodeOcean
+      - [ ] OpenJupyter
+      - [ ] MOCSIDE
+      - [ ] PyGuru
+      - [ ] CodeHelper
+      - [ ] KODETHON
+      - [ ] WebIDE
+      - [ ] WIDE
+      - [ ] Codeboard IDE
+      - [ ] JDE
+      - [ ] onlineSPARC
+      - [ ] Weblinux
+      - [ ] Matlab Programming Environment
+      - [ ] NODE-RED based environment
+      - [ ] DPP environment
+      - [ ] CodeXchange
+      - [ ] Redprint
+      - [ ] C-Solvis
+    - [ ] Mögliche Vorteile von online IDEs
+    - [ ] Mögliche Herausforderungen von online IDEs
+    - [ ] Mögliche Anforderungen an online IDEs
+  - [ ] Weitere IDEs (Industrie)
 - [ ] Anforderungen
   - Szenario Microcontroller-Programmierung: Darstellung auf verschiedenen Wissensleveln
   - Darlegung der verschiedenen Akteure und deren möglichen Anforderungen basierend auf der Literaturrecherche
   - Editor-Komponente sollte austauschbar sein
-- [ ] Stand der Technik?
-  - Dieser Abschnitt könnte auch mit in die Literaturrecherche eingearbeitet werden
 - [ ] Konzeption
   - [ ] Client-Server-basierter Ansatz
   - [ ] Browserbasierter Ansatz

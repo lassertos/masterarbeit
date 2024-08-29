@@ -1,0 +1,99 @@
+\section{Literaturrecherche} \label{literaturrecherche}
+
+Um einen Überblick über den aktuellen Stand der Forschung zu bekommen wird zunächst eine Literaturrecherche vorgenommen. Dabei sollen vorhandene online IDEs gefunden sowie die folgenden Fragen beantwortet werden:
+
+\begin{itemize}
+    \item Welche Anforderungen werden an online IDEs gestellt?
+    \item Welchen Architekturmustern folgen online IDEs?
+    \item Welche Vor- und Nachteile haben die online IDEs?
+\end{itemize}
+
+Die folgenden Datenbanken wurden für die Literaturrecherche ausgewählt:
+
+\begin{itemize}
+    \item ACM Digital Library
+    \item IEEE Xplore
+    \item Scopus
+    \item Web of Science
+\end{itemize}
+
+Zunächst wurde eine allgemeine Suche nach online IDEs in den genannten Datenbanken vorgenommen. Dazu werden zunächst die in Tabelle \ref{table:search-terms} genannten Stichwörter jeweils mit ihren Synonymen mit einer OR-Operation verknüpft. Danach werden die daraus resultierenden Terme mit einer AND-Operation verbunden. Die so entstehende Suchanfrage werden dann für die Suche in den Datenbanken verwendet. Dabei werden die Titel, Abstracts und Keywords der Publikationen durchsucht.
+
+In Tabelle \ref{table:amount-search-results} ist die Anzahl der Treffer für den einzelnen Datenbanken dargelegt. Um die Anzahl der zu betrachtenden Publikationen zu verringern wird eine weitere Filterung der Ergebnisse vorgenommen. Dafür werden nur Publikationen betrachtet, die IDE oder ein entsprechendes Synonym in ihrem Titel oder ihren Keywords enthalten. Dadurch sinkt die Anzahl der Treffer auf insgesamt $1154$. Um eine handhabbare Anzahl an Publikationen zu erhalten werden in einem weiteren Schritt die Titel und Abstracts der Publikationen genauer betrachtet. Dabei werden unter anderem Arbeiten herausgefiltert, deren Titel und Abstracts keinen Bezug zu den Forschungsfragen besitzen. Weiterhin werden Publikationen bevorzugt, die sich zudem mit textbasierten Programmiersprachen, Kollaboration und Lehre auf Universitätsniveau befassen. Aus dieser Filterung resultieren $95$ Publikationen zur weiteren Betrachtung. \\
+
+\begin{table}[tbp]
+    \centering
+    \begin{tabularx}{\textwidth}{| >{\hsize=.6\hsize\linewidth=\hsize}X |
+            >{\hsize=1.4\hsize\linewidth=\hsize}X |}
+        \hline
+        Stichwort                           & Synonyme                                                                                                     \\
+        \hline
+        integrated development environments & IDEs, code editors, development environments, development tools, programming tools, programming environments \\
+        \hline
+        web                                 & browser, online, cloud                                                                                       \\
+        \hline
+    \end{tabularx}
+    \caption{Suchbegriffe}
+    \label{table:search-terms}
+\end{table}
+
+
+\begin{table}[tbp]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        ACM & IEEE & Scopus & Web of Science \\
+        \hline
+        785 & 1472 & 4661   & 1044           \\
+        \hline
+    \end{tabular}
+    \caption{Anzahl Suchergebnisse}
+    \label{table:amount-search-results}
+\end{table}
+
+Die Publikationen beschreiben eine Vielzahl an verschiedenen webbasierten integrierten Entwicklungsumgebungen. Dabei kann eine Unterteilung in die folgenden zwei Kategorien erfolgen:
+
+\begin{itemize}
+    \item \textbf{Client-Server-basierte Lösungen} \\
+          Systeme dieser Art zeichnen sich dadurch aus, dass sie eine Client-Server-Archi-tektur verwenden. Hierbei werden Features, die nicht innerhalb eines Browsers ausgeführt werden können (z.B. Kompilierung) über einen entsprechenden Server bereitgestellt.
+    \item \textbf{Browser-basierte Lösungen} \\
+          Systeme dieser Art zeichnen sich dadurch aus, dass alle Features im Browser des Nutzers ausgeführt werden können, ohne die Hilfe eines separaten Servers.
+\end{itemize}
+
+Colin et al. (2024)
+%\cite{DPP-2024}
+stellen eine IDE vor, die sich auf pair-programming (PP) spezialisiert und auch distributed pair-programming (DPP) unterstützt. Der Unterschied zwischen PP und DPP liegt darin, dass bei DPP die beiden Teilnehmer nicht am selben Ort sind. Die entwickelte IDE implementiert ein entsprechendes Rollensystem, bei dem einer der beiden Teilnehmer die Rolle \textit{Fahrer} und der andere Teilnehmer die Rolle \textit{Navigator} hat. Nur der Fahrer kann Änderungen am Quellcode vornehmen. Der Navigator kann über ihren geteilten Cursor sowie das Hervorheben von Quellcode mit dem Fahrer interagieren. Weiterhin hat der Navigator die Möglichkeit eine Anfrage an den Fahrer zu stellen um die Rollen zu vertauschen. \\
+
+Malan (2024)
+%\¢ite{CS50-2024}
+beschreibt die verschiedenen Ansätze zur Bereitstellung einer integrierten Entwicklungsumgebung für die Teilnehmer des Einführungskurses in die Programmierung (CS50) an der Harvard University. Zunächst wurde seit 2007 ein On-Campus Cluster für die Studenten angeboten. Studenten konnten über SSH mit diesem verbinden und dort ihre Programme ausführen. Dieser Cluster wurde 2008 mithilfe von Amazon Web Services (AWS)
+%\cite{AWS}?
+in die Cloud überführt. Diese cloud-basierte Lösung wurde 2011 durch Client-seitige virtuelle Maschinen ersetzt. In 2015 wurde eine auf Docker basierende Lösung erarbeitet, die zunächst Cloud9 IDE
+%\cite{Cloud9IDE}
+als Frontend nutzte. In 2021 wurde schlielich eine auf Github Codespaces aufbauende Lösung eingeführt, die VSCode als Code Editor verwendet. \\
+
+Jefferson et al. (2024) \cite{PyodideU-2024} beschreiben eine IDE, die es Nutzern ermöglicht Python Code im Browser zu schreiben und auszuführen. Dabei wird das Programm des Nutzers lokal in dessem Browser durchgeführt. Dies wird durch den Einsatz von PyodideU erreicht, einer erweiterten Version der WebAssembly-basierten Python Distribution Pyodide \cite{Pyodide}. Zusätzlich wird den Nutzern auch eine Grafikbibliothek angeboten samt eines Debuggers, der es ermöglicht Zeile für Zeile und auch rückwärts durch das Programm zu gehen und die entsprechenden Änderungen an der Grafik zu sehen. Weiterhin wird durch PyodideU auch die synchrone Eingabe von Daten unterstützt, während Python im Main-Thread des Browsers läuft. Zudem wird auch ein Dateisystem bereitgestellt. Insgesamt wurde die IDE sowohl von Studenten als auch von Lehrenden als hilfreich wahrgenommen. \\
+
+Über mehrere Publikationen wird die Entwicklung der Reflex IDE (RIDE) beschrieben.  Zunächst wird von Bastrykina et al. (2021)
+%\cite{RIDE-Kernel-?} 
+ein entsprechender Kernel mit dem Xtext Framework entwickelt, welcher in der Eclipse IDE verwendet werden kann, um diese. Darauf aufbauend wird von Gornev und Liakh (2021)
+%\cite{RIDE-Theia-?}
+die Konzipierung und Implementierung einer auf Theia basierten Web-Variante von RIDE vorgestellt. Gornev et al. (2022)
+%\cite{RIDE-Multi-User-?}
+beschreiben ein System, welches Docker verwendet um die Web-Version von RIDE für mehrere simultane Nutzer bereitstellen zu können. Gornev und Bondarchuk (2023)
+%\cite{RIDE-Collaboration-?}
+entwickeln ein Framework, welches es erlaubt Echtzeit-Kollaboration in Single-User Anwendungen zu ermöglichen. Kuznetsov und Zyubin (2024)
+%\cite{RIDE-Project-Management-2024}
+beschreiben die Entwicklung eines Projektmanagement-Systems für RIDE. \\
+
+Camarmas-Alonso et al. (2024)
+%\cite{CREATOR}
+beschreiben eine online IDE mit dem Namen CREATOR (didaCtic and geneRic assEmbly progrAmming simulaTOR). Diese IDE ist darauf ausgelegt dem Nutzer die Programmierung von RISC-V basierten Single Board Computern (SBC) sowie Microcontrollern zu ermöglichen. Dazu wird ein entsprechender Code Editor verwendet, der zur Erstellung von Assembler Programmen verwendet werden kann. Weiterhin bietet das System einen Compiler, einen Simulator sowie einen Debugger an, mit deren Hilfe das Programm getestet werden kann. Weiterhin können Nutzer ihr kompiliertes Programm über die IDE auf einen an ihrem Computer angeschlossenen SBC bzw. Microcontroller flashen. Dazu wird ein entsprechendes Hilfsprogramm angeboten, welches auf dem Computer des Nutzers läuft und über einen Web-Server die Kommunikation zwischen der online IDE und dem angeschlossenen Gerät übernimmt. Die IDE kann um weitere Architekturen und Befehle erweitert werden. \\
+
+Liang und Uehara (2023)
+%\cite{Jupyter-Java-2023}
+zeigen eine auf Jupyter basierende Java-IDE. Um Java in Jupyter nutzen zu können wird der IJava Kernel verwendet. \\
+
+Elhayany et al. (2023)
+%\cite{CodeOcean-OpenJupyter-2023}
+vergleichen CodeOcean und OpenJupyter im Hinblick auf deren Effektivität in Massive Open Online Courses (MOOCs).

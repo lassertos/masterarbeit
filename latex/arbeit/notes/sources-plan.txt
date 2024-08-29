@@ -1,0 +1,4 @@
+30.08.: The Code Genie Programming Environment ... An overview of platforms for cloud based development
+31.08.: Beyond Open Source: The TouchDevelop Cloud-based Integrated Development Environment ... Recording and Analyzing In-Browser Programming Sessions
+01.08.: WIDE an Interactive Web Integrated Development Environment to Practice C Programming in Distance Education ... The Learning and Productivity Benefits to Student Programmers from Real-World Development Environments
+02.09.: Adinda: A Knowledgeable, Browser-Based IDE ... A critical analysis and evaluation of Web-based environments for program development
