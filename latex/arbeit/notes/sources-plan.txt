@@ -1,8 +1,3 @@
-An eFPGA Generation Suite with Customizable Architecture and IDE
-Catchword: Language Server Protocol An Introduction to the Protocol, its Use, and Adoption for Web Modeling Tools
-THE ACCEPTANCE OF AN EDUCATIONAL INTEGRATED DEVELOPMENT ENVIRONMENT TO LEARN PROGRAMMING FUNDAMENTALS
-A pilot experience with software programming environments as a service for teaching activities
-pyiron: An integrated development environment for computational materials science
 Evaluations of JaguarCode: A web-based object-oriented programming environment with static and dynamic visualization
 An overview of platforms for cloud based development
 Enhancing team collaboration through integrating social interactions in a Web-based development environment
