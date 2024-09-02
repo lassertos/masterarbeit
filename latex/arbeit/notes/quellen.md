@@ -1578,3 +1578,9 @@ note: publisher website uses http and is in chinese
 **category:** collaboration
 
 **interesting:** 5/5
+
+## Integrating Collaborative and Live Coding for Distance Education
+
+**Link:** https://ieeexplore.ieee.org/abstract/document/7924284
+
+**Cites / Views:** 4 / 708

@@ -4,44 +4,35 @@
 - [ ] Einleitung
 - [ ] Grundlagen?
 - [ ] Stand der Technik
+  - Darstellung verschiedenster IDE Implementierungen mit ihren Vor- und Nachteilen, sowie ihren Anwendungsbereichen
+  - Aufzeigen der Tatsache, dass die meisten IDEs sehr anwendungsspezifisch sind
+  - Darlegung von allgemeinen Erkenntnissen zu online IDEs
+  - => System wird benötigt, dass viele verschiedene Anwendungsmöglichkeiten unterstützt + CrossLab-Kompatibilität
   - [ ] Methodik
-  - [ ] Literaturrecherche
-    - Darstellung verschiedenster IDE Implementierungen mit ihren Vor- und Nachteilen, sowie ihren Anwendungsbereichen
-    - Aufzeigen der Tatsache, dass die meisten IDEs sehr anwendungsspezifisch sind
-    - Darlegung von allgemeinen Erkenntnissen zu online IDEs
-    - => System wird benötigt, dass viele verschiedene Anwendungsmöglichkeiten unterstützt + CrossLab-Kompatibilität
-    - [ ] Gefundene IDEs
-      - [ ] RIDE
-      - [ ] CS50
-      - [ ] PyodideU
-      - [ ] IDEOL
-      - [ ] Collabode
-      - [ ] JaguarCode
-      - [ ] Code Genie
-      - [ ] CREATOR
-      - [ ] Jupyter Notebooks (Java)
-      - [ ] CodeOcean
-      - [ ] OpenJupyter
-      - [ ] MOCSIDE
-      - [ ] PyGuru
-      - [ ] CodeHelper
-      - [ ] KODETHON
-      - [ ] WebIDE
-      - [ ] WIDE
-      - [ ] Codeboard IDE
-      - [ ] JDE
-      - [ ] onlineSPARC
-      - [ ] Weblinux
-      - [ ] Matlab Programming Environment
-      - [ ] NODE-RED based environment
-      - [ ] DPP environment
-      - [ ] CodeXchange
-      - [ ] Redprint
-      - [ ] C-Solvis
-    - [ ] Mögliche Vorteile von online IDEs
-    - [ ] Mögliche Herausforderungen von online IDEs
-    - [ ] Mögliche Anforderungen an online IDEs
-  - [ ] Weitere IDEs (Industrie)
+  - [ ] Gefundene IDEs
+    - [ ] RIDE
+    - [ ] CS50
+    - [ ] PyodideU
+    - [ ] IDEOL
+    - [ ] Collabode
+    - [ ] JaguarCode
+    - [ ] CoRED
+    - [ ] CEclipse
+    - [ ] Weblinux
+    - [ ] KODETHON
+  - [ ] Weitere IDEs
+    - [ ] Visual Studio Code
+    - [ ] Theia / OpenSumi
+    - [ ] ...
+  - [ ] Mögliche Vorteile von online IDEs
+    - [ ] Skalierbarkeit
+    - [ ] ...
+  - [ ] Mögliche Herausforderungen von online IDEs
+    - [ ] Sicherheit
+    - [ ] ...
+  - [ ] Mögliche Anforderungen an online IDEs
+    - [ ] Funktionale Anforderungen
+    - [ ] Nichtfunktionale Anforderungen
 - [ ] Anforderungen
   - Szenario Microcontroller-Programmierung: Darstellung auf verschiedenen Wissensleveln
   - Darlegung der verschiedenen Akteure und deren möglichen Anforderungen basierend auf der Literaturrecherche
@@ -49,6 +40,21 @@
 - [ ] Konzeption
   - [ ] Client-Server-basierter Ansatz
   - [ ] Browserbasierter Ansatz
+  - [ ] Datenspeicherung
+    - [ ] client-side
+    - [ ] server-side
+    - [ ] online?
+  - [ ] Compiler
+  - [ ] Debugger
+  - [ ] Kollaboration
+    - [ ] chat (text, audio, video)?
+    - [ ] echtzeit Kollaboration
+      - [ ] Operational Transformation
+      - [ ] Conflict-free Replicated Data Types
+      - [ ] Differential Synchronization
+  - [ ] Language Server
+  - [ ] Testing
+  - [ ] Integration? (LTI, CrossLab)
   - Hierbei ist ggf. auch die Betrachtung von verschiedenen Experimentkonfigurationen interessant
 - [ ] Implementierung
 - [ ] Evaluation

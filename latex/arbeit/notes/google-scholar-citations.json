@@ -1,0 +1,390 @@
+[
+  {
+    "title": "Design and evaluation of a web-based distributed pair programming tool for novice programmers",
+    "citations": 0
+  },
+  {
+    "title": "Containerizing CS50: Standardizing students’ programming environments",
+    "citations": 1
+  },
+  {
+    "title": "PyodideU: Unlocking python entirely in a browser for CS1",
+    "citations": 5
+  },
+  {
+    "title": "Addressing misconceptions in introductory programming: Automated feedback in integrated development environments",
+    "citations": 0
+  },
+  {
+    "title": "Development of Project Management Module for Reflex Cloud IDE",
+    "citations": 0
+  },
+  {
+    "title": "Exploring the Boundaries: Online Compiler Limitations and Capabilities",
+    "citations": 0
+  },
+  {
+    "title": "CodeXchange: Leaping into the Future of AI-Powered Code Editing",
+    "citations": 0
+  },
+  {
+    "title": "CREATOR: An Educational Integrated Development Environment for RISC-V Programming",
+    "citations": 0
+  },
+  {
+    "title": "Requirements for an Online Integrated Development Environment for Automated Programming Assessment Systems",
+    "citations": 0
+  },
+  {
+    "title": "LEARNING WEB DEVELOPMENT USING GITHUB COPILOT IN AND OUTSIDE ACADEMIA: A BLESSING OR a CURSE?",
+    "citations": 0
+  },
+  {
+    "title": "Towards Collaborative Coding in RIDE Web IDE",
+    "citations": 1
+  },
+  {
+    "title": "Design of STEM Teaching Network Publishing Framework Based on Web Interactive Programming Environment",
+    "citations": 0
+  },
+  {
+    "title": "Evaluation and technological solutions for a dynamic, unified cloud programming development environment : Ease of use and applicable system for uniformized practices and assessments",
+    "citations": 4
+  },
+  {
+    "title": "Browser-based Java Development Environment for Programming Education",
+    "citations": 0
+  },
+  {
+    "title": "Exploring the Effectiveness of Web-Based Programming Environments for MOOCs: A Comparative Study of CodeOcean and OpenJupyter",
+    "citations": 0
+  },
+  {
+    "title": "An eFPGA Generation Suite with Customizable Architecture and IDE",
+    "citations": 5
+  },
+  {
+    "title": "Catchword: Language Server Protocol An Introduction to the Protocol, its Use, and Adoption for Web Modeling Tools",
+    "citations": 13
+  },
+  {
+    "title": "THE ACCEPTANCE OF AN EDUCATIONAL INTEGRATED DEVELOPMENT ENVIRONMENT TO LEARN PROGRAMMING FUNDAMENTALS",
+    "citations": 0
+  },
+  {
+    "title": "Re-imagining computer laboratories for teaching introductory programming concepts using web-based integrated development environments: Opportunities and challenges",
+    "citations": 0
+  },
+  {
+    "title": "Standardizing students’ programming environments with docker containers: Using visual studio code in the cloud with GitHub codespaces",
+    "citations": 8
+  },
+  {
+    "title": "Jupyter in the classroom: An experience report",
+    "citations": 18
+  },
+  {
+    "title": "MOCSIDE: An open-source and scalable online IDE and auto-grader for computer science education",
+    "citations": 2
+  },
+  {
+    "title": "MOCSIDE: an open-source and scalable online IDE and auto-grader for introductory programming courses",
+    "citations": 5
+  },
+  {
+    "title": "Towards Multi-User Mode in RIDE Web-IDE",
+    "citations": 2
+  },
+  {
+    "title": "A Bad IDEa: Weaponizing uncontrolled online-IDEs in availability attacks",
+    "citations": 0
+  },
+  {
+    "title": "A study of microcontroller simulator tools for autonomous and online learning",
+    "citations": 2
+  },
+  {
+    "title": "PyGuru: A Programming Environment to Facilitate Measurement of Cognitive Engagement",
+    "citations": 2
+  },
+  {
+    "title": "RIDE: Theia-Based Web IDE for the Reflex Language",
+    "citations": 7
+  },
+  {
+    "title": "CodeHelper: A Web-Based Lightweight IDE for E-Mentoring in Online Programming Courses",
+    "citations": 2
+  },
+  {
+    "title": "Developing Reflex IDE Kernel with Xtext Framework",
+    "citations": 4
+  },
+  {
+    "title": "A pilot experience with software programming environments as a service for teaching activities",
+    "citations": 12
+  },
+  {
+    "title": "Student adoption and perceptions of a web integrated development environment: An experience report",
+    "citations": 7
+  },
+  {
+    "title": "Using WebIDE as a distance learning tool for high school programming",
+    "citations": 3
+  },
+  {
+    "title": "Analyzing learners’ engagement and behavior in MOOCs on programming with the codeboard IDE",
+    "citations": 25
+  },
+  {
+    "title": "Good-bye localhost: A cloud-based web IDE for teaching java EE web development to non-computer science majors",
+    "citations": 4
+  },
+  {
+    "title": "Gamifying the Code Genie Programming Tool",
+    "citations": 2
+  },
+  {
+    "title": "JavaScript Development Environment for Programming Education Using Smartphones",
+    "citations": 8
+  },
+  {
+    "title": "pyiron: An integrated development environment for computational materials science",
+    "citations": 96
+  },
+  {
+    "title": "Teachers’ Perspectives on Learning and Programming Environments for Secondary Education",
+    "citations": 0
+  },
+  {
+    "title": "OnlineSPARC: A programming environment for answer set programming",
+    "citations": 7
+  },
+  {
+    "title": "How “Friendly” Integrated Development Environments Are?",
+    "citations": 3
+  },
+  {
+    "title": "WebLinux: A scalable in-browser and client-side linux and IDE",
+    "citations": 9
+  },
+  {
+    "title": "Matlab Programming Environment Based on Web",
+    "citations": 17
+  },
+  {
+    "title": "The Code Genie Programming Environment",
+    "citations": 5
+  },
+  {
+    "title": "Evaluations of JaguarCode: A web-based object-oriented programming environment with static and dynamic visualization",
+    "citations": 25
+  },
+  {
+    "title": "A web-based programming environment for introductory programming courses in higher education",
+    "citations": 9
+  },
+  {
+    "title": "LoIDE: A web-based IDE for logic programming preliminary report",
+    "citations": 5
+  },
+  {
+    "title": "WIDE: Centralized and collaborative approach to teaching web development",
+    "citations": 5
+  },
+  {
+    "title": "A web-based IDE for teaching with any language (abstract only)",
+    "citations": 1
+  },
+  {
+    "title": "Analyzing the learning process (in Programming) by using data collected from an online IDE",
+    "citations": 7
+  },
+  {
+    "title": "Initial Evaluation of JaguarCode: A Web-Based Object-Oriented Programming Environment with Static and Dynamic Visualization",
+    "citations": 6
+  },
+  {
+    "title": "Jimbo: A collaborative IDE with live preview",
+    "citations": 17
+  },
+  {
+    "title": "Implementation of a web-based programming tool for distributed, connected Arduino systems",
+    "citations": 5
+  },
+  {
+    "title": "Enhancing team collaboration through integrating social interactions in a Web-based development environment",
+    "citations": 36
+  },
+  {
+    "title": "The TuringLab programming environment an online python programming environment for challenge based learning",
+    "citations": 2
+  },
+  {
+    "title": "Putting cloud 9 IDE on the wheels for programming Cyber-Physical / Internet of Things Platforms: Providing educational prototypes",
+    "citations": 0
+  },
+  {
+    "title": "An overview of platforms for cloud based development",
+    "citations": 51
+  },
+  {
+    "title": "Beyond open source: The TouchDevelop cloud-based integrated development environment",
+    "citations": 25
+  },
+  {
+    "title": "Detailed recordings of student programming sessions",
+    "citations": 0
+  },
+  {
+    "title": "Formal reasoning using an iterative approach with an integrated web IDE",
+    "citations": 11
+  },
+  {
+    "title": "Experience report: Evolution of a web-integrated software development and verification environment",
+    "citations": 2
+  },
+  {
+    "title": "CodeR: Real-time Code Editor Application for Collaborative Programming",
+    "citations": 28
+  },
+  {
+    "title": "Web2Compile-CoT: A web IDE for the cloud of things",
+    "citations": 2
+  },
+  {
+    "title": "LearnCS! A new, browser-based c programming environment for CS1",
+    "citations": 15
+  },
+  {
+    "title": "New opportunities for extracting insights from cloud based IDEs",
+    "citations": 16
+  },
+  {
+    "title": "Lessons from a web-based IDE and runtime",
+    "citations": 5
+  },
+  {
+    "title": "EduCo: An integrated social environment for teaching and learning software engineering courses",
+    "citations": 2
+  },
+  {
+    "title": "A cloud-based integrated development environment for embedded systems",
+    "citations": 15
+  },
+  {
+    "title": "Learning and practicing object-oriented programming using a collaborative web-based IDE",
+    "citations": 12
+  },
+  {
+    "title": "Recording and analyzing in-browser programming sessions",
+    "citations": 38
+  },
+  {
+    "title": "WIDE an interactive Web integrated development environment to practice C programming in distance education",
+    "citations": 7
+  },
+  {
+    "title": "An interactive Web-based IDE towards teaching and learning in programming courses",
+    "citations": 29
+  },
+  {
+    "title": "Distributed Integrated Development Environment for Mobile Platforms",
+    "citations": 4
+  },
+  {
+    "title": "Software development environments on the web: A research agenda",
+    "citations": 39
+  },
+  {
+    "title": "Elements for a cloud-based development environment: Online collaboration, revision control, and continuous integration",
+    "citations": 24
+  },
+  {
+    "title": "CoRED: Browser-based collaborative real-time editor for java web applications",
+    "citations": 80
+  },
+  {
+    "title": "MiDebug: Microcontroller integrated development and debugging environment",
+    "citations": 2
+  },
+  {
+    "title": "Evaluation of a Web-Based Programming Environment",
+    "citations": 12
+  },
+  {
+    "title": "Program Behavior Analysis and Control for Online IDE",
+    "citations": 6
+  },
+  {
+    "title": "Web-Based Robot Programming Environment and Control Architecture",
+    "citations": 6
+  },
+  {
+    "title": "Components of a Wiki-based software development environment",
+    "citations": 3
+  },
+  {
+    "title": "WeScheme: The browser is your programming environment",
+    "citations": 33
+  },
+  {
+    "title": "Java WIDE - java wiki integrated development environment: Nifty tools and assignments",
+    "citations": 3
+  },
+  {
+    "title": "Real-time collaborative coding in a web IDE",
+    "citations": 176
+  },
+  {
+    "title": "Redprint: Integrating API specific \"instant example\" and \"instant documentation\" display interface in IDEs",
+    "citations": 6
+  },
+  {
+    "title": "CEclipse: An Online IDE for Programing in the Cloud",
+    "citations": 43
+  },
+  {
+    "title": "Supporting introductory test-driven labs with WebIDE",
+    "citations": 23
+  },
+  {
+    "title": "The learning and productivity benefits to student programmers from real-world development environments",
+    "citations": 1
+  },
+  {
+    "title": "Adinda: A knowledgeable, browser-based IDE",
+    "citations": 60
+  },
+  {
+    "title": "XYLUS: A virtualized programming environment",
+    "citations": 6
+  },
+  {
+    "title": "A web-based programming environment for LEGO mindstorms robots",
+    "citations": 12
+  },
+  {
+    "title": "WIPE: A programming environment for novices",
+    "citations": 36
+  },
+  {
+    "title": "View/edit/compile/run Web-based programming environment",
+    "citations": 3
+  },
+  {
+    "title": "A web-based distributed programming environment",
+    "citations": 2
+  },
+  {
+    "title": "A critical analysis and evaluation of Web-based environments for program development",
+    "citations": 22
+  },
+  {
+    "title": "CoVSCode: A Novel Real-Time Collaborative Programming Environment for Lightweight IDE",
+    "citations": 18
+  },
+  {
+    "title": "Integrating Collaborative and Live Coding for Distance Education",
+    "citations": 13
+  }
+]

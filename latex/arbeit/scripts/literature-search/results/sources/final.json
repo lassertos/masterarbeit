@@ -1,0 +1,560 @@
+[
+  {
+    "title": "LEARNING WEB DEVELOPMENT USING GITHUB COPILOT IN AND OUTSIDE ACADEMIA: A BLESSING OR a CURSE?",
+    "abstract": "This article investigates the usage of GitHub Copilot, an artificial intelligence-powered coding assistant owned by Microsoft and GitHub, in the process of learning and teaching web development both in formal academic, and informal settings. We dive into the idea behind utilizing GitHub Copilot and highlight its most common and relevant use cases which can be used to learn Web Development. Drawing from existing scientific literature and online statements from software professionals, we present an overview of the current situation with artificial intelligence-assisted programming tools such as GitHub Copilot and its impact and irrelevance on Web Development education especially for the early learning stages. Professionals both in and outside academia agree that usage of artificial intelligence Pair Programming tools such as GitHub Copilot is neither recommended nor essential when learning or teaching Web Development.",
+    "keywords": "AI pair programming; GitHub Copilot; Web Development; VS Code",
+    "link": "",
+    "released": 2024,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "Requirements for an Online Integrated Development Environment for Automated Programming Assessment Systems",
+    "abstract": "More and more introductory programming courses are being held online, using Automated Programming Assessment Systems (APASs). Some APASs provide online editors where students can solve and submit their exercises, because some course teachers want to avoid that students have to set up an Integrated Development Environment (IDE) on their PCs, fearing that this could increase the entry barrier to the course. However, most of the available online editors for APASs only provide rudimentary programming support, making it harder to write code and, therefore, have the undesired side effect of increasing the entry barrier to learning programming. To gain a better understanding of the requirements of an online IDE for APASs, we conducted a survey asking 48 APASs users to give their opinions on the importance of different online IDE features. Based on their responses we derived a set of main requirements for an online IDE within APASs. The survey was complemented by a tool review of state-of-the-art online IDEs, to see whether existing online IDEs meet the requirements. Finally, we evaluated whether the online IDEs can be integrated within APASs. This study establishes a framework for online IDEs tailored to APASs, creating the foundation for subsequent improvements. Copyright © 2024 by SCITEPRESS – Science and Technology Publications, Lda.",
+    "keywords": "Automated Programming Assessment Systems; Integrated Development Environments; Online IDE; Programming Education; Requirements",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-85193906566&doi=10.5220%2f0012556400003693&partnerID=40&md5=84d84745c4cf0fbaed52ae7e6461ffc3",
+    "released": 2024,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "CREATOR: An Educational Integrated Development Environment for RISC-V Programming",
+    "abstract": "This article introduces a new integrated development environment called CREATOR (didaCtic and geneRic assEmbly progrAmming simulaTOR) that provides an interactive platform for educational assembly programming. CREATOR is specially designed for the academic environment, so it is very intuitive to users who are encountering assembly for the first time. It makes the traditional theory classes interactive, engaging students’ participation. Moreover, it is a multiplatform simulator that can be used with a web browser without requiring a server or additional installations, and it can be used on different types of devices. CREATOR allows all the necessary steps to be performed on the same tool, from the implementation of the assembly program to its execution on real hardware. For this purpose, it allows editing, compiling, simulating, debugging, and loading the program on the hardware device without auxiliary software. In addition, it is also capable of detecting compilation errors, execution errors, and violations of the parameter passing convention, helping users understand the reason for a given error so that they can resolve it. CREATOR offers the RISC-V and MIPS32 architectures by default. However, it is possible to modify these architectures or add new architectures in the tool as needed by any user. This feature allows teachers to prepare practical labs adapted to the teaching objectives, and it can also be used for research, e.g., for the study of different instruction sets.",
+    "keywords": "Assembly programming; educational simulator; ESP32-RISCV; integrated development environment (IDE); RISC-V",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10540579",
+    "released": 2024,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "CodeXchange: Leaping into the Future of AI-Powered Code Editing",
+    "abstract": "In the ever-changing internet ecosystem, where programs need to be regularly updated by users themselves not saving time and space, web-based coding tools surpass conventional desktop programs. Thus, showing online code editors enabling programmers to interact, experiment, and innovate efficiently. This study centers on \"CodeXchange,\" an innovative online code editor designed to streamline coding processes and foster collaboration. It discusses the capabilities of code translation in Python, Java, and C++, optimization, auto-commenting, and collaborative development. Translation aids in code interchange, optimization ideas enhance time complexity and maintainability, while direct code comments improve documentation and comprehension. Multiple developers can interact on the same codebase using websockets and secure shared room access keys, enabling real-time collaborative coding and fostering knowledge exchange and cooperation. This study showcases the significant development of online code editors and their potential to revolutionize how programmers communicate, develop, and learn.",
+    "keywords": "Code translation; Optimization; Comments Generation; Websockets; IDEs; Code editors; Parsing",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10585043",
+    "released": 2024,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "Exploring the Boundaries: Online Compiler Limitations and Capabilities",
+    "abstract": "This study examines the many facets of online compilers, examining their benefits and drawbacks as vital resources for contemporary software development. Web browser-based online compilers have become indispensable for programmers since they provide a platform-neutral environment for coding. The many elements that are built into these platforms-like language support, IDEs, accessibility, and collaboration tools-are all thoroughly examined in our study. Simultaneously, we examine the intrinsic constraints, such as security issues related to remote code execution, constraints on resource allocation, and difficulties with dependency management. We examine the advantages and disadvantages of well-known online compilers via case studies, offering valuable perspectives that help shape the direction of this technology going forward. The study concludes with suggestions for resolving the constraints found and emphasises the critical role online compilers play in the changing software development environment.",
+    "keywords": "Online compilers; Software development; Integrated Development Environments (IDEs); Collaboration; Security concerns; Resource allocation; Dependency management",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10522387",
+    "released": 2024,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "Development of Project Management Module for Reflex Cloud IDE",
+    "abstract": "Paper describes a project management module for the Reflex process-oriented language cloud IDE. Currently, a prototype IDE called RIDE has been developed for the Reflex language, based on Eclipse Theia. This implementation approach allows the user to launch the IDE in a browser and immediately begin developing embedded control software. However, Theia is aimed at single-user applications and this drawback limits complexity of the programs. Therefore, Reflex IDE requires a development environment, which provides sufficient features for group development. The paper analyzes existing cloud IDEs and multi-user collaboration in projects, formulates architectural requirements for the project management module, and describes the implementation of the cloud IDE RIDE using the Reflex language.",
+    "keywords": "cloud IDE; RIDE; Reflex; Industry 4.0; project management module",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10515647",
+    "released": 2024,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "Addressing misconceptions in introductory programming: Automated feedback in integrated development environments",
+    "abstract": "In recent years, numerous approaches to automated feedback have been presented in the field of programming education. Often, these methods deliver feedback through standalone web-based environments or educational programming environments. However, only few works have explored how such feedback can be provided within Integrated Development Environments (IDEs). We propose MINDFIX, an approach for integrating alternative feedback mechanisms for addressing programming language misconceptions about Java into the Eclipse IDE. These mechanisms include textual hints, code examples, and a personalized pedagogical agent. A laboratory experiment was conducted to investigate their impact on novice programmers in higher education. The results show that MINDFIX addresses missing feedback mechanisms and features. Additionally, there are initial insights that our feedback addresses programming language misconceptions while being perceived as useful and comprehensible. Our findings also suggest that novice programmers with low self-efficacy expectations perceive pedagogical agents as more motivating, useful, and less disruptive compared to their peers.",
+    "keywords": "affective computing; example-based feedback; intelligent tutoring system; pedagogical agent; programming environment",
+    "link": "https://doi.org/10.1145/3629296.3629297",
+    "released": 2024,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "PyodideU: Unlocking python entirely in a browser for CS1",
+    "abstract": "In this paper, we present an education-focused Python IDE and runtime library which can run entirely in desktop, laptop, tablet, and mobile device web browsers. Our solution provides features useful for an engaging CS1 course, and eliminates the need for a server-based runtime. We describe a new, open source, methodology for running interactive Python entirely in the browser by solving the \"WebAssembly blocking problem,\" a core technical challenge to a web-based Python solution.Because our method enables Python entirely in the browser, it unlocks many new features. For example, students can share their code with others, without incurring extra costs to the instructors or institutions. Other features include line by line code highlighting as a program executes, highly intuitive interactive graphics, mouse and touch integration, and use of a wide selection of Python modules such as Numpy and Pandas. Currently, our IDE has been used in 5 classes, covering more than 10,000 students and teachers, with over 350,000 projects created. We found that students and instructors appreciated the variety of tools and abilities the IDE made possible. We benchmark the performance of running code with our method against other online Python solutions and we discuss the benefits and additional possibilities that our method allows, such as mobile device and/or offline code execution. We provide full free public access to our IDE and open source the core libraries which enable the conversion of student written Python to WebAssembly.",
+    "keywords": "cs1; ide; integrated development environment; mobile; python; web browser; webassembly",
+    "link": "https://doi.org/10.1145/3626252.3630913",
+    "released": 2024,
+    "interesting": "+",
+    "citations": 5
+  },
+  {
+    "title": "Containerizing CS50: Standardizing students’ programming environments",
+    "abstract": "We argue in favor of Docker containers as alternatives to clusters of servers or virtual machines for students in introductory programming courses. We present our experience with the same since 2015 in CS50 at Harvard University as well as the pedagogical and operational motivations therefor. We present, too, the evolution of our environments for students over the years, from an on-campus cluster, to an off-campus cloud, to client-side virtual machines, to Docker containers, discussing the trade-offs of each. Not only do containers provide students with a standardized environment, reducing technical difficulties and frequently asked questions at term’s start, they also provide instructors with full control over the software in use and versions thereof, additionally allowing instructors to deploy updates mid-semester. Particularly for large courses with hundreds or even thousands of students, containers allow staff to focus more of their time on teaching than on technical support. And, coupled with text editors that support extensions or plugins, containers allow instructors to optimize students’ environment for learning, while still acquainting students with industry-standard tools. Most recently implemented atop GitHub Codespaces, a cloud-based version of Visual Studio Code, our own container-based solutions have since been used by more than 700,000 students and teachers, both on campus and off, and are also freely available to any teacher or student outside of our own university.",
+    "keywords": "GUI; IDE; code; code editor; container; containerization; docker; editor; graphical user interface; integrated development environment; kubernetes; programming; text editor; web app; web application",
+    "link": "https://doi.org/10.1145/3649217.3653567",
+    "released": 2024,
+    "interesting": "+",
+    "citations": 1
+  },
+  {
+    "title": "Design and evaluation of a web-based distributed pair programming tool for novice programmers",
+    "abstract": "Research on pair programming (PP) in education have shown a number of positive outcomes for learners, and especially novice programmers, such as enhanced learning, greater confidence in work quality, higher problem solving skills or enhanced interaction skills, and promotes collaborative learning. Due to these diverse advantages, pair programming in education currently follows a growing curve. Also, blended learning approaches are becoming more and more popular in education, including when learners have to learn programming. As a consequence, distributed pair programming (DPP) can be considered as a good solution to support pair programming in hybrid learning scenarios. A large number of tools from both the research community and the major integrated development environment (IDE) editors tried to study and implement DPP in their tools. However, our review of literature shows that none of them meet the requirements for delivering effective pair programming activities to novice programmers in blended learning scenarios. Based on these findings, the paper introduces a new DPP application especially designed for novice programmers. It integrates, based on some requirements identified from previous research, several features dedicated to DPP as well as other capabilities supporting extensive data collection and learning analytics. The tool has been experimented in authentic learning settings in higher education with 82 students, both in PP and DPP conditions. The experiment showed no evidence of a difference between PP and DPP on the students’ perceived usability of the application, as well as on the quality of their productions.",
+    "keywords": "computer science education; distributed pair programming; novice programmers; tool design and evaluation",
+    "link": "https://doi.org/10.1145/3649217.3653571",
+    "released": 2024,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "THE ACCEPTANCE OF AN EDUCATIONAL INTEGRATED DEVELOPMENT ENVIRONMENT TO LEARN PROGRAMMING FUNDAMENTALS",
+    "abstract": "Programming is an important course for any IT or engineering-related course. However, previous research shows that students face difficulties in learning programming due to its abstract concepts. This study aims to evaluate the acceptance of a developed Integrated Development Environment (IDE), namely C-SOLVIS which is a web-based application that specifically intends to facilitate the teaching and learning of the C programming fundamentals in Malaysian tertiary education. The C-SOLVIS integrates problem-solving into a program development environment for the C language. The goal is to guide the users in problem-solving and help them write C programs based on problem-solving algorithms. The Rapid Application Development (RAD) Model was employed in the C-SOLVIS development process. Based on this model, the requirement planning phase was carried out through the triangulation technique by applying qualitative approaches comprising a literature review supported by semi-structured interviews, document reviews, and content validation by expert programming lecturers. Subsequently, the design of the application was accomplished through the iterative prototyping process which was then followed by the application construction. Then, the C-SOLVIS is deployed to be used by several programming lecturers to evaluate its usability by adopting a quantitative method using the System Usability Scale (SUS) questionnaire. The study has discovered several suitable techniques and designs for the problem-solving and program development environment. For the problem -solving environment, the Computational Thinking (CT) concepts were applied which were supported by the Input-Process-Output (IPO) Model through Scientific Instructions and Inquiries. Meanwhile, the program development environment was designed and developed based on frame -based programming using a set of developed Code Patterns. The C-SOLVIS evaluation using the SUS instrument has yielded a SUS mean score of 86.07. This score is interpreted by SUS as an A grade that indicates C-SOLVIS as a highly usable application and thus is accepted for C programming learning. Hence, the development process of the C-SOLVIS can be used as a guideline for educational software development, especially in the field of programming education.",
+    "keywords": "IDE; educational software; usability; programming",
+    "link": "",
+    "released": 2023,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "Catchword: Language Server Protocol An Introduction to the Protocol, its Use, and Adoption for Web Modeling Tools",
+    "abstract": "With the introduction of the Language Server Protocol (LSP), a fundamental shift has been observed in the development of language editing support for Integrated Development Environments (IDEs), such as VS Code, the traditional Eclipse IDE, or Eclipse Theia. LSP establishes a uniform protocol that standardizes the communication between a language client (e. g., an IDE like Eclipse) and a language server (e. g., for a programming language like Java). The language client only needs to be able to interpret and understand the protocol instead of the specific programming language. Likewise, the language server can focus on language support and does not need to consider the specifics of a respective IDE. This reduces the complexity of realizing language support on different editors and IDEs and enables smooth transitions from one IDE to another. LSP is an open and community-driven protocol that has been developed within the realm of the VS Code community, initiated and driven by Microsoft. The generic concept and architectural pattern of LSP enables widespread applications that go far beyond the realization of editing support for programming languages. This paper provides an introduction to LSP, describes its evolution and core characteristics, and delineates its potential for revolutionizing not only the IDE market but also other software systems, such as modeling tools. © 2023, Gesellschaft fur Informatik (GI). All rights reserved.",
+    "keywords": "Conceptual Modeling; Graphical Language Server Protocol; Integrated Development Environment; Language Server Protocol; Modeling tools; Software Engineering",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-85172705800&doi=10.18417%2femisa.18.9&partnerID=40&md5=2fc2c46b4f4b4db21547603f0a4e0687",
+    "released": 2023,
+    "interesting": "+",
+    "citations": 13
+  },
+  {
+    "title": "An eFPGA Generation Suite with Customizable Architecture and IDE",
+    "abstract": "From edge devices to cloud servers, providing optimized hardware acceleration for specific applications has become a key approach to improve the efficiency of computer systems. Traditionally, many systems employ commercial field-programmable gate arrays (FPGAs) to implement dedicated hardware accelerator as the CPU's co-processor. However, commercial FPGAs are designed in generic architectures and are provided in the form of discrete chips, which makes it difficult to meet increasingly diversified market needs, such as balancing reconfigurable hardware resources for a specific application, or to be integrated into a customer's system-ona- chip (SoC) in the form of embedded FPGA (eFPGA). In this paper, we propose an eFPGA generation suite with customizable architecture and integrated development environment (IDE), which covers the entire eFPGA design generation, testing, and utilization stages. For the eFPGA design generation, our intellectual property (IP) generation flow can explore the optimal logic cell, routing, and array structures for given target applications. For the testability, we employ a previously proposed shipping test method that is 100% accurate at detecting all stuck-at faults in the entire FPGA-IP. In addition, we propose a user-friendly and customizable Webbased IDE framework for the generated eFPGA based on the NODE-RED development framework. In the case study, we show an eFPGA architecture exploration example for a differential privacy encryption application using the proposed suite. Then we show the implementation and evaluation of the eFPGA prototype with a 55 nm test element group chip design.  © 2023 The Institute of Electronics.",
+    "keywords": "application-specific acceleration; eFPGA; FPGA architecture; FPGA CAD; FPGA-IP",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-85150477562&doi=10.1587%2ftransfun.2022VLP0008&partnerID=40&md5=27660e218bc199cbbc54ca3be4189562",
+    "released": 2023,
+    "interesting": "+",
+    "citations": 5
+  },
+  {
+    "title": "Exploring the Effectiveness of Web-Based Programming Environments for MOOCs: A Comparative Study of CodeOcean and OpenJupyter",
+    "abstract": "Programming courses offered by openHPI, the European MOOC platform of the Hasso Plattner Institute, feature hands-on programming exercises to support learners in practicing the newly acquired skills. These exercises are facilitated by two tools: CodeOcean and Open Jupyter. Code Ocean is user-friendly and suitable for beginners, while OpenJupyter is more advanced and used in data science courses. In this paper, we compare and discuss the advantages and limitations of both tools, providing recommendations for instructors and researchers in programming courses. We also address technical details, such as scalability and execution environments. Furthermore, we explore future research possibilities, particularly in learner collaboration and automated feedback. Our work supports learners in acquiring knowledge and testing it at their own pace, with individualized feedback and minimal technical requirements, contributing to an open education landscape in programming education.",
+    "keywords": "MOOC; Programming; Web-based Environment; Auto-Grader; Data Science; CodeOcean; OpenJupyter",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10306228",
+    "released": 2023,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "Browser-based Java Development Environment for Programming Education",
+    "abstract": "Programming education has become popular in elementary education. However, the pass rate for the subject of programming in higher education is not always sufficient. In recent years, data science courses have effectively taught interactive and goal-oriented programming using Python and Jupyter. We propose a method for learning Java programming interactively using a Jupyter-like execution environment. This environment also enables the execution of network applications that are difficult to execute in the existing Jupyter environment. We show that many of the actual class examples can be executed using the proposed system.",
+    "keywords": "Programming Education; Programming Environment; Java; JupyterLab; JupyterHub; Google Colaboratory (Colab)",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10409780",
+    "released": 2023,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "Evaluation and technological solutions for a dynamic, unified cloud programming development environment : Ease of use and applicable system for uniformized practices and assessments",
+    "abstract": "The dynamic development and change of the world also result in the modernization of teacher-student relationships. In the training, educational processes must be planned with innovative strategies that meet the increasingly changing needs of students, which today go beyond the traditional classroom and methodological frameworks. In this article, we present a technological solution to support the renewal efforts in the education world that, on the one hand, takes advantage of the benefits of cloud-based services, and on the other hand, ensures that students can acquire the material of a given course in a unified, stable environment. The isolated environment offered by the virtual space guarantees private work sessions, and multi-project activities can also be handled more easily and uniformly. The analysis of the teaching program presented below provides insight into the practical and appropriate solutions offered by the containerization process. In addition to these, the topic will also cover the widely used and popular Docker application that supports the implementation of the process, as well as the NodeJS environment closely related to the project.",
+    "keywords": "teach program; virtual environment; containerization; Docker; NodeJS; cloud-based services",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10044519",
+    "released": 2023,
+    "interesting": "+",
+    "citations": 4
+  },
+  {
+    "title": "Design of STEM Teaching Network Publishing Framework Based on Web Interactive Programming Environment",
+    "abstract": "With the rapid development of e-learning, collaborative learning platforms such as Web-Based Education Domain are gradually being promoted in subject education. However, with the deepening of the application of platform environments, the problem of time lag in learning interaction in virtual classrooms has gradually been exposed. The traditional one-way collaborative education platform has been difficult to meet the demand for real-time interaction in smart classroom teaching. Based on this, the research was inspired by programming education and introduced a Web-based interactive programming environment. Through segmented programming technology, real-time interaction between teachers and students in the virtual classroom was realized, and animation media resources were finally generated and published to the learning network. middle. In the environment design, the study introduced four dimensions of environmental learning goals (entry skills, primitive skills, emotional skills and wisdom skills) to analyze learners, and based on the analysis results, a corresponding teaching case for the interactive programming environment system framework was designed, discuss how to use this framework to implement subject teaching ideas and practical methods to promote real-time interaction in virtual classrooms.",
+    "keywords": "Interactive programming environment; real-time interaction; programming education; STEM; Notebooks",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10393759",
+    "released": 2023,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "Towards Collaborative Coding in RIDE Web IDE",
+    "abstract": "RIDE is an integrated development environment (IDE) suited for the Reflex language, specifically designed for creating control algorithms for cyber-physical systems. RIDE is based on Eclipse Theia and a host program running independent instances for each user. However, it does not provide collaborative experience. Eclipse Theia is designed for single-user; therefore, collaborative programming is hampered by security and ease of use issues. This paper outlines a server program architecture to add collaborative abilities to otherwise single-user web applications. The suggested approach is application independent. It is applicable to other single-user applications, making it possible to deploy them in the cloud as web services. The paper provides a detailed analysis of the problem, as well as the tools and frameworks used for implementing this design with RIDE. This implementation makes use of Docker for containerization, Python and Flask for host program, Google Auth for user authentication, and SQLite for the database.",
+    "keywords": "CPS; process-oriented programming; Reflex; cloud IDE; web application; multi-user management",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10347731",
+    "released": 2023,
+    "interesting": "+",
+    "citations": 1
+  },
+  {
+    "title": "PyGuru: A Programming Environment to Facilitate Measurement of Cognitive Engagement",
+    "abstract": "There is a vital link between students' engagement and their performance. Despite this, a dearth of studies exploring student engagement (especially cognitive) in computer programming, where high failure rates are a norm. Interestingly, online environments capture fine-grained interactions; this data has the potential to detect students' cognitive engagement. The contribution of this paper is two-fold. Firstly, it introduces an online learning environment to learn and practice python programming called PyGuru and the data logged in the system. Secondly, we provide a preliminary analysis of students' interaction with the system to reveal their level of cognitive engagement in different system components. The results of this study conducted for two weeks and 21 students demonstrate that students perform more actions that correspond to passive engagement than other levels of engagement. © 30th International Conference on Computers in Education Conference, ICCE 2022 - Proceedings.",
+    "keywords": "Cognitive Engagement; Learning Environment; log data; Programming; PyGuru",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-85151057671&partnerID=40&md5=55681dd316c4316e0dc7abf3ea120c7e",
+    "released": 2022,
+    "interesting": "+",
+    "citations": 2
+  },
+  {
+    "title": "A study of microcontroller simulator tools for autonomous and online learning",
+    "abstract": "Even though technologically advanced processors based on 32 and 64 bit are now available, embedded systems still rely on the use 8 or 16 bit microcontroller solutions, due to factors such as cost-effectiveness and low power consumption. Its widespread adoption by the industry and its simplicity led the academy to address the development of systems using these 8 or 16 bit microcontrollers in its introductory-level electrical engineering curricula. Typically, a microcontroller of the MSP, AVR, MCS-51 or PIC family is used. Although in person laboratory work offers students the opportunity for acquiring skills related to practical experience with hardware and development boards, availability of hardware resources might be reduced in autonomous or online contexts. In these scenarios, simulation tools can be highly valuable, as an alternative or complementary option to laboratory work. Standard development tools are often unsuited for such purposes, because they are oriented to development activities that often assume the availability of hardware resources for executing, testing and debugging the system. To address this, this paper presents a survey of the ecosystem of tools for 8 or 16 bit microprocessors and microcontrollers development focused on their capability for supporting the simulation of embedded systems, and evaluate these solutions from the perspective of their potential for enabling autonomous study and learning by students. This comparative analysis can be very useful as it can serve as a decision factor for the choice of the microcontroller or microprocessor and toolchain to adopt in curriculum design, while it also identifies opportunities for new developments to address existing limitations.",
+    "keywords": "microcontroller simulators; online learning; autonomous learning; development tools; embedded systems",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9820021",
+    "released": 2022,
+    "interesting": "+",
+    "citations": 2
+  },
+  {
+    "title": "A Bad IDEa: Weaponizing uncontrolled online-IDEs in availability attacks",
+    "abstract": "Botnets are an ongoing threat to the cyber world and can be utilized to carry out DDoS attacks of high magnitude. From the botmaster's perspective, there is a constant need for deploying more effective botnets and discovering new ways to bolster their bot ranks. Integrated Development Environments (IDEs) have been essential for software developers to write and compile source code. The increasing need for remote work and collaborative workspaces have led to the IDE-as-a-service paradigm that offers online code editing and compilation with multiple language support. In this paper, we show that a multitude of online IDEs do not run control checks on the user code and can be therefore lever-aged by a botnet. We examine the concept of uncontrolled execution environments and present a proof of concept to show how uncontrolled online-IDEs can be weaponized to perform large-scale attacks by a botnet. Overall, we detect a total of 719 online-IDEs with uncontrolled execution environments and limited sandboxing. Lastly, as ethical disclosure, we inform the IDE developers and service providers of the vulnerabilities and propose countermeasures.",
+    "keywords": "online IDE; uncontrolled execution",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9799405",
+    "released": 2022,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "Towards Multi-User Mode in RIDE Web-IDE",
+    "abstract": "RIDE is an integrated development environment for the Reflex language, a process-oriented language designed for developing control algorithms for cyber-physical systems. RIDE was developed based on Eclipse Theia – an open source web IDE framework. Despite being based on web technologies such as Node.JS, RIDE can not serve as a web application for multiple users simultaneously. The paper describes an approach for configuring a server environment and creating a host program that makes hosting RIDE as a public web application possible. It provides problem analysis, tools and frameworks survey, and implementation details. Among discussed technologies are Docker, Kubernetes, and Eclipse Che. For multi-user support and security reasons, an instance of RIDE runs in an independent Docker container for each client. The host program handles input connections, runs and stops Docker containers with RIDE. The described approach may be used for deploying other single-user applications in the cloud turning them into web-services.",
+    "keywords": "cloud IDE; web; Docker; multi-user management; process-oriented programming",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9855114",
+    "released": 2022,
+    "interesting": "+",
+    "citations": 2
+  },
+  {
+    "title": "MOCSIDE: An open-source and scalable online IDE and auto-grader for computer science education",
+    "abstract": "Programming is learned through practice, with said practice in introductory programming courses often translating to a prohibitively large number of assignments, increasing the grading workload for faculty and/or teaching assistants. In short, this is unsustainable. Several publishers and a few notable companies have provided meritable auto-grading solutions, although most are plagued with problems including minimal problem sets, limited customization options, high cost, and at times even a disconnect with the pedagogical needs of academia. This poster presents our newly-developed web application, MOCSIDE, an open-source and scalable online IDE and auto-grader for computer science education. Results indicate a positive user experience from students and instructors alike, with cost savings, ease of use, and code collaboration highlighted as key features.",
+    "keywords": "online ide; cs2; cs1; computer science education; auto-grading",
+    "link": "https://doi.org/10.1145/3478432.3499125",
+    "released": 2022,
+    "interesting": "+",
+    "citations": 2
+  },
+  {
+    "title": "Jupyter in the classroom: An experience report",
+    "abstract": "Jupyter is an interactive web-based programming environment commonly used by Python programmers and data scientists. It can be used in the classroom either by itself or in addition to a traditional programming environment. This paper documents our experience using Jupyter in multiple computer science courses in a public four-year university using different programming languages (Java, C++, and Python). It describes our motivations for using Jupyter in these courses and how it is made available to students. It also describes the different roles it plays in our pedagogical approaches and the challenges it poses to both instructors and students. A report is presented on the preliminary experimentation conducted to evaluate its effectiveness in improving student performance. While our tests are limited by small sample sizes and did not show that using Jupyter produces a statistically significant improvement in student performance, qualitative analysis of student responses showed the usefulness of this tool in revitalizing teaching and keeping students engaged.",
+    "keywords": "web-based interactive coding; jupyter; development environment",
+    "link": "https://doi.org/10.1145/3478431.3499379",
+    "released": 2022,
+    "interesting": "+",
+    "citations": 18
+  },
+  {
+    "title": "Standardizing students’ programming environments with docker containers: Using visual studio code in the cloud with GitHub codespaces",
+    "abstract": "",
+    "keywords": "text editor; programming; integrated development environment; ide; editor; docker; containerization; container; code editor; code",
+    "link": "https://doi.org/10.1145/3502717.3532164",
+    "released": 2022,
+    "interesting": "+",
+    "citations": 8
+  },
+  {
+    "title": "Re-imagining computer laboratories for teaching introductory programming concepts using web-based integrated development environments: Opportunities and challenges",
+    "abstract": "This study reported on students’ views and experience during the transition from a traditional computer laboratory into a web-based integrated development environment in an introductory programming concepts course. The aim of this study is twofold. First, to review and evaluate selected web-based integrated development environments (Web IDEs) that can be used to support teaching and learning of programming concepts. Second, to get insight into students’ views and experience towards the web-based integrated development environments compared to computer laboratory. Students’ understanding of basic programming concepts is part of any computer science and information technology academic program. However, research shows that it is not always easy for students to learn about these concepts, and that is reflected in the high drop rate among students in these subjects. Computer laboratory is an integral part for introductory courses on programming concepts to help students practice what they have learnt. The study is descriptive and exploratory in its nature, and was conducted in two stages. First, a review of some selected web integrated development environments was performed using a rubric for evaluating e-learning tools. Second, the study explored students’ views and experience with the web-based integrated development environment using a questionnaire and a focus group. The study demonstrated that students had positive views and experience towards the web-based integrated development environments implying that these tools have the potential to overcome the limitations inherited in computer laboratory. The study suggested some improvements to the web-based integrated development environments to be more educationally effective.",
+    "keywords": "e-learning; Web-based integrated development environments; Virtual labs; Programming education",
+    "link": "https://doi.org/10.1145/3568364.3568375",
+    "released": 2022,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "A pilot experience with software programming environments as a service for teaching activities",
+    "abstract": "Software programming is one of the key abilities for the development of Computational Thinking (CT) skills in Science, Technology, Engineering and Mathematics (STEM). However, specific software tools to emulate realistic scenarios are required for effective teaching. Unfortunately, these tools have some limitations in educational environments due to the need of an adequate configuration and orchestration, which usually assumes an unaffordable work overload for teachers and is inaccessible for students outside the laboratories. To mitigate the aforementioned limitations, we rely on cloud solutions that automate the process of orchestration and configuration of software tools on top of cloud computing infrastructures. This way, the paper presents ACTaaS as a cloud-based educational resource that deploys and orchestrates a whole realistic software programming environment. ACTaaS provides a simple, fast and automatic way to set up a professional integrated environment without involving an overload to the teacher, and it provides an ubiquitous access to the environment. The solution has been tested in a pilot group of 28 students. Currently, there is no tool like ACTaaS that allows such a high grade of automation for the deployment of software production environments focused on educational activities supporting a wide range of cloud providers. Preliminary results through a pilot group predict its effectiveness due to the efficiency to set up a class environment in minutes without overloading the teachers, and providing ubiquitous access to students. In addition, the first student opinions about the experience were greatly positive. © 2020 by the authors. Licensee MDPI, Basel, Switzerland.",
+    "keywords": "Cloud comp",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-85098764320&doi=10.3390%2fapp11010341&partnerID=40&md5=f0002aa32f4b03357dc3cc7dc5553296",
+    "released": 2021,
+    "interesting": "+",
+    "citations": 12
+  },
+  {
+    "title": "Developing Reflex IDE Kernel with Xtext Framework",
+    "abstract": "In this paper, we describe the technology of the process-oriented language Reflex IDE kernel development. The Reflex language, which is being maintained at the Institute of Automation and Electrometry, is a language for cyber-physical systems software specification. In the paper, we assume that the cyber-physical system is a computational core that interacts with the physical world. In the case of Reflex, the computation platform is an industrial PC. Reflex IDE (RIDE) includes a language-based editor, syntax and semantics analyzers as well as an abstract syntax tree (AST) generator, and a class library for working with the generated AST. In this work, we explain our motivation for the research, formulate the requirements for the development, and present the RIDE architecture. We describe the RIDE development process using Eclipse/Xtext tools and its user interface. We also provide an example of extending the Reflex IDE kernel with a code generator for the AVR platform. In the conclusion, we discuss the possibility of using the obtained result to create a web-version of RIDE.",
+    "keywords": "process-oriented programming; Reflex; Xtext; parser; translator; DSL",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9507663",
+    "released": 2021,
+    "interesting": "+",
+    "citations": 4
+  },
+  {
+    "title": "CodeHelper: A Web-Based Lightweight IDE for E-Mentoring in Online Programming Courses",
+    "abstract": "Many universities choose online courses instead of in-person during the COVID-19 pandemic. One of the limitations of online courses is that it is difficult to perform teacher-student interactions in online teaching environments. Especially in online programming courses, it is hard to find an appropriate approach to remotely guide students when they have trouble conducting program code. This paper presents a lightweight IDE named CodeHelper integrated with an online judge that allows the instructor or the teaching assistant (TA) to help students in a form of online pair programming. Students can share their code with the instructor or the TA in a sandbox programming environment generated by CodeHelper, and the instructor or the TA can guide students by marking the mistakes in the sandbox. CodeHelper allows real-time pair programming for both sides, which can reduce the time and the cost of distance learning. Besides, the source code shared in the sandbox can also be compiled for syntax check, executed with a user-defined input, and submitted to the online judge for automated assessment, which can let students check the correctness of their programs once their troubles have been solved. It is efficient to use CodeHelper for mentoring students in online programming courses.",
+    "keywords": "Online programming courses; e-mentoring; pair programming",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9486772",
+    "released": 2021,
+    "interesting": "+",
+    "citations": 2
+  },
+  {
+    "title": "RIDE: Theia-Based Web IDE for the Reflex Language",
+    "abstract": "The process-oriented programming language Reflex is a programming language for cyber-physical systems' (CPS) control software. It is based on the formal hyperprocess model. Reflex has proved effective in industrial projects. But using Reflex is difficult due to the lack of IDE for Reflex programs. In this paper, we develop a cloud desktop IDE for the Reflex language - RIDE. Modularity is the main principle of RIDE architecture. It meets the needs of CPS software development process and allows extending the IDE functionality. Reflex IDE extensions may provide various functionalities, such as a graphical representation of the Reflex code, translators to other programming languages, debugging, and verification techniques.",
+    "keywords": "process-oriented programming; cloud IDE; web; cyber-physical systems; control software",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9507678",
+    "released": 2021,
+    "interesting": "+",
+    "citations": 7
+  },
+  {
+    "title": "MOCSIDE: An open-source and scalable online IDE and auto-grader for introductory programming courses",
+    "abstract": "Programming is learned through practice, with said practice in introductory programming courses often translating to a prohibitively large number of assignments, increasing the grading workload for faculty and/or teaching assistants. In short, this is unsustainable. Several publishers and a few notable companies have provided meritable solutions, although most are plagued with problems including minimal problem sets, limited customization options, high cost, and even a disconnect with the pedagogical needs within academia. This paper presents a survey of the more popular solutions currently available, followed by a presentation of our newly-developed web application, MOCSIDE: open-source and scalable online IDE and auto-grader for computer science education.",
+    "keywords": "",
+    "link": "",
+    "released": 2021,
+    "interesting": "+",
+    "citations": 5
+  },
+  {
+    "title": "Analyzing learners’ engagement and behavior in MOOCs on programming with the codeboard IDE",
+    "abstract": "Massive Open Online Courses (MOOCs) can be enhanced with the so-called learning-by-doing, designing the courses in a way that the learners are involved in a more active way in the learning process. Within the options for increasing learners’ interaction in MOOCs, it is possible to integrate (third-party) external tools as part of the instructional design of the courses. In MOOCs on computer sciences, there are, for example, web-based Integrated Development Environments (IDEs) which can be integrated and that allow learners to do programming tasks directly in their browsers without installing desktop software. This work focuses on analyzing the effect on learners’ engagement and behavior of integrating a third-party web-based IDE, Codeboard, in three MOOCs on Java programming with the purpose of promoting learning-by-doing (learning by coding in this case). In order to measure learners’ level of engagement and behavior, data was collected from Codeboard on the number of compilations, executions and code generated, and compared between learners who registered in Codeboard to save and keep a record of their projects (registered learners) and learners who did not register in Codeboard and did not have access to these extra features (anonymous learners). The results show that learners who registered in Codeboard were more engaged than learners who did not register (in terms of number of compilations and executions), spent more time coding and did more changes in the base code provided by the teachers. The main implication of this study suggests the need for a trade-off between designing MOOCs that allow a very easy and anonymous access to external tools aimed for a more active learning, and forcing learners to give a step forward in terms of commitment in exchange for benefitting from additional features of the external tool used.",
+    "keywords": "MOOCs; Programming; Learners’ engagement; Codeboard; Learning analytics; edX",
+    "link": "",
+    "released": 2020,
+    "interesting": "+",
+    "citations": 25
+  },
+  {
+    "title": "Using WebIDE as a distance learning tool for high school programming",
+    "abstract": "During COVID-19 pandemics, not unlike their peers in other parts of the world, the high-school students in Bosnia and Herzegovina needed to get accustomed to learning from their homes. This proved to be particularly difficult for those who were scheduled to learn basic C++ programming, not only the inperson support by their teachers is invaluable in these early stages of learning, but many of them did not have access to adequate hardware or software. A web-based integrated development environment (WebIDE) was deployed, and a number of sample assignments were created. Altogether, over 130 students from 5 schools participated actively, solving a total of 65 assignments (as of June 1st). Based on questionnaire results, overall the experiment was deemed successful, and the continued use of WebIDE after life returns to normal was justified.",
+    "keywords": "distance learning; webide; introductory programming; K-12 education; COVID-19",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9245263",
+    "released": 2020,
+    "interesting": "+",
+    "citations": 3
+  },
+  {
+    "title": "Student adoption and perceptions of a web integrated development environment: An experience report",
+    "abstract": "Students often spend a considerable amount of time and effort installing and configuring programming tools and environments. This can frustrate, and distract them from more important learning objectives, particularly in introductory programming courses. A web-based integrated development environment can serve as a low-threshold, ready-to-use programming environment, and reduce the time and effort needed to start practicing programming.In this paper, we report our experience of developing and deploying a web-based integrated development environment (web IDE) as an optional tool at a large public university that has been in use for over several years in various programming courses.We conducted a survey to understand students’ perceptions toward the web IDE and usage of its features. Using the data from the survey, we explored potential correlations between student demographic and behavioral traits in adoption of the web IDE. The results of the survey suggest that around half of the students use the IDE often or very often. We also discovered that the likelihood of adoption of the IDE decreases as students to move to upper classes. In this paper, we also describe broader lessons for educators and researchers.",
+    "keywords": "web-based integrated development envioronment; tool adoption; student perceptions",
+    "link": "https://doi.org/10.1145/3328778.3366949",
+    "released": 2020,
+    "interesting": "+",
+    "citations": 7
+  },
+  {
+    "title": "How “Friendly” Integrated Development Environments Are?",
+    "abstract": "Programmers and software developers are using different Integrated Development Environments (IDEs) to perform their daily work. IDEs are often complex applications, not friendly for novice programmers, with a learning process of several weeks and with usability and satisfaction of use not always as good as expected. The Programmer eXperience (PX) is a particular case of User eXperience (UX), based on the use of the IDEs and other artifacts. We have found studies about the programmer’s behavior and work, and also articles addressed the usability and new tools proposals for IDEs. In this work, we conducted a survey to evaluate the usability of several IDEs. The survey was based on the System Usability Scale (SUS), which we adapted for the purpose of our research. We focus the study on popular IDEs such as Dev-C++, Eclipse and NetBeans. The survey was conducted in two Chilean universities and one Spanish university, with students enrolled in two undergraduate programs in Informatics Engineering. The results obtained show that the IDEs evaluated have several issues related to the usability perceived by our participants. An interview was conducted with six experienced programmers that are working in different programming environments, in order to consult them on what aspects they would like to improve the IDEs. Their comments indicate that IDEs should incorporate connection with other programmers, and also, they claim for more intuitive interfaces and understandable error messages. © 2019, Springer Nature Switzerland AG.",
+    "keywords": "Integrated Development Environment; Interview; Programmer eXperience; Survey; Usability; User eXperience",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-85069822473&doi=10.1007%2f978-3-030-21902-4_7&partnerID=40&md5=7f7bb1d4acada06f0aa26860b788cd91",
+    "released": 2019,
+    "interesting": "+",
+    "citations": 3
+  },
+  {
+    "title": "Teachers’ Perspectives on Learning and Programming Environments for Secondary Education",
+    "abstract": "Teaching and learning programming is a challenge. Although several learning and programming environments have been proposed for classes, there seems to be more dissent than consensus as to which tools are preferable over others. This paper investigates teachers’ perspectives on popular learning and programming environments used in secondary computer science education in Germany. The environments investigated are: BlueJ, Scratch, Greenfoot, Eclipse, MIT App Inventor, Processing IDE, and Alice. Based on prior research, a catalogue of environment features supporting the learning processes of students was constructed. Using these criteria, an online-survey was conducted with computer science teachers in North Rhine-Westphalia, Germany. In the survey, the participating teachers evaluated the selected tools’ adequacy for teaching object-oriented programming. The findings support the results of prior research conducted with students, stressing the importance of a simple and user-friendly graphical user interface (GUI) as well as the option to visualise classes and objects. Contrary to prior studies, the results show that teachers do not see the editor as equally important, as students do, and that there is no consensus about the role of the area of application for choosing an integrated development environment (IDE). Student-friendly debugging messages as well as a step-by-step execution of programs were identified as important features. Although no tool excelled for every criterion, the clear favourite was BlueJ. © IFIP International Federation for Information Processing 2019.",
+    "keywords": "Educational programming environments; Object-oriented-programming; Teaching and learning programming",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-85069475296&doi=10.1007%2f978-3-030-23513-0_5&partnerID=40&md5=359acaa7d57367d57584544c0e1666d4",
+    "released": 2019,
+    "interesting": "+",
+    "citations": 0
+  },
+  {
+    "title": "pyiron: An integrated development environment for computational materials science",
+    "abstract": "To support and accelerate the development of simulation protocols in atomistic modelling, we introduce an integrated development environment (IDE) for computational materials science called pyiron (http://pyiron.org). The pyiron IDE combines a web based source code editor, a job management system for build automation, and a hierarchical data management solution. The core components of the pyiron IDE are pyiron objects based on an abstract class, which links application structures such as atomistic structures, projects, jobs, simulation protocols and computing resources with persistent storage and an interactive user environment. The simulation protocols within the pyiron IDE are constructed using the Python programming language. To highlight key concepts of this tool as well as to demonstrate its ability to simplify the implementation and testing of simulation protocols we discuss two applications. In these examples we show how pyiron supports the whole life cycle of a typical simulation, seamlessly combines ab initio with empirical potential calculations, and how complex feedback loops can be implemented. While originally developed with focus on ab initio thermodynamics simulations, the concepts and implementation of pyiron are general thus allowing to employ it for a wide range of simulation topics. © 2019 The Authors",
+    "keywords": "Complex simulation protocols; Integrated development environment; Modelling workflow",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-85062973139&doi=10.1016%2fj.commatsci.2018.07.043&partnerID=40&md5=c9144d1aef0ee82e393fc2eb45f3e12d",
+    "released": 2019,
+    "interesting": "+",
+    "citations": 96
+  },
+  {
+    "title": "OnlineSPARC: A programming environment for answer set programming",
+    "abstract": "Recent progress in logic programming (e.g. the development of the answer set programming (ASP) paradigm) has made it possible to teach it to general undergraduate and even middle/high school students. Given the limited exposure of these students to computer science, the complexity of downloading, installing, and using tools for writing logic programs could be a major barrier for logic programming to reach a much wider audience. We developed onlineSPARC, an online ASP environment with a self-contained file system and a simple interface. It allows users to type/edit logic programs and perform several tasks over programs, including asking a query to a program, getting the answer sets of a program, and producing a drawing/animation based on the answer sets of a program. Copyright © Cambridge University Press 2018.",
+    "keywords": "answer set programming; CS education; integrated development environment; logic programming; visualization",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-85056604338&doi=10.1017%2fS1471068418000509&partnerID=40&md5=26819a5eb570c60a23b54d3742b86c1f",
+    "released": 2019,
+    "interesting": "+",
+    "citations": 7
+  },
+  {
+    "title": "JavaScript Development Environment for Programming Education Using Smartphones",
+    "abstract": "A development environment that allows programming at any time or place is required for supporting programming education. Currently, smartphones are more popular than personal computers. Therefore, if a development environment for smartphones is available then students can learn to program in a normal room, with no personal computer, or on the way to school. A browser-based development environment can be realized using JavaScript as a learning language. In this paper, we describe the design, implementation, and evaluation of a JavaScript development environment. Our development environment is suitable for smartphones and is easy to use even with a small screen.",
+    "keywords": "Programming Education, Smartphone, JavaScript",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8951653",
+    "released": 2019,
+    "interesting": "+",
+    "citations": 8
+  },
+  {
+    "title": "Gamifying the Code Genie Programming Tool",
+    "abstract": "The Code Genie programming environment was built by the researcher and the author of this paper as part of a Ph.D. study to encourage high school student for coding in JavaScript language. This environment was tested and used in three coding workshops. The participated students had several suggestions in their feedback comments. One of the common suggestions was adding a tutorial section to the environment. Gamification elements and the suggested tutorial section were added to the Code Genie web Integrated Development Environment (IDE). This update is introduced and discussed in this paper.",
+    "keywords": "computer programming for high school students; computer science for girls; art with coding; animation; code sharing; STEM tool for k12; Code Genie development environment; web IDE",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8833771",
+    "released": 2019,
+    "interesting": "+",
+    "citations": 2
+  },
+  {
+    "title": "Good-bye localhost: A cloud-based web IDE for teaching java EE web development to non-computer science majors",
+    "abstract": "While cloud- and web-based Integrated Development Environments (IDE) are used in practice and education for some time, these are mainly intended for classical web development. Support for enterprise platforms such as Java Enterprise Edition (EE) is typically lacking. However, in higher education, web-based cloud IDE are particularly useful in software development courses for non-computer science major students, since they could help to overcome the participants’ limited IT skills. Thus, a respective easy-to-use web IDE is required. Therefore, in this paper a software platform for a web-based cloud IDE for educational purposes is proposed and evaluated, which in particular supports Java EE and is suitable for non-computer science majors. The platform was evaluated in a classroom experiment. The results indicate that it is useful and beneficial for the students, allowing the lecturer and the students to focus more on the actual learning objectives.",
+    "keywords": "web development education; non-computer science majors; higher education; cloud computing; Java EE",
+    "link": "https://doi.org/10.1109/ICSE-Companion.2019.00108",
+    "released": 2019,
+    "interesting": "+",
+    "citations": 4
+  },
+  {
+    "title": "Evaluations of JaguarCode: A web-based object-oriented programming environment with static and dynamic visualization",
+    "abstract": "To increase program comprehension and overcome learning obstacles of Object-Oriented Programming (OOP), various visualization techniques have been adopted in educational OOP environments. Some provide software development with visual notations without source code, while others support programming with visual aids. Our research supports Java programming along with UML diagrams (class, object, and sequence) and dynamic execution traces of program synchronized in a web-based programming environment - JaguarCode. It aims to help students better understand the static structure and dynamic behavior of Java programs, as well as object-oriented design concepts. This paper reports on the evaluation results of JaguarCode to investigate its effectiveness and user satisfaction through quantitative and qualitative experiments. The experimental results revealed that having both static and dynamic visualizations did positively impact the correctness of program understanding and tracing problems, while the visual representations did affect students’ understanding on the program execution of the problems to higher accuracy. It was also observed that students were satisfied with the aspects of those visualizations provided in JaguarCode. © 2018 Elsevier Inc.",
+    "keywords": "Object-oriented; Programming environment; Static and dynamic visualization; UML diagram; Web-based",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-85051937366&doi=10.1016%2fj.jss.2018.07.037&partnerID=40&md5=4742d6b5ca9b7abfe5ec5748ce851abd",
+    "released": 2018,
+    "interesting": "+",
+    "citations": 25
+  },
+  {
+    "title": "Matlab Programming Environment Based on Web",
+    "abstract": "Matlab is a mathematics software, which is the industry leader in numerical calculation, but this software takes up a lot of system memory and is extremely cumbersome to install. As various types of modeling rise and the intensity and frequency of discipline penetration are deepened and accelerate gradually, Matlab has gradually entered more people's field of vision. In order to simplify the programming environment and improve the convenience, a Matlab programming environment based on Web is proposed in this paper. Compared with the traditional Matlab programming environment, the main features of the system are that it does not need to deploy any development environment locally, and users can write and run Matlab code through the browser of mobile phone, tablet, computer; at the same time, the system also supports standard input, parameter input, and image output. Through the research and testing of the system, the programming environment has strong feasibility, excellent user experience, good concurrency and stability.",
+    "keywords": "Matlab; Web; programming environment; online programming",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8740716",
+    "released": 2018,
+    "interesting": "+",
+    "citations": 17
+  },
+  {
+    "title": "An overview of platforms for cloud based development",
+    "abstract": "This paper provides an overview of the state of the art technologies for software development in cloud environments. The surveyed systems cover the whole spectrum of cloud-based development including integrated programming environments, code repositories, software modeling, composition and documentation tools, and application management and orchestration. In this work we evaluate the existing cloud development ecosystem based on a wide number of characteristics like applicability (e.g. programming and database technologies supported), productivity enhancement (e.g. editor capabilities, debugging tools), support for collaboration (e.g. repository functionality, version control) and post-development application hosting and we compare the surveyed systems. The conducted survey proves that software engineering in the cloud era has made its initial steps showing potential to provide concrete implementation and execution environments for cloud-based applications. However, a number of important challenges need to be addressed for this approach to be viable. These challenges are discussed in the article, while a conclusion is drawn that although several steps have been made, a compact and reliable solution does not yet exist.",
+    "keywords": "Cloud computing; Integrated Development Environment (IDE); Code repositories; Software modeling; Orchestration tools",
+    "link": "",
+    "released": 2016,
+    "interesting": "+",
+    "citations": 51
+  },
+  {
+    "title": "Enhancing team collaboration through integrating social interactions in a Web-based development environment",
+    "abstract": "This paper presents the design and evaluation of a Web-based collaborative learning environment called EduCo for learning and practicing team-based exercises in computer science and software engineering courses. EduCo's defining characteristic is integrating a number of services for software development activities, for example, project management, requirements engineering, design, and programming into integrated shared workspaces with social-networking facilities to enhance collaboration among students and instructors. We conducted a controlled experiment to evaluate the effectiveness of the system in doing a three-iteration programming project. A total of 126 second-year students who attended an object-oriented programming course participated in the experiment. The results show that while the system was not found to affect student programming performance, it improved student engagement and satisfaction when working in teams. These results imply that the system's shared workspaces and social-networking services have the potential to enhance learning outcomes of students working in teams when these features are integrated into collaborative learning environments. © 2016 Wiley Periodicals, Inc. Comput Appl Eng Educ 24:529–545, 2016; View this article online at wileyonlinelibrary.com/journal/cae; DOI 10.1002/cae.21729. © 2016 Wiley Periodicals, Inc.",
+    "keywords": "collaborative environment; programming language; social environment; social network",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-84978327317&doi=10.1002%2fcae.21729&partnerID=40&md5=53882aa9f10e59865a3ae086e889534a",
+    "released": 2016,
+    "interesting": "+",
+    "citations": 36
+  },
+  {
+    "title": "Jimbo: A collaborative IDE with live preview",
+    "abstract": "Team collaboration plays a key role in the success of any multi-user activity. Software engineering is a highly collaborative activity, where multiple developers and designers work together to solve a common problem. Meaningful and effective designer-developer collaboration improves the user experience, which can improve the chances of success for the project. Learning to program is another activity that can be implemented in a more collaborative way, students can learn in an active style by working with others. The growth of online classes, from small structured seminars to massive open online courses (MOOCs), and the isolation and impoverished learning experience some students report in these, points to an urgent need for tools that support remote pair programming in a distributed educational setting.In this paper, we describe Jimbo, a collaborative integrated development environment (IDE) that we believe is beneficial and effective in both aforementioned activities. Jimbo integrates many features that support better collaboration and communication between designers and developers, to bridge communication gaps and develop mutual understanding. These novel features can improve today’s CS education by bringing students closer to each other and their instructors as well as training them to collaborate which is consistent with current practices in software engineering.",
+    "keywords": "web development; user awareness; pair programming; live preview; distance learning; designer-developer collaboration; communication; collaborative learning; collaboration; Jimbo; IDE",
+    "link": "https://doi.org/10.1145/2897586.2897613",
+    "released": 2016,
+    "interesting": "+",
+    "citations": 17
+  },
+  {
+    "title": "CodeR: Real-time Code Editor Application for Collaborative Programming",
+    "abstract": "The world of Internet is growing rapidly, many applications that previously created on the desktop start moving to the web. Many applications could be accessed anytime and anywhere easily using Internet. Developers need tools to create their applications, one of them named code editor. The purpose of this research is to design and develop a real-time code editor application using web socket technology to help users collaborate while working on the project. This application provides a feature where users can collaborate on a project in real-time. The authors using analysis methodology which conducting on a study of the current code editor applications, distributing questionnaires and conducting on literature study. CodeR is a web application that provides workspace to writing, perform, display the results of the code through the terminal, and collaborate with other users in real-time. The application main features are providing workspace to make, execute and build the source code, real-time collaboration, chat, and build the terminal. This application supports C, C++, and Java programming languages. © 2015 The Authors. Published by Elsevier B.V.",
+    "keywords": "Application; Code Editor; Collaborative Programming; Real-time; Web Socket",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-84948430392&doi=10.1016%2fj.procs.2015.07.531&partnerID=40&md5=c1b4cfd7d02894fd1d88372f51882746",
+    "released": 2015,
+    "interesting": "+",
+    "citations": 28
+  },
+  {
+    "title": "Formal reasoning using an iterative approach with an integrated web IDE",
+    "abstract": "This paper summarizes our experience in communicating the elements of reasoning about correctness, and the central role of formal specifications in reasoning about modular, component-based software using a language and an integrated Web IDE designed for the purpose. Our experience in using such an IDE, supported by a 'push-button' verifying compiler in a classroom setting, reveals the highly iterative process learners use to arrive at suitably specified, automatically provable code. We explain how the IDE facilitates reasoning at each step of this process by providing human readable verification conditions (VCs) and feedback from an integrated prover that clearly indicates unprovable VCs to help identify obstacles to completing proofs. The paper discusses the IDE's usage in verified software development using several examples drawn from actual classroom lectures and student assignments to illustrate principles of design-by-contract and the iterative process of creating and subsequently refining assertions, such as loop invariants in object-based code.",
+    "keywords": "",
+    "link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-84954426284&doi=10.4204%2fEPTCS.187.5&partnerID=40&md5=a347f34f24d7b716b0efe792a8b55e4c",
+    "released": 2015,
+    "interesting": "+",
+    "citations": 11
+  },
+  {
+    "title": "Beyond Open Source: The Touch Develop Cloud-Based Integrated Development Environment",
+    "abstract": "Software engineering tools and environments are migrating to the cloud, enabling more people to participate in programming from many more devices. To study this phenomenon in detail, we designed, implemented and deployed Touch Develop (url www.touchdevelop.com), a cloud-based integrated development environment (CIDE), which has been online for the past three years. Touch Develop combines a cross-platform browser-based IDE for the creation of mobile cloud apps, an online programmer/user community, and an app store. A central feature of Touch Develop is to track all program edits, versions, runtime information, bugs, as well user comments, questions and feedback in a single cloud-based repository that is available publicly via Web APIs. In this paper, we examine a key feature of Touch Develop that should be relevant to others creating CIDEs, namely the seamless integration of replicated workspaces, simplified version control and app publishing. An analysis of the Touch Develop repository shows that this combination of capabilities allows users to easily create new versions of apps from existing apps, make changes to other users' apps, and share their results from a variety of devices, including smartphones, tablets and traditional PCs.",
+    "keywords": "",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7283033",
+    "released": 2015,
+    "interesting": "+",
+    "citations": 25
+  },
+  {
+    "title": "Learning and practicing object-oriented programming using a collaborative web-based IDE",
+    "abstract": "Collaborative programming is an effective approach to software development, improving software quality, programmer's satisfaction and shortening delivery time This study examines the application of a collaborative Web-based IDE named IDEOL to execute a four-week multi-submission programming assignment in an introductory object-oriented programming class. Forty eight students forming 24 two-member groups in class used the IDE to interact and write source code required by the project. All collaborative and programming activities performed by students were recorded by IDEOL. The results of the study shows that students tend to postpone their programming work until the submission dates. This study also provides an approach to designing and executing an extended programming exercises, which receives high student satisfaction. Our results imply that IDEOL is a useful environment for students to collaborate, learn, and practice programming to improve their learning satisfaction. In addition, as students tend to procrastinate, IDEOL is a useful tool to facilitate, monitor, and report student progress in extended programming exercises.",
+    "keywords": "Collaborative IDE; Web-based IDE; programming exercise; collaboration; interaction",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7044141",
+    "released": 2014,
+    "interesting": "+",
+    "citations": 12
+  },
+  {
+    "title": "A cloud-based integrated development environment for embedded systems",
+    "abstract": "Developing software for embedded systems may be a challenging task. Next to solid programming skills using the C language (and Assembly) elaborate know-how about the target controller and surrounding hardware is mandatory. Furthermore, setup of the required tooling (compiler infrastructure, debug interfaces, etc.) can be a cumbersome task, especially when supporting multiple different host operating systems. Especially for beginners, this tooling aspect can turn out as an intriguing problem. This paper presents a cloud based integrated development environment (Cloud IDE) for embedded systems based entirely on open-source solutions that has the potential to ease some of these burdens. In contrast to existing solutions it supports flashing and debugging of a target board attached to the local host computer whereas, the entire development takes place in a cloud environment.",
+    "keywords": "Cloud IDE; embedded systems development; education; Node.js; PaaS",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6935577",
+    "released": 2014,
+    "interesting": "+",
+    "citations": 15
+  },
+  {
+    "title": "New opportunities for extracting insights from cloud based IDEs",
+    "abstract": "Traditional integrated development environments (IDEs) provide developers with robust environments for writing, testing, debugging, and deploying code. As the world becomes increasingly networked and more services are delivered via the cloud, it is only natural that the functionality of IDEs be delivered via the cloud. In addition to simplifying the provisioning and deployment of new IDE features, and making it easier to integrate with other web native tools, cloud based IDEs provide some fundamental advantages when it comes to understanding the behavior of a wide community of software developers. One of these advantages for the IDE provider is the ability to transparently monitor and analyze the real-time fine-grained actions of a large number of developers. In this paper, we explore how to leverage these transparent monitoring capabilities of cloud based IDEs to develop advanced analytics to understand developers’ behavior and infer their characteristics. We demonstrate the feasibility of this research direction with a preliminary study focusing on the way that source code files grow for different developers, development tasks, and skill levels. We then analyze the trends of source code file growth and find growth is more similar within subjects than within tasks.",
+    "keywords": "fine-grained data; analytics; JazzHub; Cloud based IDE",
+    "link": "https://doi.org/10.1145/2591062.2591105",
+    "released": 2014,
+    "interesting": "+",
+    "citations": 16
+  },
+  {
+    "title": "LearnCS! A new, browser-based c programming environment for CS1",
+    "abstract": "LearnCS! is a learning environment specifically written for use by first-year computer science students. It provides students with a browser-based programming and execution environment which contains a depiction of the notional machine for the C language, and contains a built-in debugger. Many error messages are customized to assist the beginning student of computer science. These features have seemingly yielded good results in improving students’ comprehension of CS1 concepts.",
+    "keywords": "",
+    "link": "",
+    "released": 2014,
+    "interesting": "+",
+    "citations": 15
+  },
+  {
+    "title": "An interactive Web-based IDE towards teaching and learning in programming courses",
+    "abstract": "In programming courses, students are often asked to work in groups to write multiple programs. The existing Integrated Development Environments (IDE), however, do not encourage concurrent interactions among student programmers. Students often encounter difficulties in collaborative activities, sharing resources, reviewing code and discussing ideas, especially when the group cannot reach a common arrangement for face-to-face meetings at a convenient time and place. We propose to resolve this problem by transforming the traditional IDE into Software as a Service on the Web, and integrating collaborative features in order to create an interactive and responsive environment, where real-time on-the-job guidance, communication and collaboration can be delivered. In this paper, we introduce a web-based IDE designed for this purpose, and show how it can be applied in programming courses.",
+    "keywords": "web-based IDE; collaborative learning",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6654478",
+    "released": 2013,
+    "interesting": "+",
+    "citations": 29
+  },
+  {
+    "title": "Recording and analyzing in-browser programming sessions",
+    "abstract": "In this paper, we report on the analysis of a novel type of automatically recorded detailed programming session data collected on a university-level web programming course. We present a method and an implementation of collecting rich data on how students learning to program edit and execute code and explore its use in examining learners’ behavior. The data collection instrument is an in-browser Python programming environment that integrates an editor, an execution environment, and an interactive Python console and is used to deliver programming assignments with automatic feedback. Most importantly, the environment records learners’ interaction within it. We have implemented tools for viewing these traces and demonstrate their potential in learning about the programming processes of learners and of benefiting computing education research and the teaching of programming.",
+    "keywords": "web based programming environment; programming session; programming assignment; computing education research; computer science education; Python",
+    "link": "https://doi.org/10.1145/2526968.2526970",
+    "released": 2013,
+    "interesting": "+",
+    "citations": 38
+  },
+  {
+    "title": "CoRED: Browser-based collaborative real-time editor for java web applications",
+    "abstract": "While the users of completed applications are heavily moving from desktop to the web browser, the majority of developers are still working with desktop IDEs such as Eclipse or Visual Studio. In contrast to professional installable IDEs, current web-based code editors are simple text editors with extra features. They usually understand lexical syntax and can do highlighting and indenting, but lack many of the features seen in modern desktop editors. In this paper, we present CoRED, a browser-based collaborative real-time code editor for Java applications. CoRED is a complete Java editor with error checking and automatic code generation capabilities, extended with some features commonly associated with social media. As a proof of the concept, we have extended CoRED to support Java based Vaadin framework for web applications. Moreover, CoRED can be used either as a stand-alone version or as a component of any other software. It is already used as a part of browser based Arvue IDE.",
+    "keywords": "vaadin; development tools; collaboration architectures",
+    "link": "https://doi.org/10.1145/2145204.2145399",
+    "released": 2012,
+    "interesting": "+",
+    "citations": 80
+  },
+  {
+    "title": "Software development environments on the web: A research agenda",
+    "abstract": "Software is rapidly moving from the desktop to the Web. The Web provides a generic user interface that allows ubiquitous access, instant collaboration, integration with other online services, and avoids installation and configuration on desktop computers. For software development, the Web presents a shift away from developer workstations as a silo, and has the promise of closer collaboration and improved feedback through innovations in Web-based interactive development environments (IDEs). Moving IDEs to the Web is not just a matter of porting desktop IDEs; a fundamental reconsideration of the IDE architecture is necessary in order to realize the full potential that the combination of modern IDEs and the Web can offer. This paper discusses research challenges and opportunities in this area, guided by a pilot study of a web IDE implementation.",
+    "keywords": "web; spoofax; online; interactive development environment; integrated development environment; ide; collaboration; cloud9; cloud",
+    "link": "https://doi.org/10.1145/2384592.2384603",
+    "released": 2012,
+    "interesting": "+",
+    "citations": 39
+  },
+  {
+    "title": "CEclipse: An Online IDE for Programing in the Cloud",
+    "abstract": "Due to the benefits of cloud computing, many desktop applications have been migrated into the cloud. In order to program in the cloud, lots of IDEs are also moved into the cloud at recent years. Although online IDE can bring developers a lot of convenience for their developing process, some tough problems are still less touched. This paper summarized three main kinds of actual problems from three aspects (Function implementation, Security guarantee, Advanced utilization) encountered when using the online IDE, and proposed three solutions (Services composition, Program behavior analysis, Program behavior mining) to handle these according problems. Finally, this paper introduce a real online IDE (CEclipse) developed by our research group and apply the three solutions in this online IDE.",
+    "keywords": "Cloud Computing; Service Composition; Program Analysis; Program Behavior; Online IDE",
+    "link": "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6012686",
+    "released": 2011,
+    "interesting": "+",
+    "citations": 43
+  },
+  {
+    "title": "Real-time collaborative coding in a web IDE",
+    "abstract": "This paper describes Collabode, a web-based Java integrated development environment designed to support close, synchronous collaboration between programmers. We examine the problem of collaborative coding in the face of program compilation errors introduced by other users which make collaboration more difficult, and describe an algorithm for error-mediated integration of program code. Concurrent editors see the text of changes made by collaborators, but the errors reported in their view are based only on their own changes. Editors may run the program at any time, using only error-free edits supplied so far, and ignoring incomplete or otherwise error-generating changes. We evaluate this algorithm and interface on recorded data from previous pilot experiments with Collabode, and via a user study with student and professional programmers. We conclude that it offers appreciable benefits over naive continuous synchronization without regard to errors and over manual version control.",
+    "keywords": "pair programming; collaborative editing; collaboration",
+    "link": "https://doi.org/10.1145/2047196.2047215",
+    "released": 2011,
+    "interesting": "+",
+    "citations": 176
+  },
+  {
+    "title": "WeScheme: The browser is your programming environment",
+    "abstract": "We present a programming environment called WeScheme that runs in the Web browser and supports interactive development. WeScheme programmers can save programs directly on the Web, making them accessible from everywhere. As a result, sharing of programs is a central focus that WeScheme supports seamlessly. The environment also leverages the existing presentation media and program run-time support found in Web browsers, thus making these easily accessible to students and leveraging their rapid engineering improvements. WeScheme is being used successfully by students, and is especially valuable in schools that have prohibitions on installing new software or lack the computational demands of more intensive programming environments.",
+    "keywords": "web; programming environments",
+    "link": "https://doi.org/10.1145/1999747.1999795",
+    "released": 2011,
+    "interesting": "+",
+    "citations": 33
+  },
+  {
+    "title": "Adinda: A knowledgeable, browser-based IDE",
+    "abstract": "In practice, many people have to work together to develop and maintain a software system. However, the programmer’s key tool, the Integrated Development Environment (IDE), is a solo-tool, serving to help individual programmers understand and modify the system. Such an IDE does not leverage the knowledge other team members may have of the design and implementation of the system. We propose to resolve this problem by exploring, experimentally, new ways of inferring knowledge from past IDE-interactions, and of maximizing collaboration among developers. Our approach, called Adinda, revolves around transforming the IDE into a set of integrated services, accessible via a web browser, and enriched with Web 2.0 technologies. Such services will not only help developers perform traditional IDE tasks, but also facilitate the required informal communication and collaboration needs of software development projects. In this paper, we report on our vision, approach and challenges for building Adinda, and initial results.",
+    "keywords": "programming environments; interaction mining; collaboration; Web 2.0; IDE",
+    "link": "https://doi.org/10.1145/1810295.1810330",
+    "released": 2010,
+    "interesting": "+",
+    "citations": 60
+  },
+  {
+    "title": "WIPE: A programming environment for novices",
+    "abstract": "This paper presents an overview of the design principles and the evaluation of a new programming environment, WIPE (Web Integrated Programming Environment), designed specifically to teach novices the fundamentals of programming. The environment is designed for use in secondary education as a first programming course, in order to help students become familiar with the main programming concepts.",
+    "keywords": "web-based compiler; secondary education; programming and programming languages; interactive learning environment; e-learning",
+    "link": "https://doi.org/10.1145/1067445.1067479",
+    "released": 2005,
+    "interesting": "+",
+    "citations": 36
+  }
+]
