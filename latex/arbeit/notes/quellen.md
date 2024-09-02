@@ -349,10 +349,6 @@ TODO!
 
 **Cites / Views:** 0 / 128
 
-### Short Summary
-
-TODO!
-
 ## Re-imagining computer laboratories for teaching introductory programming concepts using web-based integrated development environments: Opportunities and challenges
 
 **Link:** https://doi.org/10.1145/3568364.3568375

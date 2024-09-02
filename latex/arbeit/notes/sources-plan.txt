@@ -1,4 +1,25 @@
-30.08.: The Code Genie Programming Environment ... An overview of platforms for cloud based development
-31.08.: Beyond Open Source: The TouchDevelop Cloud-based Integrated Development Environment ... Recording and Analyzing In-Browser Programming Sessions
-01.08.: WIDE an Interactive Web Integrated Development Environment to Practice C Programming in Distance Education ... The Learning and Productivity Benefits to Student Programmers from Real-World Development Environments
-02.09.: Adinda: A Knowledgeable, Browser-Based IDE ... A critical analysis and evaluation of Web-based environments for program development
+An eFPGA Generation Suite with Customizable Architecture and IDE
+Catchword: Language Server Protocol An Introduction to the Protocol, its Use, and Adoption for Web Modeling Tools
+THE ACCEPTANCE OF AN EDUCATIONAL INTEGRATED DEVELOPMENT ENVIRONMENT TO LEARN PROGRAMMING FUNDAMENTALS
+A pilot experience with software programming environments as a service for teaching activities
+pyiron: An integrated development environment for computational materials science
+Evaluations of JaguarCode: A web-based object-oriented programming environment with static and dynamic visualization
+An overview of platforms for cloud based development
+Enhancing team collaboration through integrating social interactions in a Web-based development environment
+Jimbo: A collaborative IDE with live preview
+CodeR: Real-time Code Editor Application for Collaborative Programming
+Formal reasoning using an iterative approach with an integrated web IDE
+Beyond Open Source: The Touch Develop Cloud-Based Integrated Development Environment
+Learning and practicing object-oriented programming using a collaborative web-based IDE
+A cloud-based integrated development environment for embedded systems
+New opportunities for extracting insights from cloud based IDEs
+LearnCS! A new, browser-based c programming environment for CS1
+An interactive Web-based IDE towards teaching and learning in programming courses
+Recording and analyzing in-browser programming sessions
+CoRED: Browser-based collaborative real-time editor for java web applications
+Software development environments on the web: A research agenda
+CEclipse: An Online IDE for Programing in the Cloud
+Real-time collaborative coding in a web IDE
+WeScheme: The browser is your programming environment
+Adinda: A knowledgeable, browser-based IDE
+WIPE: A programming environment for novices
