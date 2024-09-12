@@ -1,0 +1,162 @@
+<mxfile host="65bd71144e">
+    <diagram id="NUteqm9t8s20DDzcF3mp" name="Page-1">
+        <mxGraphModel dx="851" dy="642" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="11" value="«component»&lt;br&gt;&lt;b&gt;Raspberry Pi&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="360" width="180" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="11">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="17" value="«component»&lt;br&gt;&lt;b&gt;Compiler&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="450" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="17">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="19" value="«component»&lt;br&gt;&lt;b&gt;Debugger&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="400" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="19">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="13" value="«component»&lt;br&gt;&lt;b&gt;Browser&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="320" y="360" width="180" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="13">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="23" value="«component»&lt;br&gt;&lt;b&gt;Code Editor&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="330" y="400" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="23">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="15" value="«component»&lt;br&gt;&lt;b&gt;Server&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="600" y="360" width="180" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="15">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="21" value="«component»&lt;br&gt;&lt;b&gt;Language Server&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="400" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="21">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="27" value="«component»&lt;br&gt;&lt;b&gt;Language Server Protocol Service (Provider)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="240" y="720" width="340" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="27">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="29" value="«component»&lt;br&gt;&lt;b&gt;Compilation Service (Provider)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="240" y="800" width="280" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="29">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="31" value="«component»&lt;br&gt;&lt;b&gt;Debugging Service (Provider)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="240" y="880" width="280" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="31">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="33" value="«component»&lt;br&gt;&lt;b&gt;Language Server Protocol Service (Consumer)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="600" y="720" width="340" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="33">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="36" value="«component»&lt;br&gt;&lt;b&gt;Compilation Service (Consumer)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="540" y="800" width="280" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="36">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="38" value="«component»&lt;br&gt;&lt;b&gt;Debugging Service (Consumer)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="540" y="880" width="280" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="38">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="40" value="«component»&lt;br&gt;&lt;b&gt;Testing Service (Provider)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="240" y="960" width="280" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="40">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="42" value="«component»&lt;br&gt;&lt;b&gt;Testing Service (Consumer)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="540" y="960" width="280" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="42">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="44" value="«component»&lt;br&gt;&lt;b&gt;Upload Service (Provider)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="240" y="1040" width="280" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="45" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="44">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="46" value="«component»&lt;br&gt;&lt;b&gt;Upload Service (Consumer)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="540" y="1040" width="280" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="46">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="48" value="«component»&lt;br&gt;&lt;b&gt;Execution Service (Provider)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="240" y="1120" width="280" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="49" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="48">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="50" value="«component»&lt;br&gt;&lt;b&gt;Execution Service (Consumer)&lt;/b&gt;" style="html=1;dropTarget=0;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="540" y="1120" width="280" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" vertex="1" parent="50">
+                    <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
+                        <mxPoint x="-27" y="7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

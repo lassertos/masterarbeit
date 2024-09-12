@@ -1,7 +1,0 @@
-\section{Language Server} \label{language_server}
-
-\begin{itemize}
-    \item Language Server über Cloud-instanziierbares Gerät oder über clangd im Browser
-\end{itemize}
-
-Eine Möglichkeit zur Einbindung von Language Servern ist es, diese auf dem CM zu installieren und sich dann zu diesen zu verbinden. Allerdings ist das Language Server Protokoll nur auf einen einzigen Client pro Server ausgelegt. Daher müsste in einem Experiment mit mehreren Nutzern für jeden dieser Nutzer eine eigene Instanz des Language Server erstellt werden. Eine spezielle Alternative könnte die Verwendung des zu WebAssembly kompilerten Language Servers clangd darstellen. Dieser könnte im Browser des jeweiligen Nutzers instanziiert werden, wodurch keine zusätzliche Last auf dem CM entsteht. Allerdings muss hierbei die neu entstandene Last auf dem Rechner des Nutzers in Betracht gezogen werden. Eine weitere Möglichkeit ist die Bereitstellung weiterer Server zur Bereitstellung der Language Server.

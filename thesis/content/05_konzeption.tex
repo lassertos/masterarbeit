@@ -1,0 +1,18 @@
+\chapter{Konzeption} \label{konzeption}
+
+Im Fokus dieser Arbeit liegt die Programmierung von Mikrocontrollern im Rahmen des GOLDi Remotelab. Bei den verwendeten Microcontrollern handelt es sich um ATmega2560. Damit diese mit der CrossLab Infrastruktur kommunizieren können sind sie über einen FPGA mit einem Raspberry Pi Compute Module 4 verbunden. Dabei übernimmt der FPGA die Kommunikation zwischen dem CM und dem Microcontroller, während das CM die Kommunikationsschnittstelle zur CrossLab Infrastruktur übernimmt. Als Beispiel für ein steuerbares elektromechanisches Modell wird das 3-Achs-Portal verwendet. Neben den realen Systemen sollen auch die virtuellen Versionen in Betracht gezogen werden. Daraus folgen vier verschiedene Experiment-Konfigurationen, die für die Konzeption betrachtet werden:
+
+\begin{enumerate}
+    \item Realer Microcontroller und reales 3-Achs-Portal
+    \item Realer Microcontroller und virtuelles 3-Achs-Portal
+    \item Virtueller Microcontroller und reales 3-Achs-Portal
+    \item Virtueller Microcontroller und virtuelles 3-Achs-Portal
+\end{enumerate}
+
+Weiterhin ist zu beachten, dass auch mehrere Steuereinheiten und Modelle in einem Experiment enthalten sein können.
+
+\input{content/05_konzeption/051_datenspeicherung.tex}
+\input{content/05_konzeption/052_kompilierung.tex}
+\input{content/05_konzeption/053_language_server.tex}
+\input{content/05_konzeption/054_debugging.tex}
+\input{content/05_konzeption/055_kollaboration.tex}
