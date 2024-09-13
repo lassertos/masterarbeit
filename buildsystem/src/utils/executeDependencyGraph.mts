@@ -22,7 +22,7 @@ export async function executeDependencyGraph(
   for (const root of dependencyGraph.roots) {
     promiseMap.set(
       root.name,
-      executeNode(root, dependencyGraph, statusMap, promiseMap)
+      executeNode(root, dependencyGraph, variant, statusMap, promiseMap)
     );
   }
 
@@ -34,6 +34,7 @@ export async function executeDependencyGraph(
 async function executeNode(
   node: { name: string; data: Job },
   dependencyGraph: DirectedGraph<Job>,
+  variant: "normal" | "clean",
   statusMap: Map<string, JobStatus>,
   promiseMap: Map<string, Promise<JobStatus>>
 ): Promise<JobStatus> {
@@ -49,7 +50,13 @@ async function executeNode(
       if (!promiseMap.has(descendant.name)) {
         promiseMap.set(
           descendant.name,
-          executeNode(descendant, dependencyGraph, statusMap, promiseMap)
+          executeNode(
+            descendant,
+            dependencyGraph,
+            variant,
+            statusMap,
+            promiseMap
+          )
         );
       }
     });
@@ -68,12 +75,15 @@ async function executeNode(
   }
 
   statusMap.set(node.name, "running");
-  const result = await executeJob(node.data);
+  const result = await executeJob(node.data, variant);
   statusMap.set(node.name, result);
   return result;
 }
 
-async function executeJob(job: Job): Promise<"success" | "failed"> {
+async function executeJob(
+  job: Job,
+  variant: "normal" | "clean"
+): Promise<"success" | "failed"> {
   const buildsystemPath = path.join(job.path, ".buildsystem");
   const metadataPath = path.join(buildsystemPath, "meta.json");
   const logPath = path.join(buildsystemPath, "log.txt");
@@ -83,6 +93,10 @@ async function executeJob(job: Job): Promise<"success" | "failed"> {
       folders: { exclude: ["node_modules", ".buildsystem", "dist"] },
     })
   ).hash;
+
+  if (variant === "clean") {
+    fs.rmSync(buildsystemPath, { recursive: true, force: true });
+  }
 
   if (!fs.existsSync(buildsystemPath)) {
     fs.mkdirSync(buildsystemPath);

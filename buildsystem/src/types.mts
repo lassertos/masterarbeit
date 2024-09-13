@@ -14,7 +14,10 @@ export function isJobDescription(data: unknown): data is JobDescription {
   return jobDescriptionSchema.safeParse(data).success;
 }
 
-const projectDescriptionSchema = z.record(jobDescriptionSchema);
+const projectDescriptionSchema = z.object({
+  path: z.string(),
+  jobs: z.record(jobDescriptionSchema),
+});
 
 export type ProjectDescription = z.infer<typeof projectDescriptionSchema>;
 

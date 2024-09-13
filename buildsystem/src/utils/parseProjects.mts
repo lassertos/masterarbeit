@@ -8,20 +8,22 @@ export function parseProjects(
   const transformedProjects: Project[] = [];
 
   for (const project in projects) {
+    const projectPath = path.join(basePath, projects[project].path);
+
     const transformedProject: Project = {
       name: project,
-      path: path.join(basePath, project),
+      path: projectPath,
       jobs: [],
     };
 
-    for (const job in projects[project]) {
+    for (const job in projects[project].jobs) {
       transformedProject.jobs.push({
         project: project,
         name: job,
-        path: path.join(basePath, project),
-        commands: projects[project][job].commands,
+        path: projectPath,
+        commands: projects[project].jobs[job].commands,
         dependencies:
-          projects[project][job].dependencies?.map((dependency) => {
+          projects[project].jobs[job].dependencies?.map((dependency) => {
             const [project, job] = dependency.split(":");
             return { project, job };
           }) ?? [],
