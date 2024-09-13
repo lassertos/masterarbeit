@@ -1,8 +1,18 @@
 {
   "build": { "dockerfile": "Dockerfile" },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
   "customizations": {
     "vscode": {
-      "extensions": ["James-Yu.latex-workshop"]
+      "extensions": [
+        "James-Yu.latex-workshop",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "yzhang.markdown-all-in-one",
+        "amodio.tsl-problem-matcher",
+        "connor4312.esbuild-problem-matchers"
+      ]
     }
   }
 }

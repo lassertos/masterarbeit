@@ -6,7 +6,7 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 # update the repository sources list
 # and install dependencies
 RUN apt-get update \
-    && apt-get install -y curl texlive-full git \
+    && apt-get install -y curl texlive texlive-lang-german texlive-latex-extra  git \
     && apt-get -y autoclean
 
 # nvm environment variables

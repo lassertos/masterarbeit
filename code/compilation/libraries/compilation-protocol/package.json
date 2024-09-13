@@ -1,0 +1,19 @@
+{
+  "name": "compilation-protocol",
+  "version": "0.0.1",
+  "description": "A message protocol for compilation servers.",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "messaging-channels": "file:../../../shared/messaging-channels",
+    "zod": "^3.23.8"
+  }
+}

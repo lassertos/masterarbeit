@@ -1,0 +1,42 @@
+{
+    "name": "shared-library",
+    "version": "1.0.0",
+    "types": "./lib/types/index.d.ts",
+    "main": "./lib/cjs/index.js",
+    "scripts": {
+        "build": "rm -rf ./lib/* && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+        "lint": "eslint src"
+    },
+    "files": [
+        "lib"
+    ],
+    "exports": {
+        ".": {
+            "import": "./lib/esm/index.js",
+            "require": "./lib/cjs/index.js",
+            "types": "./lib/types/index.d.ts"
+        }
+    },
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "@eslint/js": "^9.7.0",
+        "eslint": "^9.7.0",
+        "globals": "^15.8.0",
+        "typescript": "^5.5.3",
+        "typescript-eslint": "^7.16.1"
+    },
+    "overrides": {
+        "eslint": "^9.7.0"
+    },
+    "dependencies": {
+        "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
+        "@cross-lab-project/soa-service-message": "file:../../crosslab/clients/soa_services/message/js",
+        "@types/ws": "^8.5.11",
+        "isomorphic-ws": "^5.0.0",
+        "messaging-channels": "file:../messaging-channels",
+        "ws": "^8.18.0",
+        "zod": "^3.23.8"
+    }
+}
