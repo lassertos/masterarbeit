@@ -1,0 +1,35 @@
+code/shared/messaging-channels:
+  build:
+    commands: 
+      prepare: npm ci
+      execute: npm run build
+
+code/compilation/libraries/compilation-protocol:
+  build:
+    prepare: npm ci
+    commands: 
+      prepare: npm ci
+      execute: npm run build
+    dependencies:
+      - code/shared/messaging-channels:build
+
+code/compilation/libraries/abstract-compilation-server:
+  build:
+    prepare: npm ci
+    commands: 
+      prepare: npm ci
+      execute: npm run build
+    dependencies:
+      - code/compilation/libraries/compilation-protocol:build
+      - code/shared/messaging-channels:build
+
+code/compilation/libraries/crosslab-compilation-server:
+  build:
+    prepare: npm ci
+    commands: 
+      prepare: npm ci
+      execute: npm run build
+    dependencies:
+      - code/shared/messaging-channels:build
+      - code/compilation/libraries/compilation-protocol:build
+      - code/compilation/libraries/abstract-compilation-server:build

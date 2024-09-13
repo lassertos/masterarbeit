@@ -1,0 +1,8 @@
+executing code/compilation/libraries/crosslab-compilation-server:build
+executing code/shared/messaging-channels:build
+running code/shared/messaging-channels:build
+executing code/compilation/libraries/compilation-protocol:build
+executing code/compilation/libraries/abstract-compilation-server:build
+running code/compilation/libraries/compilation-protocol:build
+running code/compilation/libraries/abstract-compilation-server:build
+running code/compilation/libraries/crosslab-compilation-server:build

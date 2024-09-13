@@ -11,7 +11,8 @@
         "dbaeumer.vscode-eslint",
         "yzhang.markdown-all-in-one",
         "amodio.tsl-problem-matcher",
-        "connor4312.esbuild-problem-matchers"
+        "connor4312.esbuild-problem-matchers",
+        "redhat.vscode-yaml"
       ]
     }
   }

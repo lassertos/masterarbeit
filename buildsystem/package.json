@@ -1,0 +1,24 @@
+{
+  "name": "buildsystem",
+  "version": "0.0.1",
+  "description": "A buildsystem for this repository.",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT",
+  "dependencies": {
+    "@types/folder-hash": "^4.0.4",
+    "folder-hash": "^4.0.4",
+    "inquirer": "^10.2.2",
+    "terminal-kit": "^3.1.1",
+    "yaml": "^2.5.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "@types/terminal-kit": "^2.5.6",
+    "typescript": "^5.6.2"
+  }
+}
