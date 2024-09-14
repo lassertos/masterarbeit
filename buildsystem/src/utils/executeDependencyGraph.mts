@@ -85,8 +85,8 @@ async function executeJob(
   variant: "normal" | "clean"
 ): Promise<"success" | "failed"> {
   const buildsystemPath = path.join(job.path, ".buildsystem");
-  const metadataPath = path.join(buildsystemPath, "meta.json");
-  const logPath = path.join(buildsystemPath, "log.txt");
+  const metadataPath = path.join(buildsystemPath, `${job.name}.json`);
+  const logPath = path.join(buildsystemPath, `${job.name}.log`);
 
   const hash = (
     await hashElement(job.path, {
