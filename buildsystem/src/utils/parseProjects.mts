@@ -25,7 +25,11 @@ export function parseProjects(
         dependencies:
           projects[project].jobs[job].dependencies?.map((dependency) => {
             const [project, job] = dependency.split(":");
-            return { project, job };
+            return {
+              project,
+              job,
+              path: path.join(basePath, projects[project].path),
+            };
           }) ?? [],
       });
     }

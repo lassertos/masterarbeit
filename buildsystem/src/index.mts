@@ -25,8 +25,25 @@ const projects = parseProjects(projectDescriptions, basePath);
 const jobs = parseJobs(projects);
 
 terminal.clear();
-const project = await selectProject(projects);
-const job = await selectJob(project);
+
+const project = process.argv[3]
+  ? projects.find((project) => project.path === process.cwd())
+  : await selectProject(projects);
+
+if (!project) {
+  throw new Error(`Could not find a registered project at "${process.cwd()}"`);
+}
+
+const job = process.argv[3]
+  ? project.jobs.find((job) => job.name === process.argv[3])
+  : await selectJob(project);
+
+if (!job) {
+  throw new Error(
+    `Could not find job "${process.argv[3]}" for project "${project.name}"`
+  );
+}
+
 const variant = await selectVariant();
 
 const dependencyGraph = buildDependencyGraph(job, jobs);

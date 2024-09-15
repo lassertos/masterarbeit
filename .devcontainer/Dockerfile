@@ -6,7 +6,7 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 # update the repository sources list
 # and install dependencies
 RUN apt-get update \
-    && apt-get install -y curl texlive texlive-lang-german texlive-latex-extra latexmk texlive-science  git \
+    && apt-get install -y curl texlive texlive-lang-german texlive-latex-extra latexmk texlive-science git nano \
     && apt-get -y autoclean
 
 # nvm environment variables
@@ -30,3 +30,9 @@ ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 # confirm installation
 RUN node -v
 RUN npm -v
+
+# build and install buildsystem globally
+ADD buildsystem /usr/local/buildsystem
+RUN npm ci --prefix /usr/local/buildsystem && npm run build --prefix /usr/local/buildsystem
+RUN echo "node /usr/local/buildsystem/dist/index.mjs /workspaces/masterarbeit \$@" > /bin/buildsystem
+RUN chmod +x /bin/buildsystem

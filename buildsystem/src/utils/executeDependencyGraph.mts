@@ -2,9 +2,10 @@ import fs from "fs";
 import { DirectedGraph } from "../classes/directedGraph.mjs";
 import { Job, JobStatus } from "../types.mjs";
 import { renderExecution } from "./terminal.mjs";
-import { exec, spawn } from "child_process";
+import { spawn } from "child_process";
 import path from "path";
 import { hashElement } from "folder-hash";
+import { exit } from "process";
 
 export async function executeDependencyGraph(
   dependencyGraph: DirectedGraph<Job>,
@@ -107,7 +108,28 @@ async function executeJob(
     : {};
 
   if (metadata?.hash && metadata?.status) {
-    if (metadata.hash === hash) return metadata.status;
+    let hashesMatch = true;
+
+    if (metadata.hash !== hash) {
+      hashesMatch = false;
+    }
+
+    for (const dependency of job.dependencies) {
+      const savedDependencyHash =
+        metadata?.dependencies[dependency.project][dependency.job];
+      const newDependencyHash = (
+        await hashElement(dependency.path, {
+          folders: { exclude: ["node_modules", ".buildsystem", "dist"] },
+        })
+      ).hash;
+
+      if (!savedDependencyHash || savedDependencyHash !== newDependencyHash) {
+        hashesMatch = false;
+        break;
+      }
+    }
+
+    if (hashesMatch) return metadata.status;
   }
 
   fs.rmSync(logPath, { force: true });
@@ -169,10 +191,29 @@ async function executeJob(
 
   const result = executionSuccessful ? "success" : "failed";
 
-  fs.writeFileSync(
-    metadataPath,
-    JSON.stringify({ hash, status: result }, null, 4)
-  );
+  const meta: {
+    hash: string;
+    status: JobStatus;
+    dependencies: { [k: string]: { [k: string]: string } };
+  } = {
+    hash,
+    status: result,
+    dependencies: {},
+  };
+
+  for (const dependency of job.dependencies) {
+    if (!meta.dependencies[dependency.project]) {
+      meta.dependencies[dependency.project] = {};
+    }
+
+    meta.dependencies[dependency.project][dependency.job] = (
+      await hashElement(dependency.path, {
+        folders: { exclude: ["node_modules", ".buildsystem", "dist"] },
+      })
+    ).hash;
+  }
+
+  fs.writeFileSync(metadataPath, JSON.stringify(meta, null, 4));
 
   return result;
 }

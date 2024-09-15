@@ -4,7 +4,8 @@
   "description": "A buildsystem for this repository.",
   "main": "dist/index.mjs",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node dist/index.mjs"
   },
   "author": "Pierre Helbing",
   "license": "MIT",

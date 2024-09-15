@@ -51,6 +51,7 @@ const jobSchema = z.object({
     z.object({
       project: z.string(),
       job: z.string(),
+      path: z.string(),
     })
   ),
 });
