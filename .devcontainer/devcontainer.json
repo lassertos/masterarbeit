@@ -1,7 +1,8 @@
 {
   "build": { "dockerfile": "Dockerfile", "context": ".." },
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "./crosslabFeature": {}
   },
   "customizations": {
     "vscode": {
@@ -15,5 +16,10 @@
         "redhat.vscode-yaml"
       ]
     }
+  },
+  "containerEnv": {
+    "LC_ALL": "C.UTF-8",
+    "LANG": "C.UTF-8",
+    "LANGUAGE": "C.UTF-8"
   }
 }

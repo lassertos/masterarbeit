@@ -1,0 +1,3 @@
+[submodule "code/crosslab"]
+	path = code/crosslab
+	url = git@github.com:Cross-Lab-Project/crosslab.git

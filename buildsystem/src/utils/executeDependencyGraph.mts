@@ -5,7 +5,6 @@ import { renderExecution } from "./terminal.mjs";
 import { spawn } from "child_process";
 import path from "path";
 import { hashElement } from "folder-hash";
-import { exit } from "process";
 
 export async function executeDependencyGraph(
   dependencyGraph: DirectedGraph<Job>,
@@ -91,7 +90,9 @@ async function executeJob(
 
   const hash = (
     await hashElement(job.path, {
-      folders: { exclude: ["node_modules", ".buildsystem", "dist"] },
+      folders: {
+        exclude: ["node_modules", ".buildsystem", "dist", "app", "lib"],
+      },
     })
   ).hash;
 
@@ -119,7 +120,9 @@ async function executeJob(
         metadata?.dependencies[dependency.project][dependency.job];
       const newDependencyHash = (
         await hashElement(dependency.path, {
-          folders: { exclude: ["node_modules", ".buildsystem", "dist"] },
+          folders: {
+            exclude: ["node_modules", ".buildsystem", "dist", "app", "lib"],
+          },
         })
       ).hash;
 
@@ -208,7 +211,9 @@ async function executeJob(
 
     meta.dependencies[dependency.project][dependency.job] = (
       await hashElement(dependency.path, {
-        folders: { exclude: ["node_modules", ".buildsystem", "dist"] },
+        folders: {
+          exclude: ["node_modules", ".buildsystem", "dist", "app", "lib"],
+        },
       })
     ).hash;
   }

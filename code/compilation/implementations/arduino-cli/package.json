@@ -9,7 +9,11 @@
   "author": "Pierre Helbing",
   "license": "MIT",
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/node": "^22.5.4",
     "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
   }
 }

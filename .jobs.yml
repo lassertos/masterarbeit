@@ -2,7 +2,7 @@ messaging-channels:
   path: code/shared/messaging-channels
   jobs:
     build:
-      commands: 
+      commands:
         prepare: npm ci
         execute: npm run build
 
@@ -10,8 +10,7 @@ compilation-protocol:
   path: code/compilation/libraries/compilation-protocol
   jobs:
     build:
-      prepare: npm ci
-      commands: 
+      commands:
         prepare: npm ci
         execute: npm run build
       dependencies:
@@ -21,8 +20,7 @@ abstract-compilation-server:
   path: code/compilation/libraries/abstract-compilation-server
   jobs:
     build:
-      prepare: npm ci
-      commands: 
+      commands:
         prepare: npm ci
         execute: npm run build
       dependencies:
@@ -33,11 +31,18 @@ crosslab-compilation-server:
   path: code/compilation/libraries/crosslab-compilation-server
   jobs:
     build:
-      prepare: npm ci
-      commands: 
+      commands:
         prepare: npm ci
         execute: npm run build
       dependencies:
         - messaging-channels:build
         - compilation-protocol:build
         - abstract-compilation-server:build
+
+soa-client-js:
+  path: code/crosslab/clients/soa/js
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
