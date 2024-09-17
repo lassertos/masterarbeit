@@ -12,7 +12,7 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "@cross-lab-project/soa-client": "^0.0.1",
-    "messaging-channels": "^1.0.0"
+    "@cross-lab-project/soa-client": "file:../soa-client-js",
+    "messaging-channels": "file:../messaging-channels"
   }
 }

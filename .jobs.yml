@@ -21,6 +21,11 @@ crosslab-messaging-channel:
       dependencies:
         - messaging-channels:publish
     publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
       commands:
         execute: npm unpublish -f; npm publish
       dependencies:
@@ -36,6 +41,11 @@ compilation-protocol:
       dependencies:
         - messaging-channels:publish
     publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
       commands:
         execute: npm unpublish -f; npm publish
       dependencies:
@@ -52,6 +62,11 @@ abstract-compilation-server:
         - compilation-protocol:publish
         - messaging-channels:publish
     publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
       commands:
         execute: npm unpublish -f; npm publish
       dependencies:
@@ -69,6 +84,11 @@ crosslab-compilation-server:
         - compilation-protocol:publish
         - abstract-compilation-server:publish
     publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
       commands:
         execute: npm unpublish -f; npm publish
       dependencies:
@@ -98,7 +118,13 @@ crosslab-compilation-service:
         - messaging-channels:publish
         - soa-client-js:publish
         - crosslab-messaging-channel:publish
+        - compilation-protocol:publish
     publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
       commands:
         execute: npm unpublish -f; npm publish
       dependencies:
@@ -115,6 +141,11 @@ arduino-cli-compilation-server:
         - soa-client-js:publish
         - crosslab-compilation-service:publish
     build-docker:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
       commands:
         execute: docker build --network host -t arduino-cli-compilation-server .
       dependencies:

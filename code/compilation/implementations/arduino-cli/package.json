@@ -15,9 +15,12 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "@cross-lab-project/soa-client": "^0.0.1",
-    "crosslab-compilation-service": "^0.0.1",
+    "@cross-lab-project/soa-client": "file:../../../shared/soa-client-js",
+    "compilation-protocol": "file:../../libraries/compilation-protocol",
+    "crosslab-compilation-service": "file:../../service",
+    "crosslab-messaging-channel": "file:../../../shared/crosslab-messaging-channel",
     "express": "^4.21.0",
+    "messaging-channels": "file:../../../shared/messaging-channels",
     "zod": "^3.23.8"
   }
 }
