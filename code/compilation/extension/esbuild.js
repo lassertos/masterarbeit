@@ -60,7 +60,7 @@ const testBundlePlugin = {
 async function main() {
 	const ctx = await esbuild.context({
 		entryPoints: [
-			'src/web/extension.ts',
+			'src/web/extension.mts',
 			'src/web/test/suite/extensionTests.ts'
 		],
 		bundle: true,

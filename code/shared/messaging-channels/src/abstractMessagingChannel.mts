@@ -3,7 +3,7 @@ import {
     MessagingProtocol,
     OutgoingMessage,
     Role,
-} from "./types.js";
+} from "./types.mjs";
 import { TypedEmitter } from "tiny-typed-emitter";
 
 interface MessagingChannelEvents<
@@ -19,16 +19,13 @@ export abstract class AbstractMessagingChannel<
     MP extends MessagingProtocol | undefined = undefined,
     R extends Role<MP> | undefined = undefined,
 > extends TypedEmitter<MessagingChannelEvents<MP, R>> {
-    protected _protocolInfo:
-        | {
-              protocol: MP;
-              role: R;
-          }
-        | undefined;
+    protected _protocol: MP;
+    protected _role: R;
 
-    protected constructor(options?: { protocol: MP; role: R }) {
+    protected constructor(protocol: MP, role: R) {
         super();
-        this._protocolInfo = options;
+        this._protocol = protocol;
+        this._role = role;
     }
 
     abstract send(message: OutgoingMessage<MP, R>): Promise<void> | void;

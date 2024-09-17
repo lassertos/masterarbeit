@@ -5,6 +5,26 @@ messaging-channels:
       commands:
         prepare: npm ci
         execute: npm run build
+    publish:
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - messaging-channels:build
+
+crosslab-messaging-channel:
+  path: code/shared/crosslab-messaging-channel
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - messaging-channels:publish
+    publish:
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - crosslab-messaging-channel:build
 
 compilation-protocol:
   path: code/compilation/libraries/compilation-protocol
@@ -14,7 +34,12 @@ compilation-protocol:
         prepare: npm ci
         execute: npm run build
       dependencies:
-        - messaging-channels:build
+        - messaging-channels:publish
+    publish:
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - compilation-protocol:build
 
 abstract-compilation-server:
   path: code/compilation/libraries/abstract-compilation-server
@@ -24,8 +49,13 @@ abstract-compilation-server:
         prepare: npm ci
         execute: npm run build
       dependencies:
-        - compilation-protocol:build
-        - messaging-channels:build
+        - compilation-protocol:publish
+        - messaging-channels:publish
+    publish:
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - abstract-compilation-server:build
 
 crosslab-compilation-server:
   path: code/compilation/libraries/crosslab-compilation-server
@@ -35,14 +65,57 @@ crosslab-compilation-server:
         prepare: npm ci
         execute: npm run build
       dependencies:
-        - messaging-channels:build
-        - compilation-protocol:build
-        - abstract-compilation-server:build
+        - messaging-channels:publish
+        - compilation-protocol:publish
+        - abstract-compilation-server:publish
+    publish:
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - crosslab-compilation-server:build
 
 soa-client-js:
-  path: code/crosslab/clients/soa/js
+  path: code/shared/soa-client-js
   jobs:
     build:
       commands:
         prepare: npm ci
         execute: npm run build
+    publish:
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - soa-client-js:build
+
+crosslab-compilation-service:
+  path: code/compilation/service
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - messaging-channels:publish
+        - soa-client-js:publish
+        - crosslab-messaging-channel:publish
+    publish:
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - crosslab-compilation-service:build
+
+arduino-cli-compilation-server:
+  path: code/compilation/implementations/arduino-cli
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - soa-client-js:publish
+        - crosslab-compilation-service:publish
+    build-docker:
+      commands:
+        execute: docker build --network host -t arduino-cli-compilation-server .
+      dependencies:
+        - arduino-cli-compilation-server:build

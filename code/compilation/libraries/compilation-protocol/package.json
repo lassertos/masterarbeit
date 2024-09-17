@@ -13,7 +13,7 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "messaging-channels": "file:../../../shared/messaging-channels"
+    "messaging-channels": "^1.0.0"
   },
   "peerDependencies": {
     "zod": "^3.23.8"

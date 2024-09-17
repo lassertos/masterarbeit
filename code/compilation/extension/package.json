@@ -16,8 +16,22 @@
       {
         "command": "crosslab-compilation-extension.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "crosslab-compilation-extension.compile",
+        "title": "Compile",
+        "icon": "$(run)",
+        "shortTitle": "compile",
+        "enablement": "workbenchState == folder"
       }
-    ]
+    ],
+    "menus": {
+      "editor/title/run": [
+        {
+          "command": "crosslab-compilation-extension.compile"
+        }
+      ]
+    }
   },
   "scripts": {
     "test": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/extensionTests.js",
@@ -33,19 +47,25 @@
     "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
   },
   "devDependencies": {
-    "@types/vscode": "^1.93.0",
-    "@types/mocha": "^10.0.7",
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@types/assert": "^1.5.10",
-    "eslint": "^9.9.1",
+    "@types/mocha": "^10.0.7",
+    "@types/vscode": "^1.93.0",
     "@typescript-eslint/eslint-plugin": "^8.3.0",
     "@typescript-eslint/parser": "^8.3.0",
-    "mocha": "^10.7.3",
-    "typescript": "^5.5.4",
     "@vscode/test-web": "^0.0.58",
+    "assert": "^2.1.0",
     "esbuild": "^0.23.1",
+    "eslint": "^9.9.1",
     "glob": "^11.0.0",
+    "mocha": "^10.7.3",
     "npm-run-all": "^4.1.5",
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-    "assert": "^2.1.0"
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
+    "@koa/router": "^13.0.0",
+    "compilation-protocol": "file:../libraries/compilation-protocol",
+    "crosslab-compilation-service": "file:../service"
   }
 }

@@ -1,8 +1,15 @@
 {
-  "build": { "dockerfile": "Dockerfile", "context": ".." },
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/masterarbeit",
+  "shutdownAction": "stopCompose",
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "./crosslabFeature": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "dockerDefaultAddressPool": "base=172.30.0.0/15,size=24"
+    },
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/python:1": {},
+    "./masterarbeitFeature": {}
   },
   "customizations": {
     "vscode": {
@@ -10,6 +17,7 @@
         "James-Yu.latex-workshop",
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
+        "ms-vscode.extension-test-runner",
         "yzhang.markdown-all-in-one",
         "amodio.tsl-problem-matcher",
         "connor4312.esbuild-problem-matchers",

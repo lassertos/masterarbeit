@@ -21,6 +21,7 @@ export function parseProjects(
         project: project,
         name: job,
         path: projectPath,
+        "helper-functions": projects[project].jobs[job]["helper-functions"],
         commands: projects[project].jobs[job].commands,
         dependencies:
           projects[project].jobs[job].dependencies?.map((dependency) => {

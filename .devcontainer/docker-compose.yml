@@ -1,0 +1,25 @@
+services:
+  devcontainer:
+    build:
+      context: ..
+      dockerfile: ./.devcontainer/Dockerfile
+    volumes:
+      - ..:/workspaces/masterarbeit
+    networks:
+      - node-network
+    command: sleep infinity
+  verdaccio:
+    image: verdaccio/verdaccio
+    container_name: "verdaccio"
+    networks:
+      - node-network
+    environment:
+      - VERDACCIO_PORT=4873
+    ports:
+      - "4873:4873"
+    volumes:
+      - "./.verdaccio:/verdaccio/conf"
+    restart: unless-stopped
+networks:
+  node-network:
+    driver: bridge

@@ -1,4 +1,10 @@
-FROM node:latest
+FROM node:lts-alpine
 
-RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
-RUN arduino-cli core install arduino:avr
+WORKDIR /app
+
+COPY dist ./dist
+COPY package*.json .
+
+RUN npm ci --omit=dev
+
+CMD ["node", "dist/index.js"]

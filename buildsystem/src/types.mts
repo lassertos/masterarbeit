@@ -1,6 +1,12 @@
 import { z } from "zod";
 
 const jobDescriptionSchema = z.object({
+  "helper-functions": z.optional(
+    z.object({
+      before: z.optional(z.array(z.string())),
+      after: z.optional(z.array(z.string())),
+    })
+  ),
   commands: z.object({
     prepare: z.optional(z.string()),
     execute: z.string(),
@@ -43,6 +49,12 @@ const jobSchema = z.object({
   project: z.string(),
   name: z.string(),
   path: z.string(),
+  "helper-functions": z.optional(
+    z.object({
+      before: z.optional(z.array(z.string())),
+      after: z.optional(z.array(z.string())),
+    })
+  ),
   commands: z.object({
     prepare: z.optional(z.string()),
     execute: z.string(),

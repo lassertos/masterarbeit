@@ -5,6 +5,7 @@ import { renderExecution } from "./terminal.mjs";
 import { spawn } from "child_process";
 import path from "path";
 import { hashElement } from "folder-hash";
+import { helperFunctions } from "../helper-functions/index.mjs";
 
 export async function executeDependencyGraph(
   dependencyGraph: DirectedGraph<Job>,
@@ -97,7 +98,8 @@ async function executeJob(
   ).hash;
 
   if (variant === "clean") {
-    fs.rmSync(buildsystemPath, { recursive: true, force: true });
+    fs.rmSync(metadataPath, { recursive: true, force: true });
+    fs.rmSync(logPath, { recursive: true, force: true });
   }
 
   if (!fs.existsSync(buildsystemPath)) {
@@ -116,8 +118,11 @@ async function executeJob(
     }
 
     for (const dependency of job.dependencies) {
-      const savedDependencyHash =
-        metadata?.dependencies[dependency.project][dependency.job];
+      const savedDependencyHash = metadata?.dependencies
+        ? metadata.dependencies[dependency.project]
+          ? metadata.dependencies[dependency.project][dependency.job]
+          : undefined
+        : undefined;
       const newDependencyHash = (
         await hashElement(dependency.path, {
           folders: {
@@ -137,10 +142,34 @@ async function executeJob(
 
   fs.rmSync(logPath, { force: true });
 
+  if (job["helper-functions"]?.before) {
+    for (const helperFunction of job["helper-functions"].before) {
+      if (!(helperFunction in helperFunctions)) {
+        throw new Error(`"${helperFunction}" is not a valid helper function!`);
+      }
+      try {
+        helperFunctions[helperFunction](job);
+      } catch (error) {
+        if (error instanceof Error) {
+          fs.appendFileSync(logPath, error.message);
+          fs.writeFileSync(
+            metadataPath,
+            JSON.stringify({ status: "failed" }, null, 4)
+          );
+
+          return "failed";
+        }
+      }
+    }
+  }
+
   const preparationSuccessful = await new Promise<boolean>((resolve) => {
     if (job.commands.prepare) {
       const args = job.commands.prepare.split(" ");
-      const jobProcess = spawn(args[0], args.slice(1), { cwd: job.path });
+      const jobProcess = spawn(args[0], args.slice(1), {
+        cwd: job.path,
+        shell: "/bin/bash",
+      });
 
       jobProcess.stdout.on("data", (data) => {
         fs.appendFileSync(logPath, data.toString());
@@ -173,7 +202,11 @@ async function executeJob(
 
   const executionSuccessful = await new Promise<boolean>((resolve) => {
     const args = job.commands.execute.split(" ");
-    const jobProcess = spawn(args[0], args.slice(1), { cwd: job.path });
+    fs.appendFileSync(logPath, job.path + "\n");
+    const jobProcess = spawn(args[0], args.slice(1), {
+      cwd: job.path,
+      shell: "/bin/bash",
+    });
 
     jobProcess.stdout.on("data", (data) => {
       fs.appendFileSync(logPath, data.toString());
@@ -193,6 +226,27 @@ async function executeJob(
   });
 
   const result = executionSuccessful ? "success" : "failed";
+
+  if (job["helper-functions"]?.after) {
+    for (const helperFunction of job["helper-functions"].after) {
+      if (!(helperFunction in helperFunctions)) {
+        throw new Error(`"${helperFunction}" is not a valid helper function!`);
+      }
+      try {
+        helperFunctions[helperFunction](job);
+      } catch (error) {
+        if (error instanceof Error) {
+          fs.appendFileSync(logPath, error.message);
+          fs.writeFileSync(
+            metadataPath,
+            JSON.stringify({ status: "failed" }, null, 4)
+          );
+
+          return "failed";
+        }
+      }
+    }
+  }
 
   const meta: {
     hash: string;

@@ -4,3 +4,4 @@ dist
 node_modules
 *.gz
 .buildsystem
+.vscode-test-web

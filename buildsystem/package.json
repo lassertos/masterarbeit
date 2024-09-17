@@ -5,7 +5,8 @@
   "main": "dist/index.mjs",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.mjs"
+    "start": "node dist/index.mjs",
+    "update": "npm run build && rm -rf /home/vscode/buildsystem && cp -r . /home/vscode/buildsystem"
   },
   "author": "Pierre Helbing",
   "license": "MIT",

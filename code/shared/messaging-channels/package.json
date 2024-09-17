@@ -1,22 +1,12 @@
 {
+    "type": "module",
     "name": "messaging-channels",
     "version": "1.0.0",
     "description": "Different messaging channel implementations for the servers and clients.",
-    "types": "./lib/types/index.d.ts",
-    "main": "./lib/cjs/index.js",
+    "main": "dist/index.mjs",
     "scripts": {
-        "build": "rm -rf ./lib/* && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+        "build": "tsc",
         "lint": "eslint src"
-    },
-    "files": [
-        "lib"
-    ],
-    "exports": {
-        ".": {
-            "import": "./lib/esm/index.js",
-            "require": "./lib/cjs/index.js",
-            "types": "./lib/types/index.d.ts"
-        }
     },
     "author": "",
     "license": "ISC",
