@@ -63,7 +63,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
+    "@cross-lab-project/soa-client": "file:../../shared/soa-client-js",
     "@koa/router": "^13.0.0",
     "compilation-protocol": "file:../libraries/compilation-protocol",
     "crosslab-compilation-service": "file:../service"

@@ -53,8 +53,23 @@ pip3 install tox build yq twine
 # update the repository sources list
 # and install dependencies
 apt-get update \
-    && apt-get install -y curl texlive texlive-lang-german texlive-latex-extra latexmk texlive-science git nano texlive-extra-utils \
-    && apt-get -y autoclean
+&& apt-get install -y curl \
+    texlive \
+    texlive-lang-german \
+    texlive-latex-extra \
+    latexmk \
+    texlive-science \
+    git \
+    nano \
+    texlive-extra-utils \
+    build-essential \
+    g++ \
+    libx11-dev \
+    libxkbfile-dev \
+    libsecret-1-dev \
+    libkrb5-dev \
+    python-is-python3 \
+&& apt-get -y autoclean
 
 # nvm environment variables
 NVM_DIR=/usr/local/nvm

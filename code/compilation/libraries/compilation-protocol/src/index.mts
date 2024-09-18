@@ -40,10 +40,17 @@ export const compilationProtocol = {
     "compilation:request": z.object({
       directory: DirectorySchema,
     }),
-    "compilation:response": z.object({
-      success: z.boolean(),
-      message: z.string(),
-    }),
+    "compilation:response": z.union([
+      z.object({
+        success: z.literal(false),
+        message: z.optional(z.string()),
+      }),
+      z.object({
+        success: z.literal(true),
+        message: z.optional(z.string()),
+        result: z.string(),
+      }),
+    ]),
   },
   roles: ["client", "server"],
   roleMessages: {

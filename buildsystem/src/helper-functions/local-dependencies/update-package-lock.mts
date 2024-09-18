@@ -42,6 +42,7 @@ export function updatePackageLock(job: Job) {
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 
   execSync(
-    `npm install -f ${updatedDependencies.join(" ")} --package-lock-only`
+    `npm install ${updatedDependencies.join(" ")} --force --package-lock-only`,
+    { cwd: job.path, stdio: "pipe" }
   );
 }

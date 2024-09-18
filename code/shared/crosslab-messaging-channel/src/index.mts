@@ -3,6 +3,7 @@ import {
   AbstractMessagingChannel,
   isIncomingMessage,
   MessagingProtocol,
+  OutgoingMessage,
   Role,
 } from "messaging-channels";
 
@@ -26,7 +27,7 @@ export class CrossLabMessagingChannel<
     };
   }
 
-  send(message: { type: string; content?: unknown }): Promise<void> | void {
+  send(message: OutgoingMessage<MP, R>): Promise<void> | void {
     this._channel.send(JSON.stringify(message));
   }
 }

@@ -6,13 +6,18 @@ import {
   ServiceDirection,
 } from "@cross-lab-project/soa-client";
 import { TypedEmitter } from "tiny-typed-emitter";
-import { IncomingMessage } from "messaging-channels";
+import {
+  IncomingMessage,
+  OutgoingMessage,
+  ProtocolMessage,
+} from "messaging-channels";
 import { CrossLabMessagingChannel } from "crosslab-messaging-channel";
 import { CompilationProtocol, compilationProtocol } from "compilation-protocol";
 
 interface CompilationService__ProducerEvents {
-  "compilation:initialize": () => void;
-  "compilation:result": () => void;
+  "compilation:request": (
+    request: ProtocolMessage<CompilationProtocol, "compilation:request">
+  ) => void;
 }
 
 export class CompilationService__Producer
@@ -59,6 +64,10 @@ export class CompilationService__Producer
     } else {
       connection.receive(serviceConfig, "data", channel);
     }
+  }
+
+  send(message: OutgoingMessage<CompilationProtocol, "server">) {
+    this._messagingChannel?.send(message);
   }
 
   private _handleMessage(

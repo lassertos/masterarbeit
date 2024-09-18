@@ -7,7 +7,11 @@ import {
 } from "@cross-lab-project/soa-client";
 import { TypedEmitter } from "tiny-typed-emitter";
 import { IncomingMessage } from "messaging-channels";
-import { CompilationProtocol, compilationProtocol } from "compilation-protocol";
+import {
+  CompilationProtocol,
+  compilationProtocol,
+  Directory,
+} from "compilation-protocol";
 import { CrossLabMessagingChannel } from "crosslab-messaging-channel";
 
 interface CompilationService__ComsumerEvents {
@@ -73,7 +77,10 @@ export class CompilationService__Consumer
     }
   }
 
-  sendCompilationRequest() {
-    throw new Error("not implemented!");
+  sendCompilationRequest(directory: Directory) {
+    this._messagingChannel?.send({
+      type: "compilation:request",
+      content: { directory },
+    });
   }
 }

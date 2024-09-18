@@ -1,9 +1,9 @@
-import { ArduinoCliCompilationInstance } from "./instance.mjs";
 import express from "express";
-import { configuration } from "./configuration.mjs";
+import { ArduinoCliCompilationInstance } from "./instance.mjs";
+import { Configuration } from "./configuration.mjs";
 
 export class ArduinoCliCompilationServer {
-  start(): void {
+  start(configuration: Configuration): void {
     const app = express();
 
     app.post("/", async (req, res) => {

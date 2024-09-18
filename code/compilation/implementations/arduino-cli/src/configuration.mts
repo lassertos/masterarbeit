@@ -1,4 +1,17 @@
-export const configuration = {
-  PORT: 3020,
-  WEBSOCKET_ENDPOINT: "https://api.goldi-labs.de/devices/websocket",
-} as const;
+export type Configuration = {
+  PORT: number;
+  WEBSOCKET_ENDPOINT: string;
+};
+
+function loadConfiguration(): Configuration {
+  const PORT = parseInt(process.env["PORT"] ?? "3021");
+  const WEBSOCKET_ENDPOINT = process.env["WEBSOCKET_ENDPOINT"];
+
+  if (!WEBSOCKET_ENDPOINT) {
+    throw new Error('Environment variable "WEBSOCKET_ENDPOINT" is undefined!');
+  }
+
+  return { PORT, WEBSOCKET_ENDPOINT };
+}
+
+export const configuration = loadConfiguration();

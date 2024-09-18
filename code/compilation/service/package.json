@@ -16,6 +16,7 @@
     "compilation-protocol": "file:../libraries/compilation-protocol",
     "crosslab-messaging-channel": "file:../../shared/crosslab-messaging-channel",
     "messaging-channels": "file:../../shared/messaging-channels",
-    "tiny-typed-emitter": "^2.1.0"
+    "tiny-typed-emitter": "^2.1.0",
+    "zod": "^3.23.8"
   }
 }

@@ -1,10 +1,22 @@
 import * as vscode from "vscode";
 import { parseDirectory } from "./util/parseDirectory.mjs";
+import { DeviceHandler } from "@cross-lab-project/soa-client";
+import { CompilationService__Consumer } from "crosslab-compilation-service";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log(
     'Congratulations, your extension "crosslab-compilation-extension" is now active in the web extension host!'
   );
+
+  const deviceHandler = new DeviceHandler();
+  const compilationService__Consumer = new CompilationService__Consumer(
+    "compilation"
+  );
+
+  compilationService__Consumer.on("compilation:initialize", () => {});
+  compilationService__Consumer.on("compilation:result", () => {});
+
+  deviceHandler.addService(compilationService__Consumer);
 
   const helloWorldDisposable = vscode.commands.registerCommand(
     "crosslab-compilation-extension.helloWorld",
@@ -36,6 +48,8 @@ export function activate(context: vscode.ExtensionContext) {
       const directory = await parseDirectory(workspaceFolder.uri);
 
       console.log(JSON.stringify(directory, null, 4));
+
+      compilationService__Consumer.sendCompilationRequest(directory);
     }
   );
 
