@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { Directory } from "compilation-protocol";
+import { Directory } from "@crosslab-ide/compilation-messaging-protocol";
 
 export async function parseDirectory(uri: vscode.Uri): Promise<Directory> {
   const directory: Directory = {

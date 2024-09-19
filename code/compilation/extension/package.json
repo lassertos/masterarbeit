@@ -1,5 +1,6 @@
 {
   "name": "crosslab-compilation-extension",
+  "publisher": "crosslab",
   "displayName": "crosslab-compilation-extension",
   "description": "An extension adding a crosslab compilation service consumer.",
   "version": "0.0.1",
@@ -63,9 +64,10 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@cross-lab-project/soa-client": "file:../../shared/soa-client-js",
+    "@crosslab-ide/compilation-messaging-protocol": "file:../libraries/compilation-messaging-protocol",
+    "@crosslab-ide/crosslab-compilation-service": "file:../service",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client",
     "@koa/router": "^13.0.0",
-    "compilation-protocol": "file:../libraries/compilation-protocol",
-    "crosslab-compilation-service": "file:../service"
+    "esbuild-plugin-polyfill-node": "^0.3.0"
   }
 }

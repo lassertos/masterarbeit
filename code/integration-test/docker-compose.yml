@@ -4,8 +4,6 @@
 #
 # All necessary confifguration Options are set via environment variables in the accompanying .env file.
 #
-version: "3"
-
 x-config: &common-config
   AUTHORIZATION_SERVER: "http://localhost:3010"
   AUTHORIZATION_PSK: "${AUTHORIZATION_PSK:?}"
@@ -196,5 +194,9 @@ services:
     image: arduino-cli-compilation-server:latest
     environment:
       - WEBSOCKET_ENDPOINT=http://device/devices/websocket
+    network_mode: "host"
+    restart: on-failure
+  editor:
+    image: crosslab-editor:latest
     network_mode: "host"
     restart: on-failure

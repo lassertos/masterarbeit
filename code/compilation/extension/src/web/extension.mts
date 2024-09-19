@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { parseDirectory } from "./util/parseDirectory.mjs";
-import { DeviceHandler } from "@cross-lab-project/soa-client";
-import { CompilationService__Consumer } from "crosslab-compilation-service";
+import { DeviceHandler } from "@crosslab-ide/soa-client";
+import { CompilationService__Consumer } from "@crosslab-ide/crosslab-compilation-service";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log(

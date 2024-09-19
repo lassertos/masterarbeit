@@ -24,6 +24,6 @@ COPY public ./public
 
 RUN npm ci --omit=dev
 
-COPY --from=build /tmp/build/vscode-web ./public/
+COPY --from=build /tmp/build/vscode-web ./public/vscode-web
 
 CMD [ "node", "dist/index.mjs" ]

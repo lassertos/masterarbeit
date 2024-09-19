@@ -22,7 +22,7 @@
 		<!-- Workbench Icon/Manifest/CSS -->
 		<link rel="icon" href="/favicon.ico" type="image/x-icon" />
 		<link rel="manifest" href="/manifest.json">
-		<link data-name="vs/workbench/workbench.web.main" rel="stylesheet" href="./out/vs/workbench/workbench.web.main.css">
+		<link data-name="vs/workbench/workbench.web.main" rel="stylesheet" href="./vscode-web/out/vs/workbench/workbench.web.main.css">
 	</head>
 
 	<body aria-label="">
@@ -38,19 +38,26 @@
 				"dataFolderName": ".vscode-web",
 				"version": "1.93.0"
 			},
+			"additionalBuiltinExtensions": [
+				{
+					"scheme": "http",
+					"authority": "localhost:3022",
+					"path": "/extensions/compilation"
+				}
+			]
 		}
 		document.getElementById("vscode-workbench-web-configuration").setAttribute("data-settings", JSON.stringify(configuration))
 	</script>
 
 	<!-- Startup (do not modify order of script tags!) -->
-	<script src="./out/vs/loader.js"></script>
-	<script src="./out/vs/webPackagePaths.js"></script>
+	<script src="./vscode-web/out/vs/loader.js"></script>
+	<script src="./vscode-web/out/vs/webPackagePaths.js"></script>
 	<script>
 		Object.keys(self.webPackagePaths).map(function (key, index) {
-			self.webPackagePaths[key] = `${window.location.origin}/node_modules/${key}/${self.webPackagePaths[key]}`;
+			self.webPackagePaths[key] = `${window.location.origin}/vscode-web/node_modules/${key}/${self.webPackagePaths[key]}`;
 		});
 		require.config({
-			baseUrl: `${window.location.origin}/out`,
+			baseUrl: `${window.location.origin}/vscode-web/out`,
 			recordStats: true,
 			trustedTypesPolicy: window.trustedTypes?.createPolicy('amdLoader', {
 				createScriptURL(value) {
@@ -60,7 +67,7 @@
 			paths: self.webPackagePaths
 		});
 	</script>
-	<script src="./out/nls.messages.js"></script>
-	<script src="./out/vs/workbench/workbench.web.main.js"></script>
-	<script src="./out/vs/code/browser/workbench/workbench.js"></script>
+	<script src="./vscode-web/out/nls.messages.js"></script>
+	<script src="./vscode-web/out/vs/workbench/workbench.web.main.js"></script>
+	<script src="./vscode-web/out/vs/code/browser/workbench/workbench.js"></script>
 </html>
