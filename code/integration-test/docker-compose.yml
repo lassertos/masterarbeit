@@ -198,5 +198,7 @@ services:
     restart: on-failure
   editor:
     image: crosslab-editor:latest
+    ports:
+      - "3022:3022"
     network_mode: "host"
     restart: on-failure

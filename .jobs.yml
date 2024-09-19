@@ -138,3 +138,29 @@ crosslab-editor:
       dependencies:
         - crosslab-editor:build
         - crosslab-editor:copy-extensions
+
+crosslab:
+  path: code/crosslab
+  jobs:
+    build:
+      commands:
+        execute: bash scripts/ci --no-download
+    clean-build:
+      commands:
+        execute: bash scripts/ci --clean --no-download
+
+integration-test:
+  path: code/integration-test
+  jobs:
+    install-deps:
+      commands:
+        prepare: npm ci
+        execute: npx playwright install-deps
+    test:
+      commands:
+        execute: bash scripts/test.sh
+      dependencies:
+        - integration-test:install-deps
+        - crosslab:build
+        - crosslab-editor:build-docker
+        - arduino-cli-compilation-server:build-docker
