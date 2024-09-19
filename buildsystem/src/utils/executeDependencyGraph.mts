@@ -9,7 +9,7 @@ import { helperFunctions } from "../helper-functions/index.mjs";
 
 export async function executeDependencyGraph(
   dependencyGraph: DirectedGraph<Job>,
-  variant: "normal" | "clean"
+  variant: "normal" | "clean" | "retry"
 ) {
   const statusMap: Map<string, JobStatus> = new Map();
   const promiseMap: Map<string, Promise<JobStatus>> = new Map();
@@ -35,7 +35,7 @@ export async function executeDependencyGraph(
 async function executeNode(
   node: { name: string; data: Job },
   dependencyGraph: DirectedGraph<Job>,
-  variant: "normal" | "clean",
+  variant: "normal" | "clean" | "retry",
   statusMap: Map<string, JobStatus>,
   promiseMap: Map<string, Promise<JobStatus>>
 ): Promise<JobStatus> {
@@ -83,7 +83,7 @@ async function executeNode(
 
 async function executeJob(
   job: Job,
-  variant: "normal" | "clean"
+  variant: "normal" | "clean" | "retry"
 ): Promise<"success" | "failed"> {
   const buildsystemPath = path.join(job.path, ".buildsystem");
   const metadataPath = path.join(buildsystemPath, `${job.name}.json`);
@@ -137,7 +137,9 @@ async function executeJob(
       }
     }
 
-    if (hashesMatch) return metadata.status;
+    if (hashesMatch && (variant !== "retry" || metadata.status === "success")) {
+      return metadata.status;
+    }
   }
 
   fs.rmSync(logPath, { force: true });

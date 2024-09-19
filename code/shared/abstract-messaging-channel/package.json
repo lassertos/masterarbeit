@@ -1,8 +1,8 @@
 {
     "type": "module",
-    "name": "messaging-channels",
+    "name": "@crosslab-ide/abstract-messaging-channel",
     "version": "1.0.0",
-    "description": "Different messaging channel implementations for the servers and clients.",
+    "description": "Abstract messaging channel.",
     "main": "dist/index.mjs",
     "scripts": {
         "build": "tsc",

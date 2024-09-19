@@ -1,11 +1,11 @@
-import { DataChannel } from "@cross-lab-project/soa-client";
+import { DataChannel } from "@crosslab-ide/soa-client";
 import {
   AbstractMessagingChannel,
   isIncomingMessage,
   MessagingProtocol,
   OutgoingMessage,
   Role,
-} from "messaging-channels";
+} from "@crosslab-ide/abstract-messaging-channel";
 
 export class CrossLabMessagingChannel<
   MP extends MessagingProtocol | undefined = undefined,

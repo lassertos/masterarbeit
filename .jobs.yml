@@ -1,5 +1,5 @@
-messaging-channels:
-  path: code/shared/messaging-channels
+abstract-messaging-channel:
+  path: code/shared/abstract-messaging-channel
   jobs:
     build:
       commands:
@@ -9,7 +9,7 @@ messaging-channels:
       commands:
         execute: npm unpublish -f; npm publish
       dependencies:
-        - messaging-channels:build
+        - abstract-messaging-channel:build
 
 crosslab-messaging-channel:
   path: code/shared/crosslab-messaging-channel
@@ -19,7 +19,7 @@ crosslab-messaging-channel:
         prepare: npm ci
         execute: npm run build
       dependencies:
-        - messaging-channels:publish
+        - abstract-messaging-channel:publish
     publish:
       helper-functions:
         before:
@@ -31,15 +31,15 @@ crosslab-messaging-channel:
       dependencies:
         - crosslab-messaging-channel:build
 
-compilation-protocol:
-  path: code/compilation/libraries/compilation-protocol
+compilation-messaging-protocol:
+  path: code/compilation/libraries/compilation-messaging-protocol
   jobs:
     build:
       commands:
         prepare: npm ci
         execute: npm run build
       dependencies:
-        - messaging-channels:publish
+        - abstract-messaging-channel:publish
     publish:
       helper-functions:
         before:
@@ -49,53 +49,10 @@ compilation-protocol:
       commands:
         execute: npm unpublish -f; npm publish
       dependencies:
-        - compilation-protocol:build
+        - compilation-messaging-protocol:build
 
-abstract-compilation-server:
-  path: code/compilation/libraries/abstract-compilation-server
-  jobs:
-    build:
-      commands:
-        prepare: npm ci
-        execute: npm run build
-      dependencies:
-        - compilation-protocol:publish
-        - messaging-channels:publish
-    publish:
-      helper-functions:
-        before:
-          - update-package-lock
-        after:
-          - revert-package-lock
-      commands:
-        execute: npm unpublish -f; npm publish
-      dependencies:
-        - abstract-compilation-server:build
-
-crosslab-compilation-server:
-  path: code/compilation/libraries/crosslab-compilation-server
-  jobs:
-    build:
-      commands:
-        prepare: npm ci
-        execute: npm run build
-      dependencies:
-        - messaging-channels:publish
-        - compilation-protocol:publish
-        - abstract-compilation-server:publish
-    publish:
-      helper-functions:
-        before:
-          - update-package-lock
-        after:
-          - revert-package-lock
-      commands:
-        execute: npm unpublish -f; npm publish
-      dependencies:
-        - crosslab-compilation-server:build
-
-soa-client-js:
-  path: code/shared/soa-client-js
+soa-client:
+  path: code/shared/soa-client
   jobs:
     build:
       commands:
@@ -105,7 +62,7 @@ soa-client-js:
       commands:
         execute: npm unpublish -f; npm publish
       dependencies:
-        - soa-client-js:build
+        - soa-client:build
 
 crosslab-compilation-service:
   path: code/compilation/service
@@ -115,10 +72,10 @@ crosslab-compilation-service:
         prepare: npm ci
         execute: npm run build
       dependencies:
-        - messaging-channels:publish
-        - soa-client-js:publish
+        - abstract-messaging-channel:publish
+        - soa-client:publish
         - crosslab-messaging-channel:publish
-        - compilation-protocol:publish
+        - compilation-messaging-protocol:publish
     publish:
       helper-functions:
         before:
@@ -138,7 +95,7 @@ arduino-cli-compilation-server:
         prepare: npm ci
         execute: npm run build
       dependencies:
-        - soa-client-js:publish
+        - soa-client:publish
         - crosslab-compilation-service:publish
     build-docker:
       helper-functions:
@@ -150,3 +107,16 @@ arduino-cli-compilation-server:
         execute: docker build --network host -t arduino-cli-compilation-server .
       dependencies:
         - arduino-cli-compilation-server:build
+
+crosslab-editor:
+  path: code/editor
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+    build-docker:
+      commands:
+        execute: docker build --network host -t crosslab-editor .
+      dependencies:
+        - crosslab-editor:build

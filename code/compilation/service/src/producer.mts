@@ -4,15 +4,18 @@ import {
   Service,
   ServiceConfiguration,
   ServiceDirection,
-} from "@cross-lab-project/soa-client";
+} from "@crosslab-ide/soa-client";
 import { TypedEmitter } from "tiny-typed-emitter";
 import {
   IncomingMessage,
   OutgoingMessage,
   ProtocolMessage,
-} from "messaging-channels";
-import { CrossLabMessagingChannel } from "crosslab-messaging-channel";
-import { CompilationProtocol, compilationProtocol } from "compilation-protocol";
+} from "@crosslab-ide/abstract-messaging-channel";
+import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
+import {
+  CompilationProtocol,
+  compilationProtocol,
+} from "@crosslab-ide/compilation-messaging-protocol";
 
 interface CompilationService__ProducerEvents {
   "compilation:request": (

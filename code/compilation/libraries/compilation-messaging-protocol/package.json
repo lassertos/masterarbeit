@@ -1,5 +1,5 @@
 {
-  "name": "compilation-protocol",
+  "name": "@crosslab-ide/compilation-messaging-protocol",
   "version": "0.0.1",
   "description": "A message protocol for compilation servers.",
   "main": "dist/index.mjs",
@@ -13,7 +13,7 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "messaging-channels": "file:../../../shared/messaging-channels"
+    "@crosslab-ide/abstract-messaging-channel": "file:../../../shared/abstract-messaging-channel"
   },
   "peerDependencies": {
     "zod": "^3.23.8"

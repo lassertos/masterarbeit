@@ -90,12 +90,42 @@ PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 # build and install buildsystem globally
 npm ci --prefix /home/vscode/buildsystem && npm run build --prefix /home/vscode/buildsystem
-echo "node /home/vscode/buildsystem/dist/index.mjs /workspaces/masterarbeit \$@" > /usr/local/bin/buildsystem
+cat > /usr/local/bin/buildsystem << EOL 
+path=$(pwd)
+    while [[ "$path" != "" && ! -e "$path/.jobs.yml" ]]; do
+        path=${path%/*}
+    done
+path="$path"
+
+node /home/vscode/buildsystem/dist/index.mjs --path "$path" --project "$1" --job "$2" --variant "$3"
+EOL
+
+cat > /home/vscode/.bash_completion << EOL
+_buildsystem(){
+  path=$(pwd)
+  while [[ "$path" != "" && ! -e "$path/.jobs.yml" ]]; do
+    path=${path%/*}
+  done
+  path="$path/.jobs.yml"
+  projects=$(yq -r 'keys | join(" ")' $path)
+  if [ ${#COMP_WORDS[@]} == 2 ]; then
+    COMPREPLY=( $(compgen -W "$projects" -- "$2") )
+  elif [ ${#COMP_WORDS[@]} == 3 ]; then
+    jobs=$(yq -r '."'"${COMP_WORDS[1]}"'".jobs | keys | join(" ")' $path)
+    COMPREPLY=( $(compgen -W "$jobs" -- "$2") )
+  elif [ ${#COMP_WORDS[@]} == 4 ]; then
+    COMPREPLY=( $(compgen -W "normal clean" -- "$2") )
+  fi
+}
+
+complete -F _buildsystem buildsystem
+EOL
+
 chmod +x /usr/local/bin/buildsystem
 chown -R vscode:vscode /home/vscode
 
 # update npmrc
-echo "registry=http://verdaccio:4873/" > /home/vscode/.npmrc
+echo "@crosslab-ide:registry=http://verdaccio:4873/" > /home/vscode/.npmrc
 echo "//verdaccio:4873/:username=admin" >> /home/vscode/.npmrc
 echo "//verdaccio:4873/:_password=admin" >> /home/vscode/.npmrc
 

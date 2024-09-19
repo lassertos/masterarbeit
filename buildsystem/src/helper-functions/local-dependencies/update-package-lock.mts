@@ -15,28 +15,38 @@ export function updatePackageLock(job: Job) {
   const packageJson = JSON.parse(
     fs.readFileSync(packageJsonPath, { encoding: "utf-8" })
   );
-
-  const dependencies = packageJson.dependencies ?? {};
   const updatedDependencies: string[] = [];
 
-  for (const dependencyName in dependencies) {
-    if (!dependencies[dependencyName].startsWith("file:")) {
-      continue;
+  for (const key of [
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "optionalDependencies",
+  ]) {
+    const dependencies = packageJson.dependencies ?? {};
+
+    for (const dependencyName in dependencies) {
+      if (!dependencies[dependencyName].startsWith("file:")) {
+        continue;
+      }
+
+      const relativeDependencyPath = dependencies[dependencyName].slice(5);
+      const dependencyPath = path.resolve(job.path, relativeDependencyPath);
+      const dependencyPackageJsonPath = path.join(
+        dependencyPath,
+        "package.json"
+      );
+
+      const dependencyPackageJson = JSON.parse(
+        fs.readFileSync(dependencyPackageJsonPath, { encoding: "utf-8" })
+      );
+
+      const dependencyVersion = dependencyPackageJson.version;
+
+      dependencies[dependencyName] = `^${dependencyVersion}`;
+
+      updatedDependencies.push(dependencyName);
     }
-
-    const relativeDependencyPath = dependencies[dependencyName].slice(5);
-    const dependencyPath = path.resolve(job.path, relativeDependencyPath);
-    const dependencyPackageJsonPath = path.join(dependencyPath, "package.json");
-
-    const dependencyPackageJson = JSON.parse(
-      fs.readFileSync(dependencyPackageJsonPath, { encoding: "utf-8" })
-    );
-
-    const dependencyVersion = dependencyPackageJson.version;
-
-    dependencies[dependencyName] = `^${dependencyVersion}`;
-
-    updatedDependencies.push(dependencyName);
   }
 
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));

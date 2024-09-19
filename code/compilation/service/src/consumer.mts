@@ -4,15 +4,15 @@ import {
   Service,
   ServiceConfiguration,
   ServiceDirection,
-} from "@cross-lab-project/soa-client";
+} from "@crosslab-ide/soa-client";
 import { TypedEmitter } from "tiny-typed-emitter";
-import { IncomingMessage } from "messaging-channels";
+import { IncomingMessage } from "@crosslab-ide/abstract-messaging-channel";
 import {
   CompilationProtocol,
   compilationProtocol,
   Directory,
-} from "compilation-protocol";
-import { CrossLabMessagingChannel } from "crosslab-messaging-channel";
+} from "@crosslab-ide/compilation-messaging-protocol";
+import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
 
 interface CompilationService__ComsumerEvents {
   "compilation:initialize": () => void;

@@ -1,11 +1,11 @@
-import { DeviceHandler } from "@cross-lab-project/soa-client";
-import { CompilationService__Producer } from "crosslab-compilation-service";
+import { DeviceHandler } from "@crosslab-ide/soa-client";
+import { CompilationService__Producer } from "@crosslab-ide/crosslab-compilation-service";
 import { configuration } from "./configuration.mjs";
-import { ProtocolMessage } from "messaging-channels";
+import { ProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
 import {
   CompilationProtocol,
   Directory,
-} from "../../../libraries/compilation-protocol/dist/index.mjs";
+} from "@crosslab-ide/compilation-messaging-protocol";
 import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";

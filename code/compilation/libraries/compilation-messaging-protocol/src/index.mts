@@ -1,5 +1,5 @@
 import z from "zod";
-import { MessagingProtocol } from "messaging-channels";
+import { MessagingProtocol } from "@crosslab-ide/abstract-messaging-channel";
 
 // declare File type + typeguard
 export const FileSchema = z.object({

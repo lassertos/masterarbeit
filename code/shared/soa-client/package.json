@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "@cross-lab-project/soa-client",
+  "name": "@crosslab-ide/soa-client",
   "description": "SOA-Client for all Crosslab",
   "main": "dist/index.mjs",
   "version": "0.0.1",

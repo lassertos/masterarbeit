@@ -10,8 +10,32 @@ import { parseJobs } from "./utils/parseJobs.mjs";
 import { buildDependencyGraph } from "./utils/buildDependencyGraph.mjs";
 import { executeDependencyGraph } from "./utils/executeDependencyGraph.mjs";
 import { terminal } from "./utils/terminal.mjs";
+import { parseArgs } from "util";
 
-const basePath = path.resolve(process.argv[2]);
+const args = parseArgs({
+  allowPositionals: true,
+  options: {
+    path: {
+      type: "string",
+    },
+    project: {
+      type: "string",
+    },
+    job: {
+      type: "string",
+    },
+    variant: {
+      type: "string",
+    },
+  },
+  args: process.argv,
+});
+
+if (!args.values.path) {
+  throw new Error('The option "--path" is required!');
+}
+
+const basePath = args.values.path;
 const data = fs.readFileSync(path.join(basePath, ".jobs.yml"), {
   encoding: "utf8",
 });
@@ -26,25 +50,31 @@ const jobs = parseJobs(projects);
 
 terminal.clear();
 
-const project = process.argv[3]
-  ? projects.find((project) => project.path === process.cwd())
+const project = args.values.project
+  ? projects.find((project) => project.name === args.values.project)
   : await selectProject(projects);
 
 if (!project) {
-  throw new Error(`Could not find a registered project at "${process.cwd()}"`);
+  throw new Error(`Could not find a registered project at "${process.cwd()}"!`);
 }
 
-const job = process.argv[3]
-  ? project.jobs.find((job) => job.name === process.argv[3])
+const job = args.values.job
+  ? project.jobs.find((job) => job.name === args.values.job)
   : await selectJob(project);
 
 if (!job) {
   throw new Error(
-    `Could not find job "${process.argv[3]}" for project "${project.name}"`
+    `Could not find job "${args.values.job}" for project "${project.name}"!`
   );
 }
 
-const variant = await selectVariant();
+const variant = args.values.variant
+  ? args.values.variant
+  : await selectVariant();
+
+if (variant !== "clean" && variant !== "normal" && variant !== "retry") {
+  throw new Error(`"${args.values.variant}" is not a valid execution variant!`);
+}
 
 const dependencyGraph = buildDependencyGraph(job, jobs);
 await executeDependencyGraph(dependencyGraph, variant);

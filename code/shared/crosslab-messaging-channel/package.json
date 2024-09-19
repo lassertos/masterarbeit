@@ -1,5 +1,5 @@
 {
-  "name": "crosslab-messaging-channel",
+  "name": "@crosslab-ide/crosslab-messaging-channel",
   "version": "0.0.1",
   "description": "A messaging channel implementation for use in crosslab.",
   "main": "dist/index.mjs",
@@ -12,7 +12,7 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "@cross-lab-project/soa-client": "file:../soa-client-js",
-    "messaging-channels": "file:../messaging-channels"
+    "@crosslab-ide/soa-client": "file:../soa-client",
+    "@crosslab-ide/abstract-messaging-channel": "file:../abstract-messaging-channel"
   }
 }

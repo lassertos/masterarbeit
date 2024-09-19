@@ -1,5 +1,5 @@
 {
-  "name": "arduino-cli-compilation-server",
+  "name": "@crosslab-ide/arduino-cli-compilation-server",
   "version": "0.0.1",
   "description": "A compilation server using the arduino-cli compiler.",
   "main": "dist/index.mjs",
@@ -15,12 +15,12 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "@cross-lab-project/soa-client": "file:../../../shared/soa-client-js",
-    "compilation-protocol": "file:../../libraries/compilation-protocol",
-    "crosslab-compilation-service": "file:../../service",
-    "crosslab-messaging-channel": "file:../../../shared/crosslab-messaging-channel",
+    "@crosslab-ide/soa-client": "file:../../../shared/soa-client",
+    "@crosslab-ide/compilation-messaging-protocol": "file:../../libraries/compilation-messaging-protocol",
+    "@crosslab-ide/crosslab-compilation-service": "file:../../service",
+    "@crosslab-ide/crosslab-messaging-channel": "file:../../../shared/crosslab-messaging-channel",
+    "@crosslab-ide/abstract-messaging-channel": "file:../../../shared/abstract-messaging-channel",
     "express": "^4.21.0",
-    "messaging-channels": "file:../../../shared/messaging-channels",
     "zod": "^3.23.8"
   }
 }

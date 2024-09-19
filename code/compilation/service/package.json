@@ -1,5 +1,5 @@
 {
-  "name": "crosslab-compilation-service",
+  "name": "@crosslab-ide/crosslab-compilation-service",
   "version": "0.0.1",
   "description": "A crosslab service for compilation.",
   "main": "dist/index.mjs",
@@ -9,13 +9,13 @@
   "author": "Pierre Helbing",
   "license": "MIT",
   "devDependencies": {
-    "@cross-lab-project/soa-client": "^0.0.1",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client",
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "compilation-protocol": "file:../libraries/compilation-protocol",
-    "crosslab-messaging-channel": "file:../../shared/crosslab-messaging-channel",
-    "messaging-channels": "file:../../shared/messaging-channels",
+    "@crosslab-ide/compilation-messaging-protocol": "file:../libraries/compilation-messaging-protocol",
+    "@crosslab-ide/crosslab-messaging-channel": "file:../../shared/crosslab-messaging-channel",
+    "@crosslab-ide/abstract-messaging-channel": "file:../../shared/abstract-messaging-channel",
     "tiny-typed-emitter": "^2.1.0",
     "zod": "^3.23.8"
   }
