@@ -1,6 +1,6 @@
 services:
   devcontainer:
-    image: ghcr.io/lassertos/masterarbeit-devcontainer:latest
+    image: masterarbeit-devcontainer
     volumes:
       - ..:/workspaces/masterarbeit
     networks:
