@@ -172,12 +172,12 @@ crosslab/helper/openapi-codegeneration:
   jobs:
     build:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build.sh
       dependencies: []
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/helper/openapi-codegeneration:build
@@ -187,13 +187,13 @@ crosslab/helper/crosslab-typescript-addon:
   jobs:
     build:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build.sh
       dependencies:
         - crosslab/helper/openapi-codegeneration:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/helper/crosslab-typescript-addon:build
@@ -203,18 +203,18 @@ crosslab/helper/python-test-helper:
   jobs:
     build:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build.sh
       dependencies: []
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/helper/python-test-helper:build
     test:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/test.sh
       dependencies:
         - crosslab/helper/python-test-helper:build
@@ -224,7 +224,7 @@ crosslab/helper/dummy-device/js:
   jobs:
     build:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build.sh
       dependencies:
         - crosslab/clients/api/js:build
@@ -234,7 +234,7 @@ crosslab/helper/dummy-device/js:
         - crosslab/clients/soa_services/webcam/js:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/helper/dummy-device/js:build
@@ -260,12 +260,12 @@ crosslab/services/common:
   jobs:
     build:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build.sh
       dependencies: []
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/services/common:build
@@ -275,12 +275,12 @@ crosslab/services/auth:
   jobs:
     build-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-spec.sh
       dependencies: []
     lint-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint-spec.sh
       dependencies:
         - crosslab/services/auth:build-spec
@@ -295,19 +295,19 @@ crosslab/services/auth:
         - crosslab/helper/openapi-codegeneration:build
     build-docker:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-docker.sh
       dependencies:
         - crosslab/services/auth:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/services/auth:build
     test:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/test.sh
       dependencies:
         - crosslab/services/auth:build
@@ -317,12 +317,12 @@ crosslab/services/authorization:
   jobs:
     build-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-spec.sh
       dependencies: []
     lint-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint-spec.sh
       dependencies:
         - crosslab/services/authorization:build-spec
@@ -334,19 +334,19 @@ crosslab/services/authorization:
         - crosslab/services/common:build
     build-docker:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-docker.sh
       dependencies:
         - crosslab/services/authorization:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/services/authorization:build
     test:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/test.sh
       dependencies:
         - crosslab/services/authorization:build
@@ -364,12 +364,12 @@ crosslab/services/device:
   jobs:
     build-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-spec.sh
       dependencies: []
     lint-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint-spec.sh
       dependencies:
         - crosslab/services/device:build-spec
@@ -385,7 +385,7 @@ crosslab/services/device:
         - crosslab/clients/api/js:build
     build-docker:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-docker.sh
       dependencies:
         - crosslab/services/device:build
@@ -395,12 +395,12 @@ crosslab/services/experiment:
   jobs:
     build-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-spec.sh
       dependencies: []
     lint-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint-spec.sh
       dependencies:
         - crosslab/services/experiment:build-spec
@@ -416,13 +416,13 @@ crosslab/services/experiment:
         - crosslab/clients/api/js:build
     build-docker:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-docker.sh
       dependencies:
         - crosslab/services/experiment:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/services/experiment:build
@@ -432,12 +432,12 @@ crosslab/services/federation:
   jobs:
     build-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-spec.sh
       dependencies: []
     lint-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint-spec.sh
       dependencies:
         - crosslab/services/federation:build-spec
@@ -453,7 +453,7 @@ crosslab/services/federation:
         - crosslab/clients/api/js:build
     build-docker:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-docker.sh
       dependencies:
         - crosslab/services/federation:build
@@ -472,7 +472,7 @@ crosslab/services/lti:
         - crosslab/clients/api/js:build
     build-docker:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-docker.sh
       dependencies:
         - crosslab/services/lti:build
@@ -491,7 +491,7 @@ crosslab/services/openapi:
         - crosslab/services/federation:build-spec
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/services/openapi:build
@@ -514,12 +514,12 @@ crosslab/services/forwarding:
   jobs:
     build-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-spec.sh
       dependencies: []
     lint-spec:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint-spec.sh
       dependencies:
         - crosslab/services/forwarding:build-spec
@@ -534,13 +534,13 @@ crosslab/services/forwarding:
         - crosslab/helper/openapi-codegeneration:build
     build-docker:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build-docker.sh
       dependencies:
         - crosslab/services/forwarding:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/services/forwarding:build
@@ -563,7 +563,7 @@ crosslab/clients/api/js:
         - crosslab/services/openapi:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/clients/api/js:build
@@ -615,12 +615,12 @@ crosslab/clients/soa/js:
   jobs:
     build:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build.sh
       dependencies: []
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/clients/soa/js:build
@@ -652,13 +652,13 @@ crosslab/clients/soa_services/electricalConnection/js:
   jobs:
     build:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build.sh
       dependencies:
         - crosslab/clients/soa/js:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/clients/soa_services/electricalConnection/js:build
@@ -689,13 +689,13 @@ crosslab/clients/soa_services/webcam/js:
   jobs:
     build:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build.sh
       dependencies:
         - crosslab/clients/soa/js:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/clients/soa_services/webcam/js:build
@@ -726,13 +726,13 @@ crosslab/clients/soa_services/file/js:
   jobs:
     build:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build.sh
       dependencies:
         - crosslab/clients/soa/js:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/clients/soa_services/file/js:build
@@ -763,13 +763,13 @@ crosslab/clients/soa_services/message/js:
   jobs:
     build:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build.sh
       dependencies:
         - crosslab/clients/soa/js:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/clients/soa_services/message/js:build
@@ -800,13 +800,13 @@ crosslab/clients/soa_services/parameter/js:
   jobs:
     build:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/build.sh
       dependencies:
         - crosslab/clients/soa/js:build
     lint:
       commands:
-        prepare: bash scripts/set-scene.sh
+        prepare: npm ci
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/clients/soa_services/message/js:build
