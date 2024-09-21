@@ -1,9 +1,12 @@
 import terminalKit from "terminal-kit";
-import { JobStatus } from "../types.mjs";
+import { Job, JobStatus } from "../types.mjs";
 
 export const terminal = terminalKit.terminal;
 
-export function renderExecution(statusMap: Map<string, JobStatus>) {
+export function renderExecution(
+  statusMap: Map<string, JobStatus>,
+  jobs: Job[]
+) {
   const screenBuffer = new terminalKit.ScreenBuffer({ dst: terminal });
   const textBuffer = new terminalKit.TextBuffer({ dst: screenBuffer });
   const characters = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
@@ -100,6 +103,29 @@ export function renderExecution(statusMap: Map<string, JobStatus>) {
       }\n\n`,
       { color: "red" }
     );
+
+    const failedJobs = Array.from(statusMap.entries())
+      .filter((entry) => entry[1] === "failed")
+      .map((entry) => {
+        return jobs.find((job) => `${job.project}:${job.name}` === entry[0]);
+      })
+      .filter((job) => job !== undefined);
+
+    if (failedJobs.length > 0) {
+      textBuffer.insert(
+        failedJobs
+          .map((job) => {
+            return (
+              `${job.project}:${job.name}\n\t` +
+              `log:  ${job.path}/.buildsystem/${job.name}.log\n\t` +
+              `meta: ${job.path}/.buildsystem/${job.name}.json`
+            );
+          })
+          .join("\n") + "\n\n",
+        { color: "red" }
+      );
+    }
+
     textBuffer.draw();
     screenBuffer.draw();
     textBuffer.drawCursor();

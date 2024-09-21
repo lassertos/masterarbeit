@@ -1,8 +1,6 @@
 services:
   devcontainer:
-    build:
-      context: ..
-      dockerfile: ./.devcontainer/Dockerfile
+    image: ghcr.io/lassertos/masterarbeit-devcontainer:latest
     volumes:
       - ..:/workspaces/masterarbeit
     networks:

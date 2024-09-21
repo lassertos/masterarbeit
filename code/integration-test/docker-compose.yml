@@ -48,6 +48,7 @@ services:
           "--connect",
           "--innodb_initialized",
         ]
+      interval: 5s
     restart: on-failure
   rabbitmq:
     image: rabbitmq:3.13.4

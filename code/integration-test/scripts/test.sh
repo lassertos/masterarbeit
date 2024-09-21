@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-docker compose up -d
+echo starting services
+docker compose up >& .buildsystem/servers.log &
 
 npx playwright test
 
 result=$?
 
-docker compose down
+echo stopping services
+docker compose down >> .buildsystem/servers.log 2>&1
 
 exit $result

@@ -1,14 +1,51 @@
 import { APIClient } from "@cross-lab-project/api-client";
 import test from "@playwright/test";
+import assert from "assert";
 
-test("setup", async () => {
-  const apiClient = new APIClient("http://localhost");
+test.describe.serial("global setup", () => {
+  test("wait for services", async () => {
+    test.slow();
+    let active;
 
-  await apiClient.login("admin", "admin");
+    while (!active) {
+      active = true;
+      for (const service of [
+        "auth",
+        "authorization",
+        "device",
+        "experiment",
+        "federation",
+        "forwarding",
+      ]) {
+        try {
+          const response = await fetch(`http://localhost/${service}/status`);
+          const bodyJson = await response.json();
+          if (bodyJson.status !== "ok") {
+            active = false;
+          }
+        } catch {
+          active = false;
+          break;
+        }
+      }
+      if (active === true) {
+        break;
+      }
+      await new Promise<void>((resolve) => setTimeout(resolve, 2000));
+    }
 
-  await apiClient.createDevice({
-    type: "device",
-    name: "test-device",
-    isPublic: true,
+    assert(active);
+  });
+
+  test("setup", async () => {
+    const apiClient = new APIClient("http://localhost");
+
+    await apiClient.login("admin", "admin");
+
+    await apiClient.createDevice({
+      type: "device",
+      name: "test-device",
+      isPublic: true,
+    });
   });
 });

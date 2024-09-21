@@ -1,9 +1,9 @@
 import path from "path";
 import fs from "fs";
 import { Job } from "../../types.mjs";
-import { execSync } from "child_process";
+import { spawn } from "child_process";
 
-export function updatePackageLock(job: Job) {
+export async function updatePackageLock(job: Job) {
   const packageJsonPath = path.join(job.path, "package.json");
   const packageLockJsonPath = path.join(job.path, "package-lock.json");
   const packageJsonBackupPath = `${packageJsonPath}.bak`;
@@ -51,8 +51,15 @@ export function updatePackageLock(job: Job) {
 
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 
-  execSync(
-    `npm install ${updatedDependencies.join(" ")} --force --package-lock-only`,
-    { cwd: job.path, stdio: "pipe" }
+  const updateProcess = spawn(
+    "npm",
+    ["install", ...updatedDependencies, "--force", "--package-lock-only"],
+    { cwd: job.path }
   );
+
+  await new Promise<void>((resolve) => {
+    updateProcess.on("exit", () => {
+      resolve();
+    });
+  });
 }

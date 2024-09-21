@@ -18,7 +18,10 @@ export async function executeDependencyGraph(
     statusMap.set(node.name, "waiting");
   }
 
-  const finishRender = renderExecution(statusMap);
+  const finishRender = renderExecution(
+    statusMap,
+    dependencyGraph.nodes.map((node) => node.data)
+  );
 
   for (const root of dependencyGraph.roots) {
     promiseMap.set(
@@ -143,6 +146,7 @@ async function executeJob(
   }
 
   fs.rmSync(logPath, { force: true });
+  fs.writeFileSync(logPath, "");
 
   if (job["helper-functions"]?.before) {
     for (const helperFunction of job["helper-functions"].before) {
@@ -150,7 +154,7 @@ async function executeJob(
         throw new Error(`"${helperFunction}" is not a valid helper function!`);
       }
       try {
-        helperFunctions[helperFunction](job);
+        await helperFunctions[helperFunction](job);
       } catch (error) {
         if (error instanceof Error) {
           fs.appendFileSync(logPath, error.message);
@@ -235,7 +239,7 @@ async function executeJob(
         throw new Error(`"${helperFunction}" is not a valid helper function!`);
       }
       try {
-        helperFunctions[helperFunction](job);
+        await helperFunctions[helperFunction](job);
       } catch (error) {
         if (error instanceof Error) {
           fs.appendFileSync(logPath, error.message);
