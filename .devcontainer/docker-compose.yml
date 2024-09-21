@@ -1,6 +1,8 @@
 services:
   devcontainer:
-    image: masterarbeit-devcontainer
+    build:
+      context: ..
+      dockerfile: ./.devcontainer/Dockerfile
     volumes:
       - ..:/workspaces/masterarbeit
     networks:
