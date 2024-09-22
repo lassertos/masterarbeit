@@ -34,10 +34,21 @@ export class ArduinoCliCompilationInstance {
   }
 
   public async connect() {
+    const response = await fetch(
+      configuration.WEBSOCKET_ENDPOINT.replace(
+        "/websocket",
+        `/${this._instanceUrl.split("/").at(-1)}/websocket`
+      ),
+      {
+        method: "POST",
+        headers: [["authorization", `Bearer ${this._deviceToken}`]],
+      }
+    );
+    const token = await response.json();
     await this._deviceHandler.connect({
       endpoint: configuration.WEBSOCKET_ENDPOINT,
       id: this._instanceUrl,
-      token: this._deviceToken,
+      token: token,
     });
   }
 

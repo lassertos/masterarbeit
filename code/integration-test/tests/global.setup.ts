@@ -43,9 +43,33 @@ test.describe.serial("global setup", () => {
     await apiClient.login("admin", "admin");
 
     await apiClient.createDevice({
-      type: "device",
-      name: "test-device",
+      type: "cloud instantiable",
+      name: "arduino-cli-compilation-server",
       isPublic: true,
+      instantiateUrl: "http://localhost:3021",
+      services: [
+        {
+          serviceDirection: "consumer",
+          serviceId: "compilation",
+          serviceType: "http://localhost/serviceTypes/compilation",
+          supportedConnectionTypes: ["websocket"],
+        },
+      ],
+    });
+
+    await apiClient.createDevice({
+      type: "edge instantiable",
+      name: "code-editor",
+      isPublic: true,
+      codeUrl: "http://localhost:3022",
+      services: [
+        {
+          serviceDirection: "consumer",
+          serviceId: "compilation",
+          serviceType: "http://localhost/serviceTypes/compilation",
+          supportedConnectionTypes: ["webrtc", "websocket"],
+        },
+      ],
     });
   });
 });

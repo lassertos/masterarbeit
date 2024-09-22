@@ -61,8 +61,6 @@ services:
     network_mode: "host"
   gateway:
     image: gateway-service:latest
-    ports:
-      - "${API_PORT}:80"
     environment:
       <<: *common-config
     network_mode: "host"
@@ -194,12 +192,10 @@ services:
   compilation:
     image: arduino-cli-compilation-server:latest
     environment:
-      - WEBSOCKET_ENDPOINT=http://device/devices/websocket
+      - WEBSOCKET_ENDPOINT=http://localhost:80/devices/websocket
     network_mode: "host"
     restart: on-failure
   editor:
     image: crosslab-editor:latest
-    ports:
-      - "3022:3022"
     network_mode: "host"
     restart: on-failure
