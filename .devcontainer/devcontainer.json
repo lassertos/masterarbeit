@@ -33,5 +33,9 @@
   },
   "mounts": [
     "type=bind,source=${localWorkspaceFolder},target=/workspaces/masterarbeit"
-  ]
+  ],
+  "postCreateCommand": {
+    "workspace": "git config --global --add safe.directory /workspaces/masterarbeit",
+    "crosslab": "git config --global --add safe.directory /workspaces/masterarbeit/code/crosslab"
+  }
 }
