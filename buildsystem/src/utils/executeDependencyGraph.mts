@@ -4,8 +4,8 @@ import { Job, JobStatus } from "../types.mjs";
 import { renderExecution } from "./terminal.mjs";
 import { spawn } from "child_process";
 import path from "path";
-import { hashElement } from "folder-hash";
 import { helperFunctions } from "../helper-functions/index.mjs";
+import { hashJob } from "./hash-job.mjs";
 
 export async function executeDependencyGraph(
   dependencyGraph: DirectedGraph<Job>,
@@ -92,13 +92,7 @@ async function executeJob(
   const metadataPath = path.join(buildsystemPath, `${job.name}.json`);
   const logPath = path.join(buildsystemPath, `${job.name}.log`);
 
-  const hash = (
-    await hashElement(job.path, {
-      folders: {
-        exclude: ["node_modules", ".buildsystem", "dist", "app", "lib"],
-      },
-    })
-  ).hash;
+  const hash = hashJob(job);
 
   if (variant === "clean") {
     fs.rmSync(metadataPath, { recursive: true, force: true });
@@ -126,12 +120,11 @@ async function executeJob(
           ? metadata.dependencies[dependency.project][dependency.job]
           : undefined
         : undefined;
-      const newDependencyHash = (
-        await hashElement(dependency.path, {
-          folders: {
-            exclude: ["node_modules", ".buildsystem", "dist", "app", "lib"],
-          },
-        })
+      const newDependencyHash = JSON.parse(
+        fs.readFileSync(
+          path.join(dependency.path, `.buildsystem/${dependency.job}.json`),
+          { encoding: "utf-8" }
+        )
       ).hash;
 
       if (!savedDependencyHash || savedDependencyHash !== newDependencyHash) {
@@ -269,12 +262,11 @@ async function executeJob(
       meta.dependencies[dependency.project] = {};
     }
 
-    meta.dependencies[dependency.project][dependency.job] = (
-      await hashElement(dependency.path, {
-        folders: {
-          exclude: ["node_modules", ".buildsystem", "dist", "app", "lib"],
-        },
-      })
+    meta.dependencies[dependency.project][dependency.job] = JSON.parse(
+      fs.readFileSync(
+        path.join(dependency.path, `.buildsystem/${dependency.job}.json`),
+        { encoding: "utf-8" }
+      )
     ).hash;
   }
 

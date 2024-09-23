@@ -45,6 +45,7 @@ export class CompilationService__Producer
       serviceId: this.serviceId,
       serviceType: this.serviceType,
       serviceDirection: this.serviceDirection,
+      supportedConnectionTypes: ["webrtc", "websocket"],
     };
   }
 

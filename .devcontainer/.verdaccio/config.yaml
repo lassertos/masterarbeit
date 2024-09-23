@@ -38,6 +38,9 @@ packages:
   '@crosslab-ide':
     access: $all
     publish: $all
+  '@cross-lab-project':
+    access: $all
+    publish: $all
   '**':
     access: $all
     publish: $all

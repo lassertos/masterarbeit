@@ -23,6 +23,8 @@ export function parseProjects(
         path: projectPath,
         "helper-functions": projects[project].jobs[job]["helper-functions"],
         commands: projects[project].jobs[job].commands,
+        include: projects[project].jobs[job].include,
+        exclude: projects[project].jobs[job].exclude,
         dependencies:
           projects[project].jobs[job].dependencies?.map((dependency) => {
             const [project, job] = dependency.split(":");

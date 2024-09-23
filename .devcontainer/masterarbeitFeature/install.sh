@@ -74,5 +74,6 @@ chown -R vscode:vscode /home/vscode
 
 # update npmrc
 echo "@crosslab-ide:registry=http://verdaccio:4873/" > /home/vscode/.npmrc
+echo "@cross-lab-project:registry=http://verdaccio:4873/" > /home/vscode/.npmrc
 echo "//verdaccio:4873/:username=admin" >> /home/vscode/.npmrc
 echo "//verdaccio:4873/:_password=admin" >> /home/vscode/.npmrc

@@ -30,6 +30,7 @@
 
 	<!-- Helper Script -->
 	<script>
+		const queryParameters = new URLSearchParams(window.location.search)
 		const configuration = {
 			"productConfiguration": {
 				"nameShort": "Code Web",
@@ -42,9 +43,19 @@
 				{
 					"scheme": "http",
 					"authority": "localhost:3022",
+					"path": "/extensions/base"
+				},
+				{
+					"scheme": "http",
+					"authority": "localhost:3022",
 					"path": "/extensions/compilation"
 				}
-			]
+			],
+			"enabledExtensions": ["crosslab.crosslab-base-extension"],
+			"configurationDefaults": {
+				"crosslab.instanceUrl": queryParameters.get("instanceUrl"),
+				"crosslab.deviceToken": queryParameters.get("deviceToken")
+			}
 		}
 		document.getElementById("vscode-workbench-web-configuration").setAttribute("data-settings", JSON.stringify(configuration))
 	</script>

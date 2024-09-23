@@ -19,7 +19,8 @@ crosslab-messaging-channel:
         prepare: npm ci
         execute: npm run build
       dependencies:
-        - abstract-messaging-channel:publish
+        - abstract-messaging-channel:build
+        - soa-client:build
     publish:
       helper-functions:
         before:
@@ -30,6 +31,7 @@ crosslab-messaging-channel:
         execute: npm unpublish -f; npm publish
       dependencies:
         - crosslab-messaging-channel:build
+        - soa-client:publish
 
 compilation-messaging-protocol:
   path: code/compilation/libraries/compilation-messaging-protocol
@@ -120,6 +122,16 @@ crosslab-compilation-extension:
         - crosslab-compilation-service:build
         - soa-client:build
 
+crosslab-base-extension:
+  path: code/base/extension
+  jobs:
+    package:
+      commands:
+        prepare: npm ci
+        execute: npm run package-web
+      dependencies:
+        - soa-client:build
+
 crosslab-editor:
   path: code/editor
   jobs:
@@ -131,6 +143,7 @@ crosslab-editor:
       commands:
         execute: bash scripts/copy-extensions.sh
       dependencies:
+        - crosslab-base-extension:package
         - crosslab-compilation-extension:package
     build-docker:
       commands:
@@ -278,6 +291,8 @@ crosslab/services/auth:
         prepare: npm ci
         execute: bash scripts/build-spec.sh
       dependencies: []
+      include:
+        - api/**/*
     lint-spec:
       commands:
         prepare: npm ci
@@ -316,6 +331,8 @@ crosslab/services/authorization:
   path: code/crosslab/services/authorization
   jobs:
     build-spec:
+      include:
+        - api/**/*
       commands:
         prepare: npm ci
         execute: bash scripts/build-spec.sh
@@ -355,6 +372,8 @@ crosslab/services/booking:
   path: code/crosslab/services/booking
   jobs:
     build-spec:
+      include:
+        - api/**/*
       commands:
         execute: bash scripts/build-spec.sh
       dependencies: []
@@ -363,6 +382,8 @@ crosslab/services/device:
   path: code/crosslab/services/device
   jobs:
     build-spec:
+      include:
+        - api/**/*
       commands:
         prepare: npm ci
         execute: bash scripts/build-spec.sh
@@ -394,6 +415,8 @@ crosslab/services/experiment:
   path: code/crosslab/services/experiment
   jobs:
     build-spec:
+      include:
+        - api/**/*
       commands:
         prepare: npm ci
         execute: bash scripts/build-spec.sh
@@ -431,6 +454,8 @@ crosslab/services/federation:
   path: code/crosslab/services/federation
   jobs:
     build-spec:
+      include:
+        - api/**/*
       commands:
         prepare: npm ci
         execute: bash scripts/build-spec.sh
@@ -513,6 +538,8 @@ crosslab/services/forwarding:
   path: code/crosslab/services/forwarding
   jobs:
     build-spec:
+      include:
+        - api/**/*
       commands:
         prepare: npm ci
         execute: bash scripts/build-spec.sh
@@ -624,6 +651,13 @@ crosslab/clients/soa/js:
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/clients/soa/js:build
+    publish:
+      commands:
+        prepare: npm ci
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - crosslab/clients/soa/js:build
+
 
 crosslab/clients/soa_services/electricalConnection/python:
   path: code/crosslab/clients/soa_services/electricalConnection/python

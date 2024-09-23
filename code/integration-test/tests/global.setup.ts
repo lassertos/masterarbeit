@@ -49,7 +49,7 @@ test.describe.serial("global setup", () => {
       instantiateUrl: "http://localhost:3021",
       services: [
         {
-          serviceDirection: "consumer",
+          serviceDirection: "producer",
           serviceId: "compilation",
           serviceType: "http://localhost/serviceTypes/compilation",
           supportedConnectionTypes: ["websocket"],

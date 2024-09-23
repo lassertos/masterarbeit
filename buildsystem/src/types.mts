@@ -12,6 +12,8 @@ const jobDescriptionSchema = z.object({
     execute: z.string(),
   }),
   dependencies: z.optional(z.array(z.string())),
+  include: z.optional(z.array(z.string())),
+  exclude: z.optional(z.array(z.string())),
 });
 
 export type JobDescription = z.infer<typeof jobDescriptionSchema>;
@@ -66,6 +68,8 @@ const jobSchema = z.object({
       path: z.string(),
     })
   ),
+  include: z.optional(z.array(z.string())),
+  exclude: z.optional(z.array(z.string())),
 });
 
 export type Job = z.infer<typeof jobSchema>;

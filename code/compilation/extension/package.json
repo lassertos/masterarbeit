@@ -64,9 +64,9 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client",
     "@crosslab-ide/compilation-messaging-protocol": "file:../libraries/compilation-messaging-protocol",
     "@crosslab-ide/crosslab-compilation-service": "file:../service",
-    "@crosslab-ide/soa-client": "file:../../shared/soa-client",
     "@koa/router": "^13.0.0",
     "esbuild-plugin-polyfill-node": "^0.3.0"
   }

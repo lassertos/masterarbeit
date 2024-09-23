@@ -16,10 +16,10 @@
   },
   "dependencies": {
     "@crosslab-ide/soa-client": "file:../../../shared/soa-client",
+    "@crosslab-ide/abstract-messaging-channel": "file:../../../shared/abstract-messaging-channel",
     "@crosslab-ide/compilation-messaging-protocol": "file:../../libraries/compilation-messaging-protocol",
     "@crosslab-ide/crosslab-compilation-service": "file:../../service",
     "@crosslab-ide/crosslab-messaging-channel": "file:../../../shared/crosslab-messaging-channel",
-    "@crosslab-ide/abstract-messaging-channel": "file:../../../shared/abstract-messaging-channel",
     "express": "^4.21.0",
     "zod": "^3.23.8"
   }

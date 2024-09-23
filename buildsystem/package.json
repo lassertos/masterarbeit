@@ -13,6 +13,7 @@
   "dependencies": {
     "@types/folder-hash": "^4.0.4",
     "folder-hash": "^4.0.4",
+    "glob": "^11.0.0",
     "inquirer": "^10.2.2",
     "terminal-kit": "^3.1.1",
     "yaml": "^2.5.1",

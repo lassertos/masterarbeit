@@ -60,7 +60,7 @@ test("simple experiment", async () => {
   const instance = experiment.instantiatedDevices[0];
   console.log(
     experiment.instantiatedDevices[0].codeUrl +
-      `?instanceUrl=${instance.codeUrl}&deviceToken=${instance.token}`
+      `?instanceUrl=${instance.url}&deviceToken=${instance.token}`
   );
 
   await new Promise<void>((resolve) => setTimeout(resolve, 60000));

@@ -17,7 +17,7 @@ export class CrossLabMessagingChannel<
     super(protocol, role);
     this._channel = channel;
     this._channel.ready().then(() => this.emit("ready"));
-    this._channel.ondata = (data) => {
+    this._channel.ondata = (data: unknown) => {
       if (typeof data === "string") {
         const message = JSON.parse(data);
         if (isIncomingMessage(protocol, role, message)) {
