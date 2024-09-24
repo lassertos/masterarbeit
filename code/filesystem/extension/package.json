@@ -1,5 +1,6 @@
 {
   "name": "crosslab-filesystem-extension",
+  "publisher": "crosslab",
   "displayName": "crosslab-filesystem-extension",
   "description": "An extension adding a filesystem for use in crosslab.",
   "version": "0.0.1",
@@ -9,15 +10,74 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished",
+    "onFileSystem:crosslabfs"
+  ],
   "browser": "./dist/web/extension.js",
+  "enabledApiProposals": [
+    "fileSearchProvider",
+    "textSearchProvider"
+  ],
   "contributes": {
+    "viewsWelcome": [
+      {
+        "view": "explorer",
+        "contents": "You can also open a folder saved in GOLDi.\n[Open Folder (GOLDi)](command:crosslab-filesystem-extension.workspaceInit)",
+        "when": "workbenchState == empty || workspaceFolderCount == 0"
+      }
+    ],
     "commands": [
       {
-        "command": "crosslab-filesystem-extension.helloWorld",
-        "title": "Hello World"
+        "command": "crosslab-filesystem-extension.workspaceInit",
+        "title": "Setup Workspace",
+        "category": "CrossLab-Filesystem"
+      },
+      {
+        "command": "crosslab-filesystem-extension.init",
+        "title": "Create Files",
+        "category": "CrossLab-Filesystem"
+      },
+      {
+        "command": "crosslab-filesystem-extension.reset",
+        "title": "Delete Files",
+        "category": "CrossLab-Filesystem"
+      },
+      {
+        "command": "crosslab-filesystem-extension.deleteFile",
+        "title": "Delete \"file.txt\"",
+        "category": "CrossLab-Filesystem"
+      },
+      {
+        "command": "crosslab-filesystem-extension.addFile",
+        "title": "Add \"file.txt\"",
+        "category": "CrossLab-Filesystem"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "crosslab-filesystem-extension.init",
+          "when": "workbenchState == workspace || workbenchState == folder"
+        },
+        {
+          "command": "crosslab-filesystem-extension.reset",
+          "when": "workbenchState == workspace || workbenchState == folder"
+        },
+        {
+          "command": "crosslab-filesystem-extension.deleteFile",
+          "when": "workbenchState == workspace || workbenchState == folder"
+        },
+        {
+          "command": "crosslab-filesystem-extension.addFile",
+          "when": "workbenchState == workspace || workbenchState == folder"
+        },
+        {
+          "command": "crosslab-filesystem-extension.workspaceInit",
+          "when": "workbenchState != folder && workbenchState != workspace"
+        }
+      ]
+    }
   },
   "scripts": {
     "test": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/extensionTests.js",
@@ -33,19 +93,26 @@
     "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
   },
   "devDependencies": {
-    "@types/vscode": "^1.93.0",
-    "@types/mocha": "^10.0.7",
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@types/assert": "^1.5.10",
-    "eslint": "^9.9.1",
+    "@types/diff": "^5.2.2",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^22.6.1",
+    "@types/vscode": "^1.93.0",
     "@typescript-eslint/eslint-plugin": "^8.3.0",
     "@typescript-eslint/parser": "^8.3.0",
-    "mocha": "^10.7.3",
-    "typescript": "^5.5.4",
     "@vscode/test-web": "^0.0.58",
+    "assert": "^2.1.0",
     "esbuild": "^0.23.1",
+    "eslint": "^9.9.1",
     "glob": "^11.0.0",
+    "mocha": "^10.7.3",
     "npm-run-all": "^4.1.5",
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-    "assert": "^2.1.0"
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "diff": "^7.0.0",
+    "esbuild-plugin-polyfill-node": "^0.3.0",
+    "fuse.js": "^7.0.0"
   }
 }

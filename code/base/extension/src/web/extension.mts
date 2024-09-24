@@ -21,18 +21,34 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(disposable);
   const extensions = vscode.extensions.all;
 
+  const statusBarItem = vscode.window.createStatusBarItem(
+    "experiment-status",
+    vscode.StatusBarAlignment.Left
+  );
+  context.subscriptions.push(statusBarItem);
+
+  deviceHandler.on("experimentStatusChanged", (statusUpdate) => {
+    statusBarItem.text = `CrossLab Experiment: ${statusUpdate.status}`;
+  });
+  statusBarItem.text = "CrossLab Experiment: initializing";
+  statusBarItem.show();
+
   for (const extension of extensions) {
     if (
       extension.id.startsWith("crosslab") &&
       extension.id !== context.extension.id
     ) {
       const api = await extension.activate();
-      api.addServices(deviceHandler);
+      if (api && api.addServices) {
+        api.addServices(deviceHandler);
+      }
     }
   }
 
   console.log("crosslab services initialized successfully!");
   console.log(deviceHandler.getServiceMeta());
+
+  statusBarItem.text = "CrossLab: waiting";
 
   const configuration = vscode.workspace.getConfiguration();
   const instanceUrl = configuration.get("crosslab.instanceUrl");
@@ -58,22 +74,14 @@ export async function activate(context: vscode.ExtensionContext) {
       const token = await apiClient.createWebsocketToken(instanceUrl);
       console.log(token);
 
-      const statusBarItem = vscode.window.createStatusBarItem(
-        vscode.StatusBarAlignment.Left
-      );
-      statusBarItem.text = "CrossLab Experiment: connecting";
-      statusBarItem.show();
-      context.subscriptions.push(statusBarItem);
-
-      deviceHandler.on("experimentStatusChanged", (statusUpdate) => {
-        statusBarItem.text = `CrossLab Experiment: ${statusUpdate.status}`;
-      });
+      statusBarItem.text = "CrossLab: connecting";
 
       await deviceHandler.connect({
         endpoint: baseUrl + "/devices/websocket",
         id: instanceUrl,
         token: token,
       });
+
       console.log("connection established successfully!");
     } catch (error) {
       console.error(error);

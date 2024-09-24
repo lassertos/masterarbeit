@@ -110,6 +110,24 @@ arduino-cli-compilation-server:
       dependencies:
         - arduino-cli-compilation-server:build
 
+crosslab-base-extension:
+  path: code/base/extension
+  jobs:
+    package:
+      commands:
+        prepare: npm ci
+        execute: npm run package-web
+      dependencies:
+        - soa-client:build
+
+crosslab-filesystem-extension:
+  path: code/filesystem/extension
+  jobs:
+    package:
+      commands:
+        prepare: npm ci
+        execute: npm run package-web
+
 crosslab-compilation-extension:
   path: code/compilation/extension
   jobs:
@@ -120,16 +138,6 @@ crosslab-compilation-extension:
       dependencies:
         - compilation-messaging-protocol:build
         - crosslab-compilation-service:build
-        - soa-client:build
-
-crosslab-base-extension:
-  path: code/base/extension
-  jobs:
-    package:
-      commands:
-        prepare: npm ci
-        execute: npm run package-web
-      dependencies:
         - soa-client:build
 
 crosslab-editor:
@@ -144,6 +152,7 @@ crosslab-editor:
         execute: bash scripts/copy-extensions.sh
       dependencies:
         - crosslab-base-extension:package
+        - crosslab-filesystem-extension:package
         - crosslab-compilation-extension:package
     build-docker:
       commands:

@@ -37,7 +37,13 @@
 				"nameLong": "Code Web",
 				"applicationName": "code-web",
 				"dataFolderName": ".vscode-web",
-				"version": "1.93.0"
+				"version": "1.93.0",
+				"extensionEnabledApiProposals": {
+					"crosslab.crosslab-filesystem-extension": [
+						"fileSearchProvider",
+						"textSearchProvider"
+					]
+				}
 			},
 			"additionalBuiltinExtensions": [
 				{
@@ -48,10 +54,14 @@
 				{
 					"scheme": "http",
 					"authority": "localhost:3022",
+					"path": "/extensions/filesystem"
+				},
+				{
+					"scheme": "http",
+					"authority": "localhost:3022",
 					"path": "/extensions/compilation"
 				}
 			],
-			"enabledExtensions": ["crosslab.crosslab-base-extension"],
 			"configurationDefaults": {
 				"crosslab.instanceUrl": queryParameters.get("instanceUrl"),
 				"crosslab.deviceToken": queryParameters.get("deviceToken")
