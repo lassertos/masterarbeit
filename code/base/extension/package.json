@@ -10,7 +10,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "browser": "./dist/web/extension.js",
   "contributes": {
     "commands": [
@@ -65,8 +67,8 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@crosslab-ide/soa-client": "file:../../shared/soa-client",
     "@cross-lab-project/api-client": "0.2.8",
+    "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
     "esbuild-plugin-polyfill-node": "^0.3.0"
   }
 }

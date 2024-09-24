@@ -20,7 +20,7 @@ crosslab-messaging-channel:
         execute: npm run build
       dependencies:
         - abstract-messaging-channel:build
-        - soa-client:build
+        - crosslab/clients/soa/js:build
     publish:
       helper-functions:
         before:
@@ -31,7 +31,7 @@ crosslab-messaging-channel:
         execute: npm unpublish -f; npm publish
       dependencies:
         - crosslab-messaging-channel:build
-        - soa-client:publish
+        - crosslab/clients/soa/js:publish
 
 compilation-messaging-protocol:
   path: code/compilation/libraries/compilation-messaging-protocol
@@ -53,18 +53,18 @@ compilation-messaging-protocol:
       dependencies:
         - compilation-messaging-protocol:build
 
-soa-client:
-  path: code/shared/soa-client
-  jobs:
-    build:
-      commands:
-        prepare: npm ci
-        execute: npm run build
-    publish:
-      commands:
-        execute: npm unpublish -f; npm publish
-      dependencies:
-        - soa-client:build
+# soa-client:
+#   path: code/shared/soa-client
+#   jobs:
+#     build:
+#       commands:
+#         prepare: npm ci
+#         execute: npm run build
+#     publish:
+#       commands:
+#         execute: npm unpublish -f; npm publish
+#       dependencies:
+#         - soa-client:build
 
 crosslab-compilation-service:
   path: code/compilation/service
@@ -75,7 +75,7 @@ crosslab-compilation-service:
         execute: npm run build
       dependencies:
         - abstract-messaging-channel:publish
-        - soa-client:publish
+        - crosslab/clients/soa/js:publish
         - crosslab-messaging-channel:publish
         - compilation-messaging-protocol:publish
     publish:
@@ -97,7 +97,7 @@ arduino-cli-compilation-server:
         prepare: npm ci
         execute: npm run build
       dependencies:
-        - soa-client:publish
+        - crosslab/clients/soa/js:publish
         - crosslab-compilation-service:publish
     build-docker:
       helper-functions:
@@ -118,7 +118,7 @@ crosslab-base-extension:
         prepare: npm ci
         execute: npm run package-web
       dependencies:
-        - soa-client:build
+        - crosslab/clients/soa/js:build
 
 crosslab-filesystem-extension:
   path: code/filesystem/extension
@@ -138,7 +138,7 @@ crosslab-compilation-extension:
       dependencies:
         - compilation-messaging-protocol:build
         - crosslab-compilation-service:build
-        - soa-client:build
+        - crosslab/clients/soa/js:build
 
 crosslab-editor:
   path: code/editor
@@ -661,6 +661,11 @@ crosslab/clients/soa/js:
       dependencies:
         - crosslab/clients/soa/js:build
     publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
       commands:
         prepare: npm ci
         execute: npm unpublish -f; npm publish

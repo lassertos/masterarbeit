@@ -1,4 +1,4 @@
-import { DeviceHandler } from "@crosslab-ide/soa-client";
+import { DeviceHandler } from "@cross-lab-project/soa-client";
 import { CompilationService__Producer } from "@crosslab-ide/crosslab-compilation-service";
 import { configuration } from "./configuration.mjs";
 import { ProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";

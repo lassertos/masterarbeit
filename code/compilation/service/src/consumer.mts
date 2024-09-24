@@ -4,7 +4,7 @@ import {
   Service,
   ServiceConfiguration,
   ServiceDirection,
-} from "@crosslab-ide/soa-client";
+} from "@cross-lab-project/soa-client";
 import { TypedEmitter } from "tiny-typed-emitter";
 import { IncomingMessage } from "@crosslab-ide/abstract-messaging-channel";
 import {

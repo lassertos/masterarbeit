@@ -1,4 +1,4 @@
-import { DataChannel } from "@crosslab-ide/soa-client";
+import { DataChannel } from "@cross-lab-project/soa-client";
 import {
   AbstractMessagingChannel,
   isIncomingMessage,

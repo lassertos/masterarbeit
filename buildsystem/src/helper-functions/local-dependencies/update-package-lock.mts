@@ -15,6 +15,11 @@ export async function updatePackageLock(job: Job) {
   const packageJson = JSON.parse(
     fs.readFileSync(packageJsonPath, { encoding: "utf-8" })
   );
+
+  if (!packageJson.version) {
+    packageJson.version = "0.0.1";
+  }
+
   const updatedDependencies: string[] = [];
 
   for (const key of [
@@ -23,7 +28,7 @@ export async function updatePackageLock(job: Job) {
     "peerDependencies",
     "optionalDependencies",
   ]) {
-    const dependencies = packageJson.dependencies ?? {};
+    const dependencies = packageJson[key] ?? {};
 
     for (const dependencyName in dependencies) {
       if (!dependencies[dependencyName].startsWith("file:")) {
@@ -41,7 +46,7 @@ export async function updatePackageLock(job: Job) {
         fs.readFileSync(dependencyPackageJsonPath, { encoding: "utf-8" })
       );
 
-      const dependencyVersion = dependencyPackageJson.version;
+      const dependencyVersion = dependencyPackageJson.version ?? "0.0.1";
 
       dependencies[dependencyName] = `^${dependencyVersion}`;
 

@@ -1,4 +1,4 @@
-import { DeviceHandler } from "@crosslab-ide/soa-client";
+import { DeviceHandler } from "@cross-lab-project/soa-client";
 import { APIClient } from "@cross-lab-project/api-client";
 import * as vscode from "vscode";
 

@@ -2,6 +2,10 @@ import { test } from "@playwright/test";
 import { APIClient, DeviceServiceTypes } from "@cross-lab-project/api-client";
 import assert from "assert";
 
+async function sleep(milliseconds: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
+}
+
 function checkDevices<T extends string>(
   devices: DeviceServiceTypes.DeviceOverview<"response">[],
   deviceNames: T[]
@@ -17,7 +21,7 @@ function checkDevices<T extends string>(
   return foundDevices as Record<T, string>;
 }
 
-test("simple experiment", async () => {
+test("simple experiment", async ({ page }) => {
   test.slow();
 
   const apiClient = new APIClient("http://localhost");
@@ -58,10 +62,28 @@ test("simple experiment", async () => {
 
   assert.strictEqual(experiment.instantiatedDevices.length, 1);
   const instance = experiment.instantiatedDevices[0];
-  console.log(
-    experiment.instantiatedDevices[0].codeUrl +
-      `?instanceUrl=${instance.url}&deviceToken=${instance.token}`
+
+  page.goto(
+    `${experiment.instantiatedDevices[0].codeUrl}?instanceUrl=${instance.url}&deviceToken=${instance.token}`
   );
 
-  await new Promise<void>((resolve) => setTimeout(resolve, 60000));
+  console.log("waiting for device to be connected!");
+  while (!(await apiClient.getDevice(instance.url)).connected) {
+    await sleep(1000);
+  }
+
+  console.log("waiting for experiment to be running!");
+  while ((await apiClient.getExperiment(experiment.url)).status !== "running") {
+    await sleep(1000);
+  }
+
+  console.log("waiting for ui to be updated!");
+  while (
+    (await page
+      .locator("#crosslab\\.crosslab-base-extension\\.experiment-status")
+      .first()
+      .getAttribute("aria-label")) !== "CrossLab Experiment: running"
+  ) {
+    await sleep(1000);
+  }
 });
