@@ -92,7 +92,7 @@ async function executeJob(
   const metadataPath = path.join(buildsystemPath, `${job.name}.json`);
   const logPath = path.join(buildsystemPath, `${job.name}.log`);
 
-  const hash = hashJob(job);
+  const hash = await hashJob(job);
 
   if (variant === "clean") {
     fs.rmSync(metadataPath, { recursive: true, force: true });

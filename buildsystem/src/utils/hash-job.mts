@@ -1,14 +1,12 @@
 import { createHash } from "crypto";
-import fs from "fs";
+import fs from "fs/promises";
 import { Job } from "../types.mjs";
 import path from "path";
-import { globSync } from "glob";
 
-export function hashJob(job: Job) {
-  const hasher = createHash("sha256");
-  hasher.setEncoding("base64");
+export async function hashJob(job: Job) {
+  const hasher = createHash("sha1");
 
-  const files = collectFilesForJob(job);
+  const files = await collectFilesForJob(job);
 
   for (const file of files) {
     hasher.update(file, "utf-8");
@@ -17,38 +15,132 @@ export function hashJob(job: Job) {
   return hasher.digest("base64");
 }
 
-function collectFilesForJob(job: Job): string[] {
-  const jobFiles = globSync(job.include ? job.include : "**", {
-    cwd: job.path,
-    nodir: true,
-    absolute: true,
-    follow: true,
-    ignore: [
-      "node_modules/**/*",
-      "dist/**/*",
-      "app/**/*",
-      "lib/**/*",
-      "test-results/**/*",
+async function collectFilesForJob(job: Job): Promise<string[]> {
+  const jobFiles = await collectFilesForPath(job.path, job.path, {
+    include: job.include,
+    exclude: [
+      "node_modules",
+      ".buildsystem",
+      ".packages",
+      "test-results",
+      ".vscode",
+      "dist",
+      "app",
+      "lib",
+      ".vscode-test-web",
       ...(job.exclude ?? []),
     ],
-  }).map((filePath) => fs.readFileSync(filePath, { encoding: "utf-8" }));
-  const dependencyHashes = collectDependencyHashes(job);
+  });
+  const dependencyHashes = await collectDependencyHashes(job);
 
   return [...jobFiles, ...dependencyHashes];
 }
 
-function collectDependencyHashes(job: Job): string[] {
-  const hashes: string[] = [];
+async function collectFilesForPath(
+  basePath: string,
+  currentPath: string,
+  options: {
+    include?: string[];
+    exclude?: string[];
+  }
+): Promise<string[]> {
+  const stat = await fs.stat(currentPath);
+  const relativePath = path.relative(basePath, currentPath);
 
-  for (const dependency of job.dependencies) {
-    const meta = JSON.parse(
-      fs.readFileSync(
-        path.join(dependency.path, `.buildsystem/${dependency.job}.json`),
-        { encoding: "utf-8" }
-      )
-    );
-    hashes.push(meta.hash);
+  if (options?.include && options.include.length > 0) {
+    for (const include of options.include) {
+      if (
+        include !== relativePath &&
+        !relativePath.startsWith(
+          include.endsWith("/") ? include : include + "/"
+        )
+      ) {
+        return [];
+      }
+    }
   }
 
-  return hashes;
+  if (options?.exclude) {
+    for (const exclude of options.exclude) {
+      if (
+        exclude === relativePath ||
+        relativePath.startsWith(exclude.endsWith("/") ? exclude : exclude + "/")
+      ) {
+        return [];
+      }
+    }
+  }
+
+  if (stat.isFile()) {
+    return [await fs.readFile(currentPath, { encoding: "utf-8" })];
+  } else if (stat.isDirectory()) {
+    const entries = await fs.readdir(currentPath);
+    return (
+      await Promise.all(
+        entries.map(
+          async (entry) =>
+            await collectFilesForPath(
+              basePath,
+              path.join(currentPath, entry),
+              options
+            )
+        )
+      )
+    ).flat();
+  }
+
+  return [];
+}
+
+// async function collectFilesForJob(job: Job): Promise<string[]> {
+//   const jobFiles = await Promise.all(
+//     (
+//       await glob(
+//         job.include
+//           ? job.include
+//           : [
+//               "src/**/*",
+//               "package.json",
+//               "package-lock.json",
+//               "Dockerfile",
+//               "public/**/*",
+//               "tsconfig.json",
+//             ],
+//         {
+//           cwd: job.path,
+//           nodir: true,
+//           absolute: true,
+//           follow: true,
+//           ignore: [
+//             "node_modules/**/*",
+//             ".packages/**/*",
+//             ".buildsystem/**/*",
+//             "dist/**/*",
+//             "app/**/*",
+//             "lib/**/*",
+//             "test-results/**/*",
+//             ...(job.exclude ?? []),
+//           ],
+//         }
+//       )
+//     ).map(
+//       async (filePath) => await fs.readFile(filePath, { encoding: "utf-8" })
+//     )
+//   );
+//   const dependencyHashes = await collectDependencyHashes(job);
+
+//   return [...jobFiles, ...dependencyHashes];
+// }
+
+async function collectDependencyHashes(job: Job): Promise<string[]> {
+  return await Promise.all(
+    job.dependencies.map(async (dependency) => {
+      return JSON.parse(
+        await fs.readFile(
+          path.join(dependency.path, `.buildsystem/${dependency.job}.json`),
+          { encoding: "utf-8" }
+        )
+      ).hash;
+    })
+  );
 }

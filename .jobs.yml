@@ -292,7 +292,7 @@ crosslab/services/auth:
         execute: bash scripts/build-spec.sh
       dependencies: []
       include:
-        - api/**/*
+        - api
     lint-spec:
       commands:
         prepare: npm ci
@@ -332,7 +332,7 @@ crosslab/services/authorization:
   jobs:
     build-spec:
       include:
-        - api/**/*
+        - api
       commands:
         prepare: npm ci
         execute: bash scripts/build-spec.sh
@@ -373,7 +373,7 @@ crosslab/services/booking:
   jobs:
     build-spec:
       include:
-        - api/**/*
+        - api
       commands:
         execute: bash scripts/build-spec.sh
       dependencies: []
@@ -383,7 +383,7 @@ crosslab/services/device:
   jobs:
     build-spec:
       include:
-        - api/**/*
+        - api
       commands:
         prepare: npm ci
         execute: bash scripts/build-spec.sh
@@ -416,7 +416,7 @@ crosslab/services/experiment:
   jobs:
     build-spec:
       include:
-        - api/**/*
+        - api
       commands:
         prepare: npm ci
         execute: bash scripts/build-spec.sh
@@ -455,7 +455,7 @@ crosslab/services/federation:
   jobs:
     build-spec:
       include:
-        - api/**/*
+        - api
       commands:
         prepare: npm ci
         execute: bash scripts/build-spec.sh
@@ -539,7 +539,7 @@ crosslab/services/forwarding:
   jobs:
     build-spec:
       include:
-        - api/**/*
+        - api
       commands:
         prepare: npm ci
         execute: bash scripts/build-spec.sh
@@ -657,7 +657,6 @@ crosslab/clients/soa/js:
         execute: npm unpublish -f; npm publish
       dependencies:
         - crosslab/clients/soa/js:build
-
 
 crosslab/clients/soa_services/electricalConnection/python:
   path: code/crosslab/clients/soa_services/electricalConnection/python
@@ -844,7 +843,7 @@ crosslab/clients/soa_services/parameter/js:
         execute: bash scripts/lint.sh
       dependencies:
         - crosslab/clients/soa_services/message/js:build
-        
+
 crosslab/integration-test:
   path: code/crosslab/integration-test
   jobs:
