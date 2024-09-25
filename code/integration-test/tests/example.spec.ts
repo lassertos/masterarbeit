@@ -24,7 +24,7 @@ function checkDevices<T extends string>(
 test("simple experiment", async ({ page }) => {
   test.slow();
 
-  const apiClient = new APIClient("http://localhost");
+  const apiClient = new APIClient("http://localhost:8080");
 
   await apiClient.login("admin", "admin");
 
@@ -51,7 +51,7 @@ test("simple experiment", async ({ page }) => {
     roles: [{ name: "server" }, { name: "client" }],
     serviceConfigurations: [
       {
-        serviceType: "http://localhost/serviceTypes/compilation",
+        serviceType: "http://localhost:8080/serviceTypes/compilation",
         participants: [
           { role: "server", serviceId: "compilation", config: {} },
           { role: "client", serviceId: "compilation", config: {} },

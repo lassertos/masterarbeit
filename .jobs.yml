@@ -161,6 +161,13 @@ crosslab-editor:
         - crosslab-editor:build
         - crosslab-editor:copy-extensions
 
+helper-gateway:
+  path: code/integration-test/helper-gateway
+  jobs:
+    build-docker:
+      commands:
+        execute: docker build -t helper-gateway .
+
 integration-test:
   path: code/integration-test
   jobs:
@@ -184,6 +191,7 @@ integration-test:
         - crosslab/services/gateway:build-docker
         - crosslab/services/forwarding:build-docker
         - crosslab/clients/api/js:build
+        - helper-gateway:build-docker
 
 ###############################################################################
 # CrossLab Jobs ###############################################################

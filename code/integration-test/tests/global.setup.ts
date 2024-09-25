@@ -18,7 +18,9 @@ test.describe.serial("global setup", () => {
         "forwarding",
       ]) {
         try {
-          const response = await fetch(`http://localhost/${service}/status`);
+          const response = await fetch(
+            `http://localhost:8080/${service}/status`
+          );
           const bodyJson = await response.json();
           if (bodyJson.status !== "ok") {
             active = false;
@@ -38,7 +40,7 @@ test.describe.serial("global setup", () => {
   });
 
   test("setup", async () => {
-    const apiClient = new APIClient("http://localhost");
+    const apiClient = new APIClient("http://localhost:8080");
 
     await apiClient.login("admin", "admin");
 
@@ -46,12 +48,12 @@ test.describe.serial("global setup", () => {
       type: "cloud instantiable",
       name: "arduino-cli-compilation-server",
       isPublic: true,
-      instantiateUrl: "http://localhost:3021",
+      instantiateUrl: "http://compilation:3021",
       services: [
         {
           serviceDirection: "producer",
           serviceId: "compilation",
-          serviceType: "http://localhost/serviceTypes/compilation",
+          serviceType: "http://localhost:8080/serviceTypes/compilation",
           supportedConnectionTypes: ["websocket"],
         },
       ],
@@ -66,7 +68,7 @@ test.describe.serial("global setup", () => {
         {
           serviceDirection: "consumer",
           serviceId: "compilation",
-          serviceType: "http://localhost/serviceTypes/compilation",
+          serviceType: "http://localhost:8080/serviceTypes/compilation",
           supportedConnectionTypes: ["webrtc", "websocket"],
         },
       ],
