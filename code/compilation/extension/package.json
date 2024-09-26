@@ -1,5 +1,5 @@
 {
-  "name": "crosslab-compilation-extension",
+  "name": "@crosslab-ide/crosslab-compilation-extension",
   "publisher": "crosslab",
   "displayName": "crosslab-compilation-extension",
   "description": "An extension adding a crosslab compilation service consumer.",

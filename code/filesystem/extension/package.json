@@ -1,5 +1,5 @@
 {
-  "name": "crosslab-filesystem-extension",
+  "name": "@crosslab-ide/crosslab-filesystem-extension",
   "publisher": "crosslab",
   "displayName": "crosslab-filesystem-extension",
   "description": "An extension adding a filesystem for use in crosslab.",

@@ -1,5 +1,6 @@
 {
-  "name": "crosslab-debugging-extension",
+  "name": "@crosslab-ide/crosslab-debugging-extension",
+  "publisher": "crosslab",
   "displayName": "crosslab-debugging-extension",
   "description": "An extension adding a crosslab debugging service consumer.",
   "version": "0.0.1",

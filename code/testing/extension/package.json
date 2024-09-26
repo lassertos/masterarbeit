@@ -1,5 +1,6 @@
 {
-  "name": "crosslab-testing-extension",
+  "name": "@crosslab-ide/crosslab-testing-extension",
+  "publisher": "crosslab",
   "displayName": "crosslab-testing-extension",
   "description": "An extension adding a crosslab testing service consumer.",
   "version": "0.0.1",

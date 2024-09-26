@@ -1,5 +1,5 @@
 {
-  "name": "crosslab-base-extension",
+  "name": "@crosslab-ide/crosslab-base-extension",
   "publisher": "crosslab",
   "displayName": "crosslab-base-extension",
   "description": "An extension providing a crosslab device handler for other extensions to use.",

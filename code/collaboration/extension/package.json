@@ -1,5 +1,5 @@
 {
-  "name": "crosslab-collaboration-extension",
+  "name": "@crosslab-ide/crosslab-collaboration-extension",
   "displayName": "crosslab-collaboration-extension",
   "description": "An extension adding a crosslab collaboration service prosumer.",
   "version": "0.0.1",
@@ -12,12 +12,24 @@
   "activationEvents": [],
   "browser": "./dist/web/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "crosslab-collaboration-extension.helloWorld",
-        "title": "Hello World"
-      }
-    ]
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "collaboration",
+          "title": "Collaboration",
+          "icon": "$(organization)"
+        }
+      ]
+    },
+    "views": {
+      "collaboration": [
+        {
+          "type": "webview",
+          "id": "collaboration.view",
+          "name": "Collaboration"
+        }
+      ]
+    }
   },
   "scripts": {
     "test": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/extensionTests.js",
@@ -47,5 +59,12 @@
     "npm-run-all": "^4.1.5",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "assert": "^2.1.0"
+  },
+  "dependencies": {
+    "@vscode/webview-ui-toolkit": "^1.4.0",
+    "async-mutex": "^0.5.0",
+    "lit": "^3.1.4",
+    "y-websocket": "^2.0.3",
+    "yjs": "^13.6.15"
   }
 }

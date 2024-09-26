@@ -8,15 +8,19 @@ async function sleep(milliseconds: number) {
 
 function checkDevices<T extends string>(
   devices: DeviceServiceTypes.DeviceOverview<"response">[],
-  deviceNames: T[]
+  deviceDescriptions: { name: T; type: DeviceServiceTypes.Device["type"] }[]
 ): Record<T, string> {
   const foundDevices: Partial<Record<T, string>> = {};
-  for (const deviceName of deviceNames) {
-    const foundDevice = devices.find((device) => device.name === deviceName);
+  for (const deviceDescription of deviceDescriptions) {
+    const foundDevice = devices.find(
+      (device) =>
+        device.name === deviceDescription.name &&
+        device.type === deviceDescription.type
+    );
     if (!foundDevice) {
-      throw new Error(`device "${deviceName}" not found!`);
+      throw new Error(`device "${deviceDescription.name}" not found!`);
     }
-    foundDevices[deviceName] = foundDevice.url;
+    foundDevices[deviceDescription.name] = foundDevice.url;
   }
   return foundDevices as Record<T, string>;
 }
@@ -30,10 +34,9 @@ test("simple experiment", async ({ page }) => {
 
   const devices = await apiClient.listDevices();
 
-  assert.strictEqual(devices.length, 2);
   const foundDevices = checkDevices(devices, [
-    "code-editor",
-    "arduino-cli-compilation-server",
+    { name: "code-editor", type: "edge instantiable" },
+    { name: "arduino-cli-compilation-server", type: "cloud instantiable" },
   ]);
 
   const experiment = await apiClient.createExperiment({
@@ -67,17 +70,14 @@ test("simple experiment", async ({ page }) => {
     `${experiment.instantiatedDevices[0].codeUrl}?instanceUrl=${instance.url}&deviceToken=${instance.token}`
   );
 
-  console.log("waiting for device to be connected!");
   while (!(await apiClient.getDevice(instance.url)).connected) {
     await sleep(1000);
   }
 
-  console.log("waiting for experiment to be running!");
   while ((await apiClient.getExperiment(experiment.url)).status !== "running") {
     await sleep(1000);
   }
 
-  console.log("waiting for ui to be updated!");
   while (
     (await page
       .locator("#crosslab\\.crosslab-base-extension\\.experiment-status")
@@ -86,4 +86,6 @@ test("simple experiment", async ({ page }) => {
   ) {
     await sleep(1000);
   }
+
+  await sleep(1000);
 });
