@@ -29,7 +29,8 @@
     "menus": {
       "editor/title/run": [
         {
-          "command": "crosslab-compilation-extension.compile"
+          "command": "crosslab-compilation-extension.compile",
+          "when": "workbenchState == folder"
         }
       ]
     }
@@ -67,6 +68,8 @@
     "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
     "@crosslab-ide/compilation-messaging-protocol": "file:../libraries/compilation-messaging-protocol",
     "@crosslab-ide/crosslab-compilation-service": "file:../service",
+    "@crosslab-ide/crosslab-filesystem-service": "file:../../filesystem/service",
+    "@crosslab-ide/filesystem-messaging-protocol": "file:../../filesystem/libraries/filesystem-messaging-protocol",
     "@koa/router": "^13.0.0",
     "esbuild-plugin-polyfill-node": "^0.3.0"
   }

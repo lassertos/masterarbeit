@@ -27,6 +27,30 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(statusBarItem);
 
+  const settingsDatabase = await openSettingsDatabase();
+  const configuration = vscode.workspace.getConfiguration();
+  const instanceUrl =
+    configuration.get("crosslab.instanceUrl") ??
+    (await readSetting(settingsDatabase, "crosslab.instanceUrl"));
+  const deviceToken =
+    configuration.get("crosslab.deviceToken") ??
+    (await readSetting(settingsDatabase, "crosslab.deviceToken"));
+
+  if (typeof instanceUrl !== "string") {
+    throw new Error(
+      `expected configuration option "crosslab.instanceUrl" to be of type "string" but got type "${typeof instanceUrl}"`
+    );
+  }
+
+  if (typeof deviceToken !== "string") {
+    throw new Error(
+      `expected configuration option "crosslab.deviceToken" to be of type "string" but got type "${typeof deviceToken}"`
+    );
+  }
+
+  await writeSetting(settingsDatabase, "crosslab.instanceUrl", instanceUrl);
+  await writeSetting(settingsDatabase, "crosslab.deviceToken", deviceToken);
+
   deviceHandler.on("experimentStatusChanged", (statusUpdate) => {
     statusBarItem.text = `CrossLab Experiment: ${statusUpdate.status}`;
   });
@@ -49,22 +73,6 @@ export async function activate(context: vscode.ExtensionContext) {
   console.log(deviceHandler.getServiceMeta());
 
   statusBarItem.text = "CrossLab: waiting";
-
-  const configuration = vscode.workspace.getConfiguration();
-  const instanceUrl = configuration.get("crosslab.instanceUrl");
-  const deviceToken = configuration.get("crosslab.deviceToken");
-
-  if (typeof instanceUrl !== "string") {
-    throw new Error(
-      `expected configuration option "crosslab.instanceUrl" to be of type "string" but got type "${typeof instanceUrl}"`
-    );
-  }
-
-  if (typeof deviceToken !== "string") {
-    throw new Error(
-      `expected configuration option "crosslab.deviceToken" to be of type "string" but got type "${typeof deviceToken}"`
-    );
-  }
 
   if (instanceUrl && deviceToken) {
     const baseUrl = instanceUrl.slice(0, instanceUrl.indexOf("/devices"));
@@ -90,3 +98,54 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {}
+
+async function openSettingsDatabase(): Promise<IDBDatabase> {
+  const request = indexedDB.open("crosslab-settings");
+  return await new Promise<IDBDatabase>((resolve, reject) => {
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore("settings");
+    };
+    request.onsuccess = async () => {
+      resolve(request.result);
+    };
+    request.onerror = () => {
+      reject(request.error);
+    };
+  });
+}
+
+async function writeSetting(
+  db: IDBDatabase,
+  setting: string,
+  value: string
+): Promise<void> {
+  const request = db
+    .transaction(["settings"], "readwrite")
+    .objectStore("settings")
+    .put(value, setting);
+
+  await new Promise<void>((resolve, reject) => {
+    request.onsuccess = () => {
+      resolve();
+    };
+    request.onerror = () => {
+      reject(request.error);
+    };
+  });
+}
+
+async function readSetting(db: IDBDatabase, setting: string) {
+  const request = db
+    .transaction(["settings"], "readonly")
+    .objectStore("settings")
+    .get(setting);
+
+  return await new Promise((resolve, reject) => {
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
+    request.onerror = () => {
+      reject(request.error);
+    };
+  });
+}

@@ -11,7 +11,6 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished",
     "onFileSystem:crosslabfs"
   ],
   "browser": "./dist/web/extension.js",
@@ -20,58 +19,15 @@
     "textSearchProvider"
   ],
   "contributes": {
-    "viewsWelcome": [
-      {
-        "view": "explorer",
-        "contents": "You can also open a folder saved in GOLDi.\n[Open Folder (GOLDi)](command:crosslab-filesystem-extension.workspaceInit)",
-        "when": "workbenchState == empty || workspaceFolderCount == 0"
-      }
-    ],
     "commands": [
       {
         "command": "crosslab-filesystem-extension.workspaceInit",
         "title": "Setup Workspace",
         "category": "CrossLab-Filesystem"
-      },
-      {
-        "command": "crosslab-filesystem-extension.init",
-        "title": "Create Files",
-        "category": "CrossLab-Filesystem"
-      },
-      {
-        "command": "crosslab-filesystem-extension.reset",
-        "title": "Delete Files",
-        "category": "CrossLab-Filesystem"
-      },
-      {
-        "command": "crosslab-filesystem-extension.deleteFile",
-        "title": "Delete \"file.txt\"",
-        "category": "CrossLab-Filesystem"
-      },
-      {
-        "command": "crosslab-filesystem-extension.addFile",
-        "title": "Add \"file.txt\"",
-        "category": "CrossLab-Filesystem"
       }
     ],
     "menus": {
       "commandPalette": [
-        {
-          "command": "crosslab-filesystem-extension.init",
-          "when": "workbenchState == workspace || workbenchState == folder"
-        },
-        {
-          "command": "crosslab-filesystem-extension.reset",
-          "when": "workbenchState == workspace || workbenchState == folder"
-        },
-        {
-          "command": "crosslab-filesystem-extension.deleteFile",
-          "when": "workbenchState == workspace || workbenchState == folder"
-        },
-        {
-          "command": "crosslab-filesystem-extension.addFile",
-          "when": "workbenchState == workspace || workbenchState == folder"
-        },
         {
           "command": "crosslab-filesystem-extension.workspaceInit",
           "when": "workbenchState != folder && workbenchState != workspace"
@@ -111,8 +67,13 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
+    "@crosslab-ide/crosslab-filesystem-service": "file:../service",
+    "@crosslab-ide/filesystem-messaging-protocol": "file:../libraries/filesystem-messaging-protocol",
+    "@types/uuid": "^10.0.0",
     "diff": "^7.0.0",
     "esbuild-plugin-polyfill-node": "^0.3.0",
-    "fuse.js": "^7.0.0"
+    "fuse.js": "^7.0.0",
+    "uuid": "^10.0.0"
   }
 }

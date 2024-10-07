@@ -111,3 +111,24 @@ export function isOutgoingMessage<
     }
     return valid;
 }
+
+export function isProtocolMessage<
+    MP extends MessagingProtocol,
+    MT extends MessageType<MP> | undefined = undefined,
+>(
+    protocol: MP,
+    messageType: MT,
+    message: unknown,
+): message is ProtocolMessage<MP, MT> {
+    if (messageType) {
+        return protocol.messages[messageType].safeParse(message).success;
+    }
+
+    for (const messageType of protocol.messageTypes) {
+        if (protocol.messages[messageType].safeParse(message).success) {
+            return true;
+        }
+    }
+
+    return false;
+}

@@ -38,17 +38,20 @@ export const compilationProtocol = {
   messageTypes: ["compilation:request", "compilation:response"],
   messages: {
     "compilation:request": z.object({
+      requestId: z.string(),
       directory: DirectorySchema,
     }),
     "compilation:response": z.union([
       z.object({
-        success: z.literal(false),
-        message: z.optional(z.string()),
-      }),
-      z.object({
+        requestId: z.string(),
         success: z.literal(true),
         message: z.optional(z.string()),
         result: z.string(),
+      }),
+      z.object({
+        requestId: z.string(),
+        success: z.literal(false),
+        message: z.optional(z.string()),
       }),
     ]),
   },

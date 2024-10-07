@@ -26,4 +26,4 @@ RUN npm ci --omit=dev
 
 COPY --from=build /tmp/build/vscode-web ./public/vscode-web
 
-CMD [ "node", "dist/index.mjs" ]
+ENTRYPOINT [ "node", "dist/index.mjs" ]

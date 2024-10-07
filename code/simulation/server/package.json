@@ -1,0 +1,24 @@
+{
+  "type": "module",
+  "name": "@crosslab-ide/simavr-server",
+  "version": "0.0.1",
+  "description": "A simavr server.",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.mjs"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.4",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
+    "@crosslab-ide/soa-service-electrical": "file:../../shared/electrical-connection-service-js",
+    "@crosslab-ide/simavr-node-addon": "file:../node-addon",
+    "express": "^4.21.0"
+  }
+}

@@ -53,9 +53,12 @@ export class ArduinoCliCompilationInstance {
   }
 
   private _handleCompilationRequest(
-    request: ProtocolMessage<CompilationProtocol, "compilation:request">
+    request: ProtocolMessage<
+      CompilationProtocol,
+      "compilation:request"
+    >["content"]
   ) {
-    const directory = request.content.directory;
+    const directory = request.directory;
     const tmpDirectoryPath = fs.mkdtempSync("compilation-");
     const sourceDirectoryPath = path.join(
       tmpDirectoryPath,
@@ -81,6 +84,7 @@ export class ArduinoCliCompilationInstance {
       this._compilationServiceProducer.send({
         type: "compilation:response",
         content: {
+          requestId: request.requestId,
           success: true,
           message,
           result: hexData,
@@ -90,6 +94,7 @@ export class ArduinoCliCompilationInstance {
       this._compilationServiceProducer.send({
         type: "compilation:response",
         content: {
+          requestId: request.requestId,
           success: false,
           message:
             error instanceof Error

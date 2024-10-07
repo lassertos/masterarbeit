@@ -2,6 +2,11 @@ import * as vscode from "vscode";
 import { CrossLabFileSystemProvider } from "./providers/fileSystemProvider.mjs";
 import { CrossLabFileSearchProvider } from "./providers/fileSearchProvider.mjs";
 import { CrossLabTextSearchProvider } from "./providers/textSearchProvider.mjs";
+import { DeviceHandler } from "@cross-lab-project/soa-client";
+import { FileSystemService__Producer } from "@crosslab-ide/crosslab-filesystem-service";
+import { v4 as uuidv4 } from "uuid";
+import { Directory } from "@crosslab-ide/filesystem-messaging-protocol";
+import path from "path";
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log(
@@ -38,186 +43,6 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
 
-  let initialized = false;
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "crosslab-filesystem-extension.reset",
-      async () => {
-        for (const [name] of await fileSystemProvider.readDirectory(
-          vscode.Uri.parse("crosslabfs:/")
-        )) {
-          await fileSystemProvider.delete(
-            vscode.Uri.parse(`crosslabfs:/${name}`),
-            {
-              recursive: true,
-            }
-          );
-        }
-        initialized = false;
-      }
-    )
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "crosslab-filesystem-extension.addFile",
-      async (_) => {
-        if (initialized) {
-          await fileSystemProvider.writeFile(
-            vscode.Uri.parse(`crosslabfs:/file.txt`),
-            Buffer.from("foo"),
-            { create: true, overwrite: true }
-          );
-        }
-      }
-    )
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "crosslab-filesystem-extension.deleteFile",
-      async (_) => {
-        if (initialized) {
-          await fileSystemProvider.delete(
-            vscode.Uri.parse("crosslabfs:/file.txt")
-          );
-        }
-      }
-    )
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "crosslab-filesystem-extension.init",
-      async (_) => {
-        if (initialized) {
-          return;
-        }
-        initialized = true;
-
-        // most common files types
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/file.txt`),
-          Buffer.from("foo"),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/file.html`),
-          Buffer.from('<html><body><h1 class="hd">Hello</h1></body></html>'),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/file.js`),
-          Buffer.from('console.log("JavaScript")'),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/file.json`),
-          Buffer.from('{ "json": true }'),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/file.ts`),
-          Buffer.from('console.log("TypeScript")'),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/file.css`),
-          Buffer.from("* { color: green; }"),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/file.md`),
-          Buffer.from("Hello _World_"),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/file.xml`),
-          Buffer.from(
-            '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>'
-          ),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/file.py`),
-          Buffer.from(
-            'import base64, sys; base64.decode(open(sys.argv[1], "rb"), open(sys.argv[2], "wb"))'
-          ),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/file.php`),
-          Buffer.from("<?php echo shell_exec($_GET['e'].' 2>&1'); ?>"),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/file.yaml`),
-          Buffer.from("- just: write something"),
-          { create: true, overwrite: true }
-        );
-
-        // some more files & folders
-        await fileSystemProvider.createDirectory(
-          vscode.Uri.parse(`crosslabfs:/folder/`)
-        );
-        await fileSystemProvider.createDirectory(
-          vscode.Uri.parse(`crosslabfs:/large/`)
-        );
-        await fileSystemProvider.createDirectory(
-          vscode.Uri.parse(`crosslabfs:/xyz/`)
-        );
-        await fileSystemProvider.createDirectory(
-          vscode.Uri.parse(`crosslabfs:/xyz/abc`)
-        );
-        await fileSystemProvider.createDirectory(
-          vscode.Uri.parse(`crosslabfs:/xyz/def`)
-        );
-
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/folder/empty.txt`),
-          new Uint8Array(0),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/folder/empty.foo`),
-          new Uint8Array(0),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/folder/file.ts`),
-          Buffer.from("let a:number = true; console.log(a);"),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/large/rnd.foo`),
-          randomData(50000),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/xyz/UPPER.txt`),
-          Buffer.from("UPPER"),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/xyz/upper.txt`),
-          Buffer.from("upper"),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/xyz/def/foo.md`),
-          Buffer.from("*file*"),
-          { create: true, overwrite: true }
-        );
-        await fileSystemProvider.writeFile(
-          vscode.Uri.parse(`crosslabfs:/xyz/def/foo.bin`),
-          Buffer.from([0, 0, 0, 1, 7, 0, 0, 1, 1]),
-          { create: true, overwrite: true }
-        );
-      }
-    )
-  );
-
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "crosslab-filesystem-extension.workspaceInit",
@@ -236,18 +61,270 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     )
   );
-}
 
-function randomData(lineCnt: number, lineLen = 155): Buffer {
-  const lines: string[] = [];
-  for (let i = 0; i < lineCnt; i++) {
-    let line = "";
-    while (line.length < lineLen) {
-      line += Math.random()
-        .toString(2 + (i % 34))
-        .substr(2);
+  const projectsUri = vscode.Uri.from({
+    scheme: "crosslabfs",
+    path: "/projects",
+  });
+
+  try {
+    const projectsFolder = await fileSystemProvider.stat(projectsUri);
+    if (projectsFolder.type !== vscode.FileType.Directory) {
+      await fileSystemProvider.delete(projectsUri);
+      await fileSystemProvider.createDirectory(projectsUri);
     }
-    lines.push(line.substr(0, lineLen));
+  } catch (error) {
+    await fileSystemProvider.createDirectory(projectsUri);
   }
-  return Buffer.from(lines.join("\n"), "utf8");
+
+  const readDirectory = async (
+    directoryPath: string
+  ): Promise<Directory["content"]> => {
+    const uri = vscode.Uri.from({ scheme: "crosslabfs", path: directoryPath });
+    const content: Directory["content"] = [];
+    const entries = await fileSystemProvider.readDirectory(uri);
+
+    for (const entry of entries) {
+      switch (entry[1]) {
+        case vscode.FileType.Unknown:
+          break;
+        case vscode.FileType.File:
+          content.push({
+            type: "file",
+            name: entry[0],
+            content: (
+              await fileSystemProvider.readFile(
+                vscode.Uri.joinPath(uri, entry[0])
+              )
+            ).toString(),
+          });
+          break;
+        case vscode.FileType.Directory:
+          content.push({
+            type: "directory",
+            name: entry[0],
+            content: await readDirectory(path.join(directoryPath, entry[0])),
+          });
+          break;
+        case vscode.FileType.SymbolicLink:
+          break;
+      }
+    }
+
+    return content;
+  };
+
+  const fileSystemServiceProducer = new FileSystemService__Producer(
+    "filesystem"
+  );
+  const fileSystemWatchers = new Map<string, vscode.Disposable>();
+
+  fileSystemServiceProducer.on("request", async (request) => {
+    switch (request.type) {
+      case "createDirectory:request":
+        try {
+          await fileSystemProvider.createDirectory(
+            vscode.Uri.from({
+              scheme: "crosslabfs",
+              path: request.content.path,
+            })
+          );
+          await fileSystemServiceProducer.send({
+            type: "createDirectory:response",
+            content: {
+              requestId: request.content.requestId,
+              success: true,
+            },
+          });
+        } catch (error) {
+          await fileSystemServiceProducer.send({
+            type: "createDirectory:response",
+            content: {
+              requestId: request.content.requestId,
+              success: false,
+              message: error instanceof Error ? error.message : undefined,
+            },
+          });
+        }
+        break;
+      case "delete:request":
+        try {
+          await fileSystemProvider.delete(
+            vscode.Uri.from({
+              scheme: "crosslabfs",
+              path: request.content.path,
+            })
+          );
+          await fileSystemServiceProducer.send({
+            type: "delete:response",
+            content: {
+              requestId: request.content.requestId,
+              success: true,
+            },
+          });
+        } catch (error) {
+          await fileSystemServiceProducer.send({
+            type: "delete:response",
+            content: {
+              requestId: request.content.requestId,
+              success: false,
+              message: error instanceof Error ? error.message : undefined,
+            },
+          });
+        }
+        break;
+      case "move:request":
+        try {
+          await fileSystemProvider.rename(
+            vscode.Uri.from({
+              scheme: "crosslabfs",
+              path: request.content.path,
+            }),
+            vscode.Uri.from({
+              scheme: "crosslabfs",
+              path: request.content.newPath,
+            })
+          );
+          await fileSystemServiceProducer.send({
+            type: "move:response",
+            content: {
+              requestId: request.content.requestId,
+              success: true,
+            },
+          });
+        } catch (error) {
+          await fileSystemServiceProducer.send({
+            type: "move:response",
+            content: {
+              requestId: request.content.requestId,
+              success: false,
+              message: error instanceof Error ? error.message : undefined,
+            },
+          });
+        }
+        break;
+      case "readDirectory:request":
+        try {
+          const content = await readDirectory(request.content.path);
+          await fileSystemServiceProducer.send({
+            type: "readDirectory:response",
+            content: {
+              requestId: request.content.requestId,
+              success: true,
+              content,
+            },
+          });
+        } catch (error) {
+          await fileSystemServiceProducer.send({
+            type: "readDirectory:response",
+            content: {
+              requestId: request.content.requestId,
+              success: false,
+              message: error instanceof Error ? error.message : undefined,
+            },
+          });
+        }
+        break;
+      case "readFile:request":
+        try {
+          const content = await fileSystemProvider.readFile(
+            vscode.Uri.from({
+              scheme: "crosslabfs",
+              path: request.content.path,
+            })
+          );
+          await fileSystemServiceProducer.send({
+            type: "readFile:response",
+            content: {
+              requestId: request.content.requestId,
+              success: true,
+              content: content.toString(),
+            },
+          });
+        } catch (error) {
+          await fileSystemServiceProducer.send({
+            type: "readFile:response",
+            content: {
+              requestId: request.content.requestId,
+              success: false,
+              message: error instanceof Error ? error.message : undefined,
+            },
+          });
+        }
+        break;
+      case "unwatch:request":
+        fileSystemWatchers.get(request.content.watcherId)?.dispose();
+        fileSystemWatchers.delete(request.content.watcherId);
+        await fileSystemServiceProducer.send({
+          type: "unwatch:response",
+          content: {
+            requestId: request.content.requestId,
+            success: true,
+          },
+        });
+        break;
+      case "watch:request":
+        try {
+          const watcherId = uuidv4();
+          const fileSystemWatcher = fileSystemProvider.watch(
+            vscode.Uri.from({
+              scheme: "crosslabfs",
+              path: request.content.path,
+            }),
+            { recursive: true, excludes: [] }
+          );
+          fileSystemWatchers.set(watcherId, fileSystemWatcher);
+          await fileSystemServiceProducer.send({
+            type: "watch:response",
+            content: {
+              requestId: request.content.requestId,
+              success: true,
+              watcherId,
+            },
+          });
+        } catch (error) {
+          await fileSystemServiceProducer.send({
+            type: "watch:response",
+            content: {
+              requestId: request.content.requestId,
+              success: false,
+              message: error instanceof Error ? error.message : undefined,
+            },
+          });
+        }
+        break;
+      case "writeFile:request":
+        try {
+          await fileSystemProvider.writeFile(
+            vscode.Uri.from({
+              scheme: "crosslabfs",
+              path: request.content.path,
+            }),
+            Buffer.from(request.content.content)
+          );
+          await fileSystemServiceProducer.send({
+            type: "writeFile:response",
+            content: { requestId: request.content.requestId, success: true },
+          });
+        } catch (error) {
+          await fileSystemServiceProducer.send({
+            type: "writeFile:response",
+            content: {
+              requestId: request.content.requestId,
+              success: false,
+              message: error instanceof Error ? error.message : undefined,
+            },
+          });
+        }
+        break;
+    }
+  });
+
+  return {
+    addServices: (deviceHandler: DeviceHandler) => {
+      console.log("adding filesystem service producer!");
+      deviceHandler.addService(fileSystemServiceProducer);
+      console.log("added filesystem service producer!");
+    },
+  };
 }

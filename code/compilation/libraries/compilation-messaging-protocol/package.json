@@ -1,7 +1,7 @@
 {
   "name": "@crosslab-ide/compilation-messaging-protocol",
   "version": "0.0.1",
-  "description": "A message protocol for compilation servers.",
+  "description": "A messaging protocol for compilation servers.",
   "main": "dist/index.mjs",
   "scripts": {
     "build": "tsc"

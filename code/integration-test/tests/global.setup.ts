@@ -73,5 +73,13 @@ test.describe.serial("global setup", () => {
         },
       ],
     });
+
+    await apiClient.createDevice({
+      type: "cloud instantiable",
+      name: "simavr",
+      isPublic: true,
+      codeUrl: "http://localhost:3023",
+      services: [],
+    });
   });
 });

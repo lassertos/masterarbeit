@@ -10,5 +10,15 @@
   "license": "MIT",
   "devDependencies": {
     "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
+    "@crosslab-ide/abstract-messaging-channel": "file:../../shared/abstract-messaging-channel",
+    "@crosslab-ide/crosslab-messaging-channel": "file:../../shared/crosslab-messaging-channel",
+    "@crosslab-ide/filesystem-messaging-protocol": "file:../libraries/filesystem-messaging-protocol",
+    "@types/uuid": "^10.0.0",
+    "tiny-typed-emitter": "^2.1.0",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8"
   }
 }

@@ -19,7 +19,10 @@ import {
 
 interface CompilationService__ProducerEvents {
   "compilation:request": (
-    request: ProtocolMessage<CompilationProtocol, "compilation:request">
+    request: ProtocolMessage<
+      CompilationProtocol,
+      "compilation:request"
+    >["content"]
   ) => void;
 }
 
@@ -79,7 +82,7 @@ export class CompilationService__Producer
   ) {
     switch (message.type) {
       case "compilation:request":
-        // TODO: implement
+        this.emit("compilation:request", message.content);
         break;
       default:
         throw new Error(`Unrecognized message type "${message.type}"!`);

@@ -1,26 +1,18 @@
 import * as vscode from "vscode";
-import { parseDirectory } from "./util/parseDirectory.mjs";
 import { DeviceHandler } from "@cross-lab-project/soa-client";
 import { CompilationService__Consumer } from "@crosslab-ide/crosslab-compilation-service";
+import { FileSystemService__Consumer } from "@crosslab-ide/crosslab-filesystem-service";
+import { Directory } from "@crosslab-ide/filesystem-messaging-protocol";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log(
     'Congratulations, your extension "crosslab-compilation-extension" is now active in the web extension host!'
   );
+  const fileSystemService__Consumer = new FileSystemService__Consumer(
+    "compilation:filesystem"
+  );
   const compilationService__Consumer = new CompilationService__Consumer(
     "compilation"
-  );
-
-  compilationService__Consumer.on("compilation:initialize", () => {});
-  compilationService__Consumer.on("compilation:result", () => {});
-
-  const helloWorldDisposable = vscode.commands.registerCommand(
-    "crosslab-compilation-extension.helloWorld",
-    () => {
-      vscode.window.showInformationMessage(
-        "Hello World from crosslab-compilation-extension in a web extension host!"
-      );
-    }
   );
 
   const compileDisposable = vscode.commands.registerCommand(
@@ -41,21 +33,35 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const directory = await parseDirectory(workspaceFolder.uri);
+      const directory: Directory = {
+        type: "directory",
+        name: workspaceFolder.name,
+        content: await fileSystemService__Consumer.readDirectory(
+          workspaceFolder.uri.path
+        ),
+      };
 
       console.log(JSON.stringify(directory, null, 4));
 
-      compilationService__Consumer.sendCompilationRequest(directory);
+      const result = await compilationService__Consumer.compile(directory);
+
+      await fileSystemService__Consumer.writeFile(
+        "/projects/compilation-result.txt",
+        result.success
+          ? result.result
+          : result.message ?? "Something went wrong during the compilation!"
+      );
     }
   );
 
-  context.subscriptions.push(helloWorldDisposable, compileDisposable);
+  context.subscriptions.push(compileDisposable);
 
   return {
     addServices: (deviceHandler: DeviceHandler) => {
-      console.log("adding compilation service consumer!");
+      console.log("adding compilation services!");
+      deviceHandler.addService(fileSystemService__Consumer);
       deviceHandler.addService(compilationService__Consumer);
-      console.log("added compilation service consumer!");
+      console.log("added compilation services!");
     },
   };
 }

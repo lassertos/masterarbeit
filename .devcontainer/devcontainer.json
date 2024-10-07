@@ -22,7 +22,8 @@
         "yzhang.markdown-all-in-one",
         "amodio.tsl-problem-matcher",
         "connor4312.esbuild-problem-matchers",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "ms-vscode.cpptools-extension-pack"
       ]
     }
   },

@@ -5,34 +5,31 @@ import {
   ServiceConfiguration,
   ServiceDirection,
 } from "@cross-lab-project/soa-client";
-import { TypedEmitter } from "tiny-typed-emitter";
-import { IncomingMessage } from "@crosslab-ide/abstract-messaging-channel";
+import {
+  IncomingMessage,
+  isProtocolMessage,
+  ProtocolMessage,
+} from "@crosslab-ide/abstract-messaging-channel";
 import {
   CompilationProtocol,
   compilationProtocol,
   Directory,
 } from "@crosslab-ide/compilation-messaging-protocol";
 import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
+import { PromiseManager } from "./promiseManager.mjs";
+import { v4 as uuidv4 } from "uuid";
 
-interface CompilationService__ComsumerEvents {
-  "compilation:initialize": () => void;
-  "compilation:result": () => void;
-}
-
-export class CompilationService__Consumer
-  extends TypedEmitter<CompilationService__ComsumerEvents>
-  implements Service
-{
+export class CompilationService__Consumer implements Service {
   private _messagingChannel?: CrossLabMessagingChannel<
     CompilationProtocol,
     "client"
   >;
+  private _promiseManager: PromiseManager = new PromiseManager();
   serviceType: string = "https://api.goldi-labs.de/service-types/compilation";
   serviceId: string;
   serviceDirection: ServiceDirection = "consumer";
 
   constructor(serviceId: string) {
-    super();
     this.serviceId = serviceId;
   }
 
@@ -71,17 +68,40 @@ export class CompilationService__Consumer
   ) {
     switch (message.type) {
       case "compilation:response":
-        // TODO: implement
+        this._promiseManager.resolve(message.content.requestId, message);
         break;
       default:
         throw new Error(`Unrecognized message type "${message.type}"!`);
     }
   }
 
-  sendCompilationRequest(directory: Directory) {
-    this._messagingChannel?.send({
+  async compile(
+    directory: Directory
+  ): Promise<
+    ProtocolMessage<CompilationProtocol, "compilation:response">["content"]
+  > {
+    if (!this._messagingChannel) {
+      throw new Error("No messaging channel has been set up!");
+    }
+
+    const requestId = uuidv4();
+    const promise = this._promiseManager.add(requestId);
+
+    await this._messagingChannel.send({
       type: "compilation:request",
-      content: { directory },
+      content: { requestId, directory },
     });
+
+    const response = await promise;
+
+    if (
+      !isProtocolMessage(compilationProtocol, "compilation:response", response)
+    ) {
+      throw new Error(
+        'Received message is not of expected type "compilation:response"!'
+      );
+    }
+
+    return response.content;
   }
 }

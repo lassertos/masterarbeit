@@ -90,6 +90,7 @@ async function main() {
       polyfillNode.polyfillNode({
         polyfills: {
           path: true,
+          crypto: true,
         },
       }),
       testBundlePlugin,

@@ -77,3 +77,12 @@ echo "@crosslab-ide:registry=http://verdaccio:4873/" > /home/vscode/.npmrc
 echo "@cross-lab-project:registry=http://verdaccio:4873/" >> /home/vscode/.npmrc
 echo "//verdaccio:4873/:username=admin" >> /home/vscode/.npmrc
 echo "//verdaccio:4873/:_password=admin" >> /home/vscode/.npmrc
+
+# build and install simavr
+apt update && apt install -y libelf-dev avr-libc libglut-dev
+cd /tmp
+git clone https://github.com/buserror/simavr.git
+cd simavr
+make install
+ldconfig
+cd ~ && rm -rf /tmp/simavr

@@ -1,0 +1,20 @@
+{
+  "name": "@crosslab-ide/filesystem-messaging-protocol",
+  "version": "0.0.1",
+  "description": "A messaging protocol for filesystem interaction.",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "@crosslab-ide/abstract-messaging-channel": "file:../../../shared/abstract-messaging-channel"
+  },
+  "peerDependencies": {
+    "zod": "^3.23.8"
+  }
+}

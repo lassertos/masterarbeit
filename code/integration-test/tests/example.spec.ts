@@ -1,31 +1,10 @@
 import { test } from "@playwright/test";
-import { APIClient, DeviceServiceTypes } from "@cross-lab-project/api-client";
+import { APIClient } from "@cross-lab-project/api-client";
 import assert from "assert";
+import fs from "fs";
+import { checkDevices, sleep } from "./helper";
 
-async function sleep(milliseconds: number) {
-  return new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
-}
-
-function checkDevices<T extends string>(
-  devices: DeviceServiceTypes.DeviceOverview<"response">[],
-  deviceDescriptions: { name: T; type: DeviceServiceTypes.Device["type"] }[]
-): Record<T, string> {
-  const foundDevices: Partial<Record<T, string>> = {};
-  for (const deviceDescription of deviceDescriptions) {
-    const foundDevice = devices.find(
-      (device) =>
-        device.name === deviceDescription.name &&
-        device.type === deviceDescription.type
-    );
-    if (!foundDevice) {
-      throw new Error(`device "${deviceDescription.name}" not found!`);
-    }
-    foundDevices[deviceDescription.name] = foundDevice.url;
-  }
-  return foundDevices as Record<T, string>;
-}
-
-test("simple experiment", async ({ page }) => {
+test("simple experiment", async ({ page, browserName }) => {
   test.slow();
 
   const apiClient = new APIClient("http://localhost:8080");
@@ -60,6 +39,32 @@ test("simple experiment", async ({ page }) => {
           { role: "client", serviceId: "compilation", config: {} },
         ],
       },
+      {
+        serviceType: "http://localhost:8080/serviceTypes/filesystem",
+        participants: [
+          {
+            role: "client",
+            serviceId: "filesystem",
+            config: {
+              templates: [
+                {
+                  id: "template:arduino:basic",
+                  name: "arduino",
+                  content: [
+                    {
+                      type: "file",
+                      name: "arduino.ino",
+                      content:
+                        "void setup() {\n\t// write your setup code here!\n}\n\nvoid loop() {\n\t// write your main loop here!\n}",
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          { role: "client", serviceId: "compilation:filesystem", config: {} },
+        ],
+      },
     ],
   });
 
@@ -69,6 +74,12 @@ test("simple experiment", async ({ page }) => {
   page.goto(
     `${experiment.instantiatedDevices[0].codeUrl}?instanceUrl=${instance.url}&deviceToken=${instance.token}`
   );
+
+  fs.rmSync(`.buildsystem/${browserName}.log`, { force: true });
+
+  page.on("console", (message) => {
+    fs.appendFileSync(`.buildsystem/${browserName}.log`, message.text() + "\n");
+  });
 
   while (!(await apiClient.getDevice(instance.url)).connected) {
     await sleep(1000);
@@ -80,7 +91,9 @@ test("simple experiment", async ({ page }) => {
 
   while (
     (await page
-      .locator("#crosslab\\.crosslab-base-extension\\.experiment-status")
+      .locator(
+        "#crosslab\\.\\@crosslab-ide\\/crosslab-base-extension\\.experiment-status"
+      )
       .first()
       .getAttribute("aria-label")) !== "CrossLab Experiment: running"
   ) {

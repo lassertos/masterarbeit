@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Launch Program",
+      "preLaunchTask": "npm: build:dev",
+      "program": "/usr/local/share/nvm/versions/node/v20.17.0/bin/node",
+      "args": ["${workspaceFolder}/dist/index.mjs"]
+    }
+  ]
+}
