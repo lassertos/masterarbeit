@@ -74,42 +74,52 @@ export function isIncomingMessage<
     MP extends MessagingProtocol | undefined,
     R extends Role<MP> | undefined,
 >(protocol: MP, role: R, message: unknown): message is IncomingMessage<MP, R> {
-    let valid = false;
-    if (!protocol) {
-        valid = isMessage(message);
-    } else if (protocol && !role) {
-        for (const messageType of protocol.messageTypes) {
-            valid = protocol.messages[messageType].safeParse(message).success;
-            if (valid) break;
+    if (!isMessage(message)) return false;
+    if (!protocol) return true;
+    if (!protocol.messageTypes.includes(message.type)) return false;
+    if (!role) {
+        const result = protocol.messages[message.type].safeParse(
+            message.content,
+        );
+        if (!result.success) {
+            console.log(JSON.stringify(result, null, 4));
         }
-    } else if (protocol && role) {
-        for (const messageType of protocol.roleMessages[role].incoming) {
-            valid = protocol.messages[messageType].safeParse(message).success;
-            if (valid) break;
-        }
+        return result.success;
     }
-    return valid;
+    if (!protocol.roleMessages[role].incoming.includes(message.type))
+        return false;
+
+    const result = protocol.messages[message.type].safeParse(message.content);
+    if (!result.success) {
+        console.log(JSON.stringify(result, null, 4));
+    }
+    return result.success;
 }
 
 export function isOutgoingMessage<
     MP extends MessagingProtocol | undefined,
     R extends Role<MP> | undefined,
 >(protocol: MP, role: R, message: unknown): message is OutgoingMessage<MP, R> {
-    let valid = false;
-    if (!protocol) {
-        valid = isMessage(message);
-    } else if (protocol && !role) {
-        for (const messageType of protocol.messageTypes) {
-            valid = protocol.messages[messageType].safeParse(message).success;
-            if (valid) break;
+    if (!isMessage(message)) return false;
+    if (!protocol) return true;
+    if (!protocol.messageTypes.includes(message.type)) return false;
+    if (!role) {
+        const result = protocol.messages[message.type].safeParse(
+            message.content,
+        );
+        if (!result.success) {
+            console.log(JSON.stringify(result, null, 4));
         }
-    } else if (protocol && role) {
-        for (const messageType of protocol.roleMessages[role].outgoing) {
-            valid = protocol.messages[messageType].safeParse(message).success;
-            if (valid) break;
-        }
+        return result.success;
     }
-    return valid;
+    if (!protocol.roleMessages[role].outgoing.includes(message.type))
+        return false;
+
+    const result = protocol.messages[message.type].safeParse(message.content);
+    if (!result.success) {
+        console.log(JSON.stringify(result, null, 4));
+    }
+    return result.success;
 }
 
 export function isProtocolMessage<
@@ -120,15 +130,13 @@ export function isProtocolMessage<
     messageType: MT,
     message: unknown,
 ): message is ProtocolMessage<MP, MT> {
-    if (messageType) {
-        return protocol.messages[messageType].safeParse(message).success;
-    }
+    if (!isMessage(message)) return false;
+    if (messageType && messageType !== message.type) return false;
+    if (!protocol.messageTypes.includes(message.type)) return false;
 
-    for (const messageType of protocol.messageTypes) {
-        if (protocol.messages[messageType].safeParse(message).success) {
-            return true;
-        }
+    const result = protocol.messages[message.type].safeParse(message.content);
+    if (!result.success) {
+        console.log(JSON.stringify(result, null, 4));
     }
-
-    return false;
+    return result.success;
 }

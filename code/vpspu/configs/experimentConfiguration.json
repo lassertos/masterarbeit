@@ -1,0 +1,332 @@
+{
+  "devices": [
+    {
+      "device": "https://api.dev.goldi-labs.de/devices/32d3661a-5569-4b82-8ed6-f076ae707de0",
+      "role": "pspu"
+    },
+    {
+      "device": "https://api.dev.goldi-labs.de/devices/af2c9d0d-c7be-4fb3-bfdf-d43faef9682e",
+      "role": "ecp"
+    },
+    {
+      "device": "https://api.dev.goldi-labs.de/devices/7d44ac41-0619-4907-915a-c8788d3c1812",
+      "role": "fsm"
+    }
+  ],
+  "roles": [
+    {
+      "name": "pspu"
+    },
+    {
+      "name": "ecp"
+    },
+    {
+      "name": "fsm"
+    }
+  ],
+  "serviceConfigurations": [
+    {
+      "serviceType": "http://api.goldi-labs.de/serviceTypes/electrical",
+      "configuration": {},
+      "participants": [
+        {
+          "role": "pspu",
+          "serviceId": "sensors",
+          "config": {
+            "interfaces": [
+              {
+                "interfaceId": "1",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitXLeft"
+                },
+                "busId": "LimitXLeft",
+                "direction": "out",
+                "driver": "pspu"
+              },
+              {
+                "interfaceId": "2",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitXRight"
+                },
+                "busId": "LimitXRight",
+                "direction": "out",
+                "driver": "pspu"
+              },
+              {
+                "interfaceId": "3",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitYBottom"
+                },
+                "busId": "LimitYBottom",
+                "direction": "out",
+                "driver": "pspu"
+              },
+              {
+                "interfaceId": "4",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitYTop"
+                },
+                "busId": "LimitYTop",
+                "direction": "out",
+                "driver": "pspu"
+              }
+            ]
+          }
+        },
+        {
+          "role": "pspu",
+          "serviceId": "actuators",
+          "config": {
+            "interfaces": [
+              {
+                "interfaceId": "5",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "XMotorLeft"
+                },
+                "busId": "XMotorLeft",
+                "direction": "in",
+                "driver": "pspu"
+              },
+              {
+                "interfaceId": "6",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "XMotorRight"
+                },
+                "busId": "XMotorRight",
+                "direction": "in",
+                "driver": "pspu"
+              },
+              {
+                "interfaceId": "7",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "YMotorBottom"
+                },
+                "busId": "YMotorBottom",
+                "direction": "in",
+                "driver": "pspu"
+              },
+              {
+                "interfaceId": "8",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "YMotorTop"
+                },
+                "busId": "YMotorTop",
+                "direction": "in",
+                "driver": "pspu"
+              }
+            ]
+          }
+        },
+        {
+          "role": "ecp",
+          "serviceId": "electrical",
+          "config": {
+            "interfaces": [
+              {
+                "interfaceId": "9",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitXLeft"
+                },
+                "busId": "LimitXLeft",
+                "direction": "in",
+                "driver": "ecp"
+              },
+              {
+                "interfaceId": "10",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitXRight"
+                },
+                "busId": "LimitXRight",
+                "direction": "in",
+                "driver": "ecp"
+              },
+              {
+                "interfaceId": "11",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitYBottom"
+                },
+                "busId": "LimitYBottom",
+                "direction": "in",
+                "driver": "ecp"
+              },
+              {
+                "interfaceId": "12",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitYTop"
+                },
+                "busId": "LimitYTop",
+                "direction": "in",
+                "driver": "ecp"
+              },
+              {
+                "interfaceId": "13",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "XMotorLeft"
+                },
+                "busId": "XMotorLeft",
+                "direction": "inout",
+                "driver": "ecp"
+              },
+              {
+                "interfaceId": "14",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "XMotorRight"
+                },
+                "busId": "XMotorRight",
+                "direction": "inout",
+                "driver": "ecp"
+              },
+              {
+                "interfaceId": "15",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "YMotorBottom"
+                },
+                "busId": "YMotorBottom",
+                "direction": "inout",
+                "driver": "ecp"
+              },
+              {
+                "interfaceId": "16",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "YMotorTop"
+                },
+                "busId": "YMotorTop",
+                "direction": "inout",
+                "driver": "ecp"
+              }
+            ]
+          }
+        },
+
+        {
+          "role": "fsm",
+          "serviceId": "input",
+          "config": {
+            "interfaces": [
+              {
+                "interfaceId": "17",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitXLeft"
+                },
+                "busId": "LimitXLeft",
+                "direction": "in",
+                "driver": "fsm"
+              },
+              {
+                "interfaceId": "18",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitXRight"
+                },
+                "busId": "LimitXRight",
+                "direction": "in",
+                "driver": "fsm"
+              },
+              {
+                "interfaceId": "19",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitYBottom"
+                },
+                "busId": "LimitYBottom",
+                "direction": "in",
+                "driver": "fsm"
+              },
+              {
+                "interfaceId": "20",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "LimitYTop"
+                },
+                "busId": "LimitYTop",
+                "direction": "in",
+                "driver": "fsm"
+              }
+            ]
+          }
+        },
+        {
+          "role": "fsm",
+          "serviceId": "output",
+          "config": {
+            "interfaces": [
+              {
+                "interfaceId": "21",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "XMotorLeft"
+                },
+                "busId": "XMotorLeft",
+                "direction": "out",
+                "driver": "fsm"
+              },
+              {
+                "interfaceId": "22",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "XMotorRight"
+                },
+                "busId": "XMotorRight",
+                "direction": "out",
+                "driver": "fsm"
+              },
+              {
+                "interfaceId": "23",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "YMotorBottom"
+                },
+                "busId": "YMotorBottom",
+                "direction": "out",
+                "driver": "fsm"
+              },
+              {
+                "interfaceId": "24",
+                "interfaceType": "gpio",
+                "signals": {
+                  "gpio": "YMotorTop"
+                },
+                "busId": "YMotorTop",
+                "direction": "out",
+                "driver": "fsm"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "serviceType": "http://api.goldi-labs.de/serviceTypes/webcam",
+      "configuration": {},
+      "participants": [
+        {
+          "role": "pspu",
+          "serviceId": "webcam",
+          "config": {}
+        },
+        {
+          "role": "ecp",
+          "serviceId": "webcam",
+          "config": {}
+        }
+      ]
+    }
+  ]
+}

@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@cross-lab-project/api-client": "0.2.8",
-    "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "esbuild-plugin-polyfill-node": "^0.3.0"
   }
 }

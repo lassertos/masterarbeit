@@ -22,7 +22,7 @@ export type Directory = z.infer<typeof DirectoryBaseSchema> & {
 };
 export const DirectorySchema: z.ZodType<Directory> = DirectoryBaseSchema.extend(
   {
-    content: z.lazy(() => DirectorySchema.array()),
+    content: z.lazy(() => z.array(z.union([DirectorySchema, FileSchema]))),
   }
 );
 export function isDirectory(data: unknown): data is Directory {

@@ -5,6 +5,14 @@
 #include <string>
 #include <queue>
 
+typedef enum
+{
+    CREATED,
+    PROGRAMMED,
+    RUNNING,
+    STOPPED
+} simulation_status;
+
 typedef struct
 {
     char port;
@@ -19,6 +27,7 @@ private:
     std::thread thread;
     bool stop_thread;
     std::queue<pin_event> pin_events;
+    simulation_status status;
 
 protected:
     std::map<std::string, Napi::ThreadSafeFunction> pin_callbacks;
@@ -33,4 +42,5 @@ public:
     Napi::Value getPinValue(const Napi::CallbackInfo &info);
     Napi::Value listPins(const Napi::CallbackInfo &info);
     void registerPinCallback(const Napi::CallbackInfo &info);
+    Napi::Value getStatus(const Napi::CallbackInfo &info);
 };

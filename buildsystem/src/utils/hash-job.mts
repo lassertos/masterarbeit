@@ -58,6 +58,8 @@ async function collectFilesForPath(
         return [];
       }
     }
+  } else if (options.include?.length === 0) {
+    return [];
   }
 
   if (options?.exclude) {

@@ -1,11 +1,11 @@
 import { test } from "@playwright/test";
 import { APIClient } from "@cross-lab-project/api-client";
 import assert from "assert";
-import fs from "fs";
-import { checkDevices, sleep } from "./helper";
+import { checkDevices, logging, sleep } from "./helper.js";
 
 test("simple experiment", async ({ page, browserName }) => {
   test.slow();
+  logging(test, browserName, page);
 
   const apiClient = new APIClient("http://localhost:8080");
 
@@ -74,12 +74,6 @@ test("simple experiment", async ({ page, browserName }) => {
   page.goto(
     `${experiment.instantiatedDevices[0].codeUrl}?instanceUrl=${instance.url}&deviceToken=${instance.token}`
   );
-
-  fs.rmSync(`.buildsystem/${browserName}.log`, { force: true });
-
-  page.on("console", (message) => {
-    fs.appendFileSync(`.buildsystem/${browserName}.log`, message.text() + "\n");
-  });
 
   while (!(await apiClient.getDevice(instance.url)).connected) {
     await sleep(1000);

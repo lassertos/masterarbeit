@@ -1,4 +1,4 @@
-import { DataChannel } from "@cross-lab-project/soa-client";
+import { DataChannel } from "@crosslab-ide/soa-client";
 import {
   AbstractMessagingChannel,
   isIncomingMessage,
@@ -18,9 +18,18 @@ export class CrossLabMessagingChannel<
     this._channel = channel;
     this._channel.ready().then(() => this.emit("ready"));
     this._channel.ondata = (data: unknown) => {
+      console.log("received data", data);
       if (typeof data === "string") {
         const message = JSON.parse(data);
+        console.log(message);
+        console.log(
+          protocol,
+          role,
+          message,
+          isIncomingMessage(protocol, role, message)
+        );
         if (isIncomingMessage(protocol, role, message)) {
+          console.log("emitting message", message);
           this.emit("message", message);
         }
       }

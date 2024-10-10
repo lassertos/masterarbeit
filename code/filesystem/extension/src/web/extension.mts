@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { CrossLabFileSystemProvider } from "./providers/fileSystemProvider.mjs";
 import { CrossLabFileSearchProvider } from "./providers/fileSearchProvider.mjs";
 import { CrossLabTextSearchProvider } from "./providers/textSearchProvider.mjs";
-import { DeviceHandler } from "@cross-lab-project/soa-client";
+import { DeviceHandler } from "@crosslab-ide/soa-client";
 import { FileSystemService__Producer } from "@crosslab-ide/crosslab-filesystem-service";
 import { v4 as uuidv4 } from "uuid";
 import { Directory } from "@crosslab-ide/filesystem-messaging-protocol";
@@ -92,11 +92,11 @@ export async function activate(context: vscode.ExtensionContext) {
           content.push({
             type: "file",
             name: entry[0],
-            content: (
+            content: new TextDecoder().decode(
               await fileSystemProvider.readFile(
                 vscode.Uri.joinPath(uri, entry[0])
               )
-            ).toString(),
+            ),
           });
           break;
         case vscode.FileType.Directory:
@@ -120,6 +120,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const fileSystemWatchers = new Map<string, vscode.Disposable>();
 
   fileSystemServiceProducer.on("request", async (request) => {
+    console.log("received request", request);
     switch (request.type) {
       case "createDirectory:request":
         try {
@@ -238,7 +239,7 @@ export async function activate(context: vscode.ExtensionContext) {
             content: {
               requestId: request.content.requestId,
               success: true,
-              content: content.toString(),
+              content: new TextDecoder().decode(content),
             },
           });
         } catch (error) {

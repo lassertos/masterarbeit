@@ -4,7 +4,7 @@ import {
   Service,
   ServiceConfiguration,
   ServiceDirection,
-} from "@cross-lab-project/soa-client";
+} from "@crosslab-ide/soa-client";
 import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
 import { TypedEmitter } from "tiny-typed-emitter";
 import {
@@ -30,7 +30,7 @@ export class FileSystemService__Producer
     FileSystemProtocol,
     "producer"
   >;
-  serviceType: string = "https://api.goldi-labs.de/service-types/filesystem";
+  serviceType: string = "https://api.goldi-labs.de/serviceTypes/filesystem";
   serviceId: string;
   serviceDirection: ServiceDirection = "producer";
 
@@ -52,6 +52,7 @@ export class FileSystemService__Producer
     connection: PeerConnection,
     serviceConfig: ServiceConfiguration
   ): void {
+    console.log("setting up filesystem service producer!");
     if ("templates" in serviceConfig) {
       if (isTemplatesArray(serviceConfig.templates)) {
         this.emit("templates", serviceConfig.templates);
@@ -63,9 +64,11 @@ export class FileSystemService__Producer
       fileSystemProtocol,
       "producer"
     );
-    this._messagingChannel.on("message", (message) =>
-      this.emit("request", message)
-    );
+    console.log(this._messagingChannel);
+    this._messagingChannel.on("message", (message) => {
+      console.log("emitting request", message);
+      this.emit("request", message);
+    });
     if (connection.tiebreaker) {
       connection.transmit(serviceConfig, "data", channel);
     } else {

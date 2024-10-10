@@ -24,6 +24,13 @@
         "icon": "$(run)",
         "shortTitle": "compile",
         "enablement": "workbenchState == folder"
+      },
+      {
+        "command": "crosslab-compilation-extension.upload",
+        "title": "Upload",
+        "icon": "$(cloud-upload)",
+        "shortTitle": "upload",
+        "enablement": "workbenchState == folder"
       }
     ],
     "menus": {
@@ -65,7 +72,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@crosslab-ide/compilation-messaging-protocol": "file:../libraries/compilation-messaging-protocol",
     "@crosslab-ide/crosslab-compilation-service": "file:../service",
     "@crosslab-ide/crosslab-filesystem-service": "file:../../filesystem/service",

@@ -8,6 +8,7 @@ export interface Simulation {
   getPinValue(pin: string): number;
   listPins(): string[];
   registerPinCallback(pin: string, callback: (value: number) => void): void;
+  readonly status: "created" | "programmed" | "running" | "stopped";
 }
 
 export const Simulation: {

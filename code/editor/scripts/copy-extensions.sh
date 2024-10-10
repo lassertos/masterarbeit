@@ -13,3 +13,7 @@ cp ../filesystem/extension/package.json public/extensions/filesystem
 mkdir public/extensions/compilation
 cp -r ../compilation/extension/dist public/extensions/compilation/dist
 cp ../compilation/extension/package.json public/extensions/compilation
+
+mkdir public/extensions/debugging
+cp -r ../debugging/extension/dist public/extensions/debugging/dist
+cp ../debugging/extension/package.json public/extensions/debugging

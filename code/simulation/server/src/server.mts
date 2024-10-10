@@ -34,9 +34,7 @@ export class SimavrServer {
     });
 
     app.listen(configuration.PORT, () => {
-      console.log(
-        `Arduino-cli compilation server listening on port ${configuration.PORT}`
-      );
+      console.log(`Simavr server listening on port ${configuration.PORT}`);
     });
   }
 }

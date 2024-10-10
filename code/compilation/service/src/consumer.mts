@@ -4,7 +4,7 @@ import {
   Service,
   ServiceConfiguration,
   ServiceDirection,
-} from "@cross-lab-project/soa-client";
+} from "@crosslab-ide/soa-client";
 import {
   IncomingMessage,
   isProtocolMessage,
@@ -47,12 +47,14 @@ export class CompilationService__Consumer implements Service {
     serviceConfig: ServiceConfiguration
   ): void {
     // TODO: add checkConfig function
+    console.log("setting up compilation service consumer!");
     const channel = new DataChannel();
     this._messagingChannel = new CrossLabMessagingChannel(
       channel,
       compilationProtocol,
       "client"
     );
+    console.log(this._messagingChannel);
     this._messagingChannel.on("message", (message) =>
       this._handleMessage(message)
     );

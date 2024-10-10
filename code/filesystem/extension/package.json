@@ -67,7 +67,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@crosslab-ide/crosslab-filesystem-service": "file:../service",
     "@crosslab-ide/filesystem-messaging-protocol": "file:../libraries/filesystem-messaging-protocol",
     "@types/uuid": "^10.0.0",

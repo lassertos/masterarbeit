@@ -168,6 +168,20 @@ services:
     networks:
       - service-network
     restart: on-failure
+  simavr:
+    image: simavr-server:latest
+    environment:
+      - WEBSOCKET_ENDPOINT=http://gateway:80/devices/websocket
+    networks:
+      - service-network
+    restart: on-failure
+  vpspu:
+    image: vpspu:latest
+    restart: on-failure
+    ports:
+      - 3024:80
+    networks:
+      - service-network
 networks:
   service-network:
     driver: bridge

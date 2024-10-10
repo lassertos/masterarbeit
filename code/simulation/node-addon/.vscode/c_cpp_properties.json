@@ -4,8 +4,8 @@
       "name": "Linux",
       "includePath": [
         "${workspaceFolder}/**",
-        "${workspaceFolder}/**/node_modules/node-addon-api",
-        "/usr/local/share/nvm/versions/node/v20.17.0/include/node",
+        "${workspaceFolder}/node_modules/node-addon-api",
+        "/usr/local/share/nvm/versions/node/v20.18.0/include/node",
         "/usr/local/include/simavr"
       ],
       "defines": [],

@@ -4,7 +4,7 @@ import {
   Service,
   ServiceConfiguration,
   ServiceDirection,
-} from "@cross-lab-project/soa-client";
+} from "@crosslab-ide/soa-client";
 import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
 import {
   Directory,
@@ -41,7 +41,7 @@ export class FileSystemService__Consumer implements Service {
     string,
     TypedEmitter<FileSystemWatcherEvents>
   > = new Map();
-  serviceType: string = "https://api.goldi-labs.de/service-types/filesystem";
+  serviceType: string = "https://api.goldi-labs.de/serviceTypes/filesystem";
   serviceId: string;
   serviceDirection: ServiceDirection = "consumer";
 
@@ -62,12 +62,14 @@ export class FileSystemService__Consumer implements Service {
     connection: PeerConnection,
     serviceConfig: ServiceConfiguration
   ): void {
+    console.log("setting up filesystem service consumer!");
     const channel = new DataChannel();
     this._messagingChannel = new CrossLabMessagingChannel(
       channel,
       fileSystemProtocol,
       "consumer"
     );
+    console.log(this._messagingChannel);
     this._messagingChannel.on("message", (message) =>
       this._handleIncomingMessage(message)
     );
@@ -81,6 +83,7 @@ export class FileSystemService__Consumer implements Service {
   private _handleIncomingMessage(
     message: IncomingMessage<FileSystemProtocol, "consumer">
   ) {
+    console.log("received incoming message", message);
     switch (message.type) {
       case "createDirectory:response":
         this._promiseManager.resolve(message.content.requestId, message);
@@ -203,12 +206,21 @@ export class FileSystemService__Consumer implements Service {
     const requestId = uuidv4();
     const promise = this._promiseManager.add(requestId);
 
+    console.log("sending readDirectory request!", {
+      type: "readDirectory:request",
+      content: { requestId, path },
+    });
+
     await this._messagingChannel.send({
       type: "readDirectory:request",
       content: { requestId, path },
     });
 
+    console.log("awaiting response!");
+
     const response = await promise;
+
+    console.log("received response!", response);
 
     this._parseResponse(response, "readDirectory:response");
 

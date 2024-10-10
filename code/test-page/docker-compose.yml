@@ -1,0 +1,140 @@
+# This docker compose file is used to deploy the "core"-services of a Crosslab instance.
+# This includes all services to provide the crosslab API. Any additional software like frontend,
+# virtual laboratory devices etc. must be deployed on top of this.
+#
+# All necessary confifguration Options are set via environment variables in the accompanying .env file.
+#
+x-config: &common-config
+  AUTHORIZATION_SERVER: "http://authorization:3010"
+  AUTHORIZATION_PSK: "${AUTHORIZATION_PSK:?}"
+  LOGGING: "${LOGGING_LEVEL:-warn}"
+  BASE_URL: ${API_BASE_URL}
+  DB_TYPE: sqlite
+  DB_DATABASE: ":memory:"
+  AUTH_SERVICE_URL: "http://auth:3000"
+  DEVICE_SERVICE_URL: "http://device:3001"
+  EXPERIMENT_SERVICE_URL: "http://experiment:3002"
+  FEDERATION_SERVICE_URL: "http://federation:3003"
+  FORWARDING_SERVICE_URL: "http://forwarding:3020"
+  AUTH_SERVICE_DOMAIN: "auth:3000"
+  DEVICE_SERVICE_DOMAIN: "device:3001"
+  EXPERIMENT_SERVICE_DOMAIN: "experiment:3002"
+  FEDERATION_SERVICE_DOMAIN: "federation:3003"
+  AUTHORIZATION_SERVICE_DOMAIN: "authorization:3010"
+  FORWARDING_SERVICE_DOMAIN: "forwarding:3020"
+
+services:
+  # =============== CROSSLAB SERVICES ===============
+  gateway:
+    image: gateway-service:latest
+    environment:
+      <<: *common-config
+    networks:
+      - service-network
+    restart: on-failure
+  # Services
+  auth:
+    image: auth-service:latest
+    environment:
+      <<: *common-config
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?}
+      JWT_SECRET: ${JWT_SECRET:?}
+    networks:
+      - service-network
+    restart: on-failure
+  authorization:
+    image: authorization-service:latest
+    environment:
+      <<: *common-config
+      JWT_SECRET: ${JWT_SECRET:?}
+    networks:
+      - service-network
+    restart: on-failure
+  device:
+    image: device-service:latest
+    environment:
+      <<: *common-config
+    networks:
+      - service-network
+    restart: on-failure
+  experiment:
+    image: experiment-service:latest
+    environment:
+      <<: *common-config
+    networks:
+      - service-network
+    restart: on-failure
+  federation:
+    image: federation-service:latest
+    environment:
+      <<: *common-config
+    networks:
+      - service-network
+    restart: on-failure
+  forwarding:
+    image: forwarding-service:latest
+    environment:
+      <<: *common-config
+    networks:
+      - service-network
+    restart: on-failure
+  # =============== NEW SERVICES ===============
+  helper-gateway:
+    image: helper-gateway:latest
+    environment:
+      - LOCAL_DOMAIN=localhost:${API_PORT:?}
+      - DOCKER_DOMAIN=gateway:80
+    ports:
+      - ${API_PORT:?}:80
+    depends_on:
+      - gateway
+    networks:
+      - service-network
+  compilation:
+    image: arduino-cli-compilation-server:latest
+    environment:
+      - WEBSOCKET_ENDPOINT=http://gateway:80/devices/websocket
+    networks:
+      - service-network
+    restart: on-failure
+  editor:
+    image: crosslab-editor:latest
+    ports:
+      - 3022:3022
+    networks:
+      - service-network
+    restart: on-failure
+  simavr:
+    image: simavr-server:latest
+    environment:
+      - WEBSOCKET_ENDPOINT=http://gateway:80/devices/websocket
+    networks:
+      - service-network
+    restart: on-failure
+  vpspu:
+    image: vpspu:latest
+    restart: on-failure
+    ports:
+      - 3024:80
+    networks:
+      - service-network
+  test-page:
+    image: test-page:latest
+    restart: on-failure
+    ports:
+      - 8081:80
+    networks:
+      - service-network
+    environment:
+      - API_URL=http://localhost:8080
+      - CODE_EDITOR_URL=http://localhost:3022
+      - COMPILER_URL=http://compilation:3021
+      - LANGUAGE_SERVER_URL=http://language-server:3025
+      - SIMULATION_URL=http://simavr:3023
+      - VPSPU_URL=http://localhost:3024
+      - USERNAME=admin
+      - PASSWORD=admin
+networks:
+  service-network:
+    driver: bridge

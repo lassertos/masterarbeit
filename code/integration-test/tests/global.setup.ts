@@ -1,5 +1,5 @@
 import { APIClient } from "@cross-lab-project/api-client";
-import test from "@playwright/test";
+import { test } from "@playwright/test";
 import assert from "assert";
 
 test.describe.serial("global setup", () => {
@@ -44,6 +44,11 @@ test.describe.serial("global setup", () => {
 
     await apiClient.login("admin", "admin");
 
+    for (const device of await apiClient.listDevices()) {
+      console.log("deleting device", device.url);
+      await apiClient.deleteDevice(device.url);
+    }
+
     await apiClient.createDevice({
       type: "cloud instantiable",
       name: "arduino-cli-compilation-server",
@@ -71,6 +76,12 @@ test.describe.serial("global setup", () => {
           serviceType: "http://localhost:8080/serviceTypes/compilation",
           supportedConnectionTypes: ["webrtc", "websocket"],
         },
+        {
+          serviceDirection: "prosumer",
+          serviceId: "gpios",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/electrical",
+          supportedConnectionTypes: ["webrtc", "websocket"],
+        },
       ],
     });
 
@@ -78,8 +89,56 @@ test.describe.serial("global setup", () => {
       type: "cloud instantiable",
       name: "simavr",
       isPublic: true,
-      codeUrl: "http://localhost:3023",
-      services: [],
+      instantiateUrl: "http://simavr:3023",
+      services: [
+        {
+          serviceDirection: "consumer",
+          serviceId: "program",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/file",
+          supportedConnectionTypes: ["websocket"],
+        },
+        {
+          serviceDirection: "prosumer",
+          serviceId: "gpios",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/electrical",
+          supportedConnectionTypes: ["websocket"],
+        },
+      ],
+    });
+
+    await apiClient.createDevice({
+      type: "edge instantiable",
+      name: "vpspu",
+      isPublic: true,
+      codeUrl: "http://localhost:3024",
+      services: [
+        {
+          serviceDirection: "prosumer",
+          serviceId: "sensors",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/electrical",
+          supportedConnectionTypes: ["webrtc", "websocket"],
+        },
+        {
+          serviceDirection: "prosumer",
+          serviceId: "actuators",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/electrical",
+          supportedConnectionTypes: ["webrtc", "websocket"],
+        },
+      ],
+    });
+
+    await apiClient.createDevice({
+      type: "device",
+      name: "test",
+      isPublic: true,
+      services: [
+        {
+          serviceDirection: "producer",
+          serviceId: "file",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/file",
+          supportedConnectionTypes: ["webrtc", "websocket"],
+        },
+      ],
     });
   });
 });

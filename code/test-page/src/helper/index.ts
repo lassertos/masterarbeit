@@ -1,0 +1,27 @@
+import codeEditor from "./code-editor.js";
+import compiler from "./compiler.js";
+import languageServer from "./language-server.js";
+import simulation from "./simulation.js";
+import vpspu from "./vpspu.js";
+
+export async function getDeviceUrl(
+  device:
+    | "code-editor"
+    | "compiler"
+    | "language-server"
+    | "simulation"
+    | "vpspu"
+) {
+  switch (device) {
+    case "code-editor":
+      return await codeEditor();
+    case "compiler":
+      return await compiler();
+    case "language-server":
+      return await languageServer();
+    case "simulation":
+      return await simulation();
+    case "vpspu":
+      return await vpspu();
+  }
+}

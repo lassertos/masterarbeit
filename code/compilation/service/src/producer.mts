@@ -4,7 +4,7 @@ import {
   Service,
   ServiceConfiguration,
   ServiceDirection,
-} from "@cross-lab-project/soa-client";
+} from "@crosslab-ide/soa-client";
 import { TypedEmitter } from "tiny-typed-emitter";
 import {
   IncomingMessage,
@@ -34,7 +34,7 @@ export class CompilationService__Producer
     CompilationProtocol,
     "server"
   >;
-  serviceType: string = "https://api.goldi-labs.de/service-types/compilation";
+  serviceType: string = "https://api.goldi-labs.de/serviceTypes/compilation";
   serviceId: string;
   serviceDirection: ServiceDirection = "producer";
 

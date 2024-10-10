@@ -1,4 +1,4 @@
-import { DeviceHandler } from "@cross-lab-project/soa-client";
+import { DeviceHandler } from "@crosslab-ide/soa-client";
 import { CompilationService__Producer } from "@crosslab-ide/crosslab-compilation-service";
 import { configuration } from "./configuration.mjs";
 import { ProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
@@ -8,6 +8,7 @@ import {
 } from "@crosslab-ide/compilation-messaging-protocol";
 import fs from "fs";
 import path from "path";
+import os from "os";
 import { execSync } from "child_process";
 
 export class ArduinoCliCompilationInstance {
@@ -45,6 +46,9 @@ export class ArduinoCliCompilationInstance {
       }
     );
     const token = await response.json();
+    // console.log("endpoint:", configuration.WEBSOCKET_ENDPOINT);
+    // console.log("id:", this._instanceUrl);
+    // console.log("token:", token);
     await this._deviceHandler.connect({
       endpoint: configuration.WEBSOCKET_ENDPOINT,
       id: this._instanceUrl,
@@ -58,20 +62,26 @@ export class ArduinoCliCompilationInstance {
       "compilation:request"
     >["content"]
   ) {
-    const directory = request.directory;
-    const tmpDirectoryPath = fs.mkdtempSync("compilation-");
-    const sourceDirectoryPath = path.join(
-      tmpDirectoryPath,
-      "source",
-      directory.name
+    console.log(
+      "handling compilation request!",
+      JSON.stringify(request, null, 4)
     );
+    const directory = request.directory;
+    const tmpDirectoryPath = fs.mkdtempSync(
+      path.join(os.tmpdir(), "compilation-")
+    );
+    const sourceDirectoryPath = path.join(tmpDirectoryPath, "source");
+    const projectDirectoryPath = path.join(sourceDirectoryPath, directory.name);
     const buildDirectoryPath = path.join(tmpDirectoryPath, "build");
 
-    this._recreateDirectory(directory, tmpDirectoryPath);
+    fs.mkdirSync(sourceDirectoryPath);
+    fs.mkdirSync(buildDirectoryPath);
+
+    this._recreateDirectory(directory, sourceDirectoryPath);
 
     try {
       const message = execSync(
-        `arduino-cli compile -b arduino:avr:mega ${sourceDirectoryPath} --build-path ${buildDirectoryPath}`,
+        `arduino-cli compile -b arduino:avr:mega ${projectDirectoryPath} --build-path ${buildDirectoryPath}`,
         { encoding: "utf-8", stdio: "pipe" }
       );
 
@@ -109,7 +119,7 @@ export class ArduinoCliCompilationInstance {
     const directoryPath = path.join(basePath, directory.name);
     fs.mkdirSync(directoryPath);
     for (const entry of directory.content) {
-      const entryPath = path.join(basePath, entry.name);
+      const entryPath = path.join(directoryPath, entry.name);
       if (entry.type === "directory") {
         this._recreateDirectory(entry, directoryPath);
       } else {

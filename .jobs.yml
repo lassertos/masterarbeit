@@ -20,7 +20,7 @@ crosslab-messaging-channel:
         execute: npm run build
       dependencies:
         - abstract-messaging-channel:build
-        - crosslab/clients/soa/js:build
+        - soa-client-js:build
     publish:
       helper-functions:
         before:
@@ -31,10 +31,10 @@ crosslab-messaging-channel:
         execute: npm unpublish -f; npm publish
       dependencies:
         - crosslab-messaging-channel:build
-        - crosslab/clients/soa/js:publish
+        - soa-client-js:publish
 
-electrical-connection-service-js:
-  path: code/shared/electrical-connection-service-js
+soa-client-js:
+  path: code/shared/soa-client-js
   jobs:
     build:
       commands:
@@ -49,8 +49,49 @@ electrical-connection-service-js:
       commands:
         execute: npm unpublish -f; npm publish
       dependencies:
+        - soa-client-js:build
+
+electrical-connection-service-js:
+  path: code/shared/electrical-connection-service-js
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - soa-client-js:build
+    publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
         - electrical-connection-service-js:build
-        - crosslab/clients/soa/js:publish
+        - soa-client-js:publish
+
+file-service-js:
+  path: code/shared/file-service-js
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - soa-client-js:build
+    publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - file-service-js:build
+        - soa-client-js:publish
 
 compilation-messaging-protocol:
   path: code/compilation/libraries/compilation-messaging-protocol
@@ -101,7 +142,7 @@ crosslab-compilation-service:
         execute: npm run build
       dependencies:
         - abstract-messaging-channel:publish
-        - crosslab/clients/soa/js:publish
+        - soa-client-js:publish
         - crosslab-messaging-channel:publish
         - compilation-messaging-protocol:publish
     publish:
@@ -124,7 +165,7 @@ crosslab-filesystem-service:
         execute: npm run build
       dependencies:
         - abstract-messaging-channel:publish
-        - crosslab/clients/soa/js:publish
+        - soa-client-js:publish
         - crosslab-messaging-channel:publish
         - filesystem-messaging-protocol:publish
       publish:
@@ -146,7 +187,7 @@ arduino-cli-compilation-server:
         prepare: npm ci
         execute: npm run build
       dependencies:
-        - crosslab/clients/soa/js:publish
+        - soa-client-js:publish
         - crosslab-compilation-service:publish
     build-docker:
       helper-functions:
@@ -166,6 +207,8 @@ simavr-node-addon:
       commands:
         prepare: npm ci
         execute: npm run build
+      exclude:
+        - build
     publish:
       helper-functions:
         before:
@@ -174,6 +217,8 @@ simavr-node-addon:
           - revert-package-lock
       commands:
         execute: npm unpublish -f; npm publish
+      exclude:
+        - build
       dependencies:
         - simavr-node-addon:build
 
@@ -185,9 +230,10 @@ simavr-server:
         prepare: npm ci
         execute: npm run build
       dependencies:
-        - crosslab/clients/soa/js:publish
+        - soa-client-js:publish
         - electrical-connection-service-js:publish
         - simavr-node-addon:publish
+        - file-service-js:publish
     build-docker:
       helper-functions:
         before:
@@ -207,7 +253,7 @@ crosslab-base-extension:
         prepare: npm ci
         execute: npm run package-web
       dependencies:
-        - crosslab/clients/soa/js:build
+        - soa-client-js:build
 
 crosslab-filesystem-extension:
   path: code/filesystem/extension
@@ -217,7 +263,7 @@ crosslab-filesystem-extension:
         prepare: npm ci
         execute: npm run package-web
       dependencies:
-        - crosslab/clients/soa/js:build
+        - soa-client-js:build
         - crosslab-filesystem-service:build
         - filesystem-messaging-protocol:build
 
@@ -233,7 +279,18 @@ crosslab-compilation-extension:
         - filesystem-messaging-protocol:build
         - crosslab-compilation-service:build
         - crosslab-filesystem-service:build
-        - crosslab/clients/soa/js:build
+        - soa-client-js:build
+
+crosslab-debugging-extension:
+  path: code/debugging/extension
+  jobs:
+    package:
+      commands:
+        prepare: npm ci
+        execute: npm run package-web
+      dependencies:
+        - electrical-connection-service-js:build
+        - soa-client-js:build
 
 crosslab-editor:
   path: code/editor
@@ -249,6 +306,7 @@ crosslab-editor:
         - crosslab-base-extension:package
         - crosslab-filesystem-extension:package
         - crosslab-compilation-extension:package
+        - crosslab-debugging-extension:package
     build-docker:
       commands:
         execute: docker build --network host -t crosslab-editor .
@@ -263,18 +321,54 @@ helper-gateway:
       commands:
         execute: docker build -t helper-gateway .
 
+vpspu:
+  path: code/vpspu
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - crosslab/clients/api/js:build
+        - soa-client-js:build
+        - electrical-connection-service-js:build
+    build-docker:
+      commands:
+        execute: docker build -t vpspu .
+      dependencies:
+        - vpspu:build
+
+test-page:
+  path: code/test-page
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - crosslab/clients/api/js:build
+    build-docker:
+      commands:
+        execute: docker build -t test-page .
+      dependencies:
+        - test-page:build
+        - integration-test:install-deps
+
 integration-test:
   path: code/integration-test
   jobs:
+    build-test-files-vpspu:
+      commands:
+        execute: arduino-cli compile -b arduino:avr:mega -e tests/test-files/vpspu
+      include: ["tests/test-files/vpspu"]
+      exclude: ["tests/test-files/vpspu/build"]
     install-deps:
       commands:
         prepare: npm ci
         execute: npx playwright install-deps
-    test:
-      commands:
-        execute: bash scripts/test.sh
+      include: [] 
       dependencies:
-        - integration-test:install-deps
+        - integration-test:build-test-files-vpspu
         - crosslab-editor:build-docker
         - arduino-cli-compilation-server:build-docker
         - crosslab/services/common:build
@@ -287,6 +381,13 @@ integration-test:
         - crosslab/services/forwarding:build-docker
         - crosslab/clients/api/js:build
         - helper-gateway:build-docker
+        - simavr-server:build-docker
+        - vpspu:build-docker
+    test:
+      commands:
+        execute: bash scripts/test.sh
+      dependencies:
+        - integration-test:install-deps
 
 ###############################################################################
 # CrossLab Jobs ###############################################################

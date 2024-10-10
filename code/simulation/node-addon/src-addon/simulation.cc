@@ -3,6 +3,7 @@
 #include <sim_elf.h>
 #include <avr_ioport.h>
 #include <thread>
+#include <chrono>
 #include <algorithm>
 #include <iostream>
 
@@ -22,6 +23,7 @@ Napi::Object Simulation::Init(Napi::Env env, Napi::Object exports)
 			InstanceMethod<&Simulation::getPinValue>("getPinValue", static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
 			InstanceMethod<&Simulation::listPins>("listPins", static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
 			InstanceMethod<&Simulation::registerPinCallback>("registerPinCallback", static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
+			InstanceAccessor<&Simulation::getStatus>("status"),
 		});
 
 	Napi::FunctionReference *constructor = new Napi::FunctionReference();
@@ -50,6 +52,7 @@ Simulation::Simulation(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Simula
 
 	Napi::String core = info[0].As<Napi::String>();
 
+	this->status = CREATED;
 	this->stop_thread = false;
 	this->avr = avr_make_mcu_by_name(core.Utf8Value().c_str());
 	if (!avr)
@@ -80,6 +83,8 @@ void Simulation::load(const Napi::CallbackInfo &info)
 	elf_read_firmware(elf_file_path.Utf8Value().c_str(), &elf_firmware);
 
 	avr_load_firmware(this->avr, &elf_firmware);
+
+	this->status = PROGRAMMED;
 }
 
 void run(avr_t *avr, bool *stop_thread, std::queue<pin_event> *pin_events)
@@ -103,12 +108,14 @@ void run(avr_t *avr, bool *stop_thread, std::queue<pin_event> *pin_events)
 
 void Simulation::start(const Napi::CallbackInfo &info)
 {
+	this->status = RUNNING;
 	this->stop_thread = false;
 	this->thread = std::thread(&run, this->avr, &this->stop_thread, &this->pin_events);
 }
 
 void Simulation::stop(const Napi::CallbackInfo &info)
 {
+	this->status = STOPPED;
 	this->stop_thread = true;
 	this->thread.join();
 	this->thread.~thread();
@@ -325,4 +332,18 @@ void Simulation::registerPinCallback(const Napi::CallbackInfo &info)
 		irq,
 		pin_changed_hook,
 		this);
+}
+
+Napi::Value Simulation::getStatus(const Napi::CallbackInfo &info)
+{
+	if (this->status == CREATED)
+		return Napi::String::New(info.Env(), "created");
+	if (this->status == PROGRAMMED)
+		return Napi::String::New(info.Env(), "programmed");
+	if (this->status == RUNNING)
+		return Napi::String::New(info.Env(), "running");
+	if (this->status == STOPPED)
+		return Napi::String::New(info.Env(), "stopped");
+
+	return info.Env().Null();
 }

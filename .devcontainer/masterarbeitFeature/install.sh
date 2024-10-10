@@ -86,3 +86,7 @@ cd simavr
 make install
 ldconfig
 cd ~ && rm -rf /tmp/simavr
+
+# install arduino-cli
+curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=/usr/local/bin sh
+arduino core install arduino:avr

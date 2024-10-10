@@ -4,7 +4,7 @@
   "description": "SOA-Service Electrical Connection",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rm -rf ./lib/* && tsc"
+    "build": "tsc"
   },
   "author": "Johannes Nau",
   "license": "UNLICENSED",
@@ -17,7 +17,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@cross-lab-project/soa-client": "file:../crosslab/soa/js",
+    "@crosslab-ide/soa-client": "file:../soa-client-js",
     "queue": "^7.0.0",
     "tiny-typed-emitter": "^2.1.0"
   }

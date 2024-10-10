@@ -16,9 +16,10 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "@cross-lab-project/soa-client": "file:../../crosslab/clients/soa/js",
-    "@crosslab-ide/soa-service-electrical": "file:../../shared/electrical-connection-service-js",
     "@crosslab-ide/simavr-node-addon": "file:../node-addon",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
+    "@crosslab-ide/soa-service-electrical": "file:../../shared/electrical-connection-service-js",
+    "@crosslab-ide/soa-service-file": "file:../../shared/file-service-js",
     "express": "^4.21.0"
   }
 }

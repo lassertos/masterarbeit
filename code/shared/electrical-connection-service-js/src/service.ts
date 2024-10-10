@@ -4,15 +4,15 @@ import {
   Prosumer,
   Service,
   ServiceConfiguration,
-} from '@cross-lab-project/soa-client';
-import Queue from 'queue';
-import { TypedEmitter } from 'tiny-typed-emitter';
+} from "@crosslab-ide/soa-client";
+import Queue from "queue";
+import { TypedEmitter } from "tiny-typed-emitter";
 
 import {
   ConnectionInterface,
   ConnectionInterfaceConfiguration,
   ConstructableConnectionInterface,
-} from './connectionInterface.js';
+} from "./connectionInterface.js";
 
 interface ConnectionInterfaceConfigurationUpstream
   extends ConnectionInterfaceConfiguration {
@@ -26,15 +26,16 @@ interface ElectricalServiceMessage {
   data: unknown;
 }
 
-type ServiceType = 'https://api.goldi-labs.de/serviceTypes/electrical';
-const ServiceType: ServiceType = 'https://api.goldi-labs.de/serviceTypes/electrical';
+type ServiceType = "https://api.goldi-labs.de/serviceTypes/electrical";
+const ServiceType: ServiceType =
+  "https://api.goldi-labs.de/serviceTypes/electrical";
 
 export interface ElectricalServiceConfiguration extends ServiceConfiguration {
   serviceType: ServiceType;
   interfaces: ConnectionInterfaceConfigurationUpstream[];
 }
 function checkConfig(
-  config: ServiceConfiguration,
+  config: ServiceConfiguration
 ): asserts config is ElectricalServiceConfiguration {
   if (config.serviceType !== ServiceType) {
     //throw Error("Service Configuration needs to be for electrical service type");
@@ -73,26 +74,28 @@ export class ElectricalConnectionService
 
   getMeta() {
     const interfaceDescriptions = Array.from(this.interfaceConstructors).map(
-      constructors => {
+      (constructors) => {
         return {
           ...constructors[1].getDescription(),
           interfaceType: constructors[1].interfaceType,
         };
-      },
+      }
     );
     return {
       serviceType: ServiceType,
       serviceId: this.serviceId,
       serviceDirection: this.serviceDirection,
-      supportedConnectionTypes: ['webrtc', 'websocket'],
+      supportedConnectionTypes: ["webrtc", "websocket"],
       interfaces: interfaceDescriptions,
     };
   }
 
-  addInterface(electricalInterfaceConstructor: ConstructableConnectionInterface): void {
+  addInterface(
+    electricalInterfaceConstructor: ConstructableConnectionInterface
+  ): void {
     this.interfaceConstructors.set(
       electricalInterfaceConstructor.interfaceType,
-      electricalInterfaceConstructor,
+      electricalInterfaceConstructor
     );
   }
 
@@ -102,7 +105,10 @@ export class ElectricalConnectionService
     }
   }
 
-  setupConnection(connection: PeerConnection, serviceConfig: ServiceConfiguration): void {
+  setupConnection(
+    connection: PeerConnection,
+    serviceConfig: ServiceConfiguration
+  ): void {
     checkConfig(serviceConfig);
 
     const channel = new DataChannel();
@@ -113,21 +119,24 @@ export class ElectricalConnectionService
 
     for (const interfaceConfig of serviceConfig.interfaces) {
       // find interface or create a new interface
-      let electricalInterface = this.interfaces.get(interfaceConfig.interfaceId);
+      let electricalInterface = this.interfaces.get(
+        interfaceConfig.interfaceId
+      );
       if (electricalInterface === undefined) {
         const electricalInterfaceConstructor = this.interfaceConstructors.get(
-          interfaceConfig.interfaceType,
+          interfaceConfig.interfaceType
         );
         if (electricalInterfaceConstructor === undefined) {
-          throw Error('No Interface for the interface config was found');
+          throw Error("No Interface for the interface config was found");
         }
-        electricalInterface = electricalInterfaceConstructor.create(interfaceConfig);
+        electricalInterface =
+          electricalInterfaceConstructor.create(interfaceConfig);
         this.interfaces.set(interfaceConfig.interfaceId, electricalInterface);
-        this.emit('newInterface', { connectionInterface: electricalInterface });
+        this.emit("newInterface", { connectionInterface: electricalInterface });
       }
 
       // set event handlers
-      electricalInterface.on('upstreamData', async data => {
+      electricalInterface.on("upstreamData", async (data) => {
         const packet: ElectricalServiceMessage = {
           busId: interfaceConfig.busId,
           data,
@@ -158,9 +167,9 @@ export class ElectricalConnectionService
     }
 
     if (connection.tiebreaker) {
-      connection.transmit(serviceConfig, 'data', channel);
+      connection.transmit(serviceConfig, "data", channel);
     } else {
-      connection.receive(serviceConfig, 'data', channel);
+      connection.receive(serviceConfig, "data", channel);
     }
   }
 
@@ -171,7 +180,7 @@ export class ElectricalConnectionService
   }
 
   handleData(data: string | Blob | ArrayBuffer | ArrayBufferView): void {
-    if (typeof data === 'string') {
+    if (typeof data === "string") {
       const message: ElectricalServiceMessage = JSON.parse(data);
       const electricalInterfaceIds = this.interfacesByBusId.get(message.busId);
       if (electricalInterfaceIds === undefined) {
@@ -180,12 +189,12 @@ export class ElectricalConnectionService
       for (const electricalInterfaceId of electricalInterfaceIds) {
         const electricalInterface = this.interfaces.get(electricalInterfaceId);
         if (electricalInterface === undefined) {
-          throw Error('ElectricalInterface not found');
+          throw Error("ElectricalInterface not found");
         }
         electricalInterface.downstreamData(message.data);
       }
     } else {
-      throw Error('Data is not a string');
+      throw Error("Data is not a string");
     }
   }
 }

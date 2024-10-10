@@ -1,4 +1,4 @@
-import { DeviceHandler } from "@cross-lab-project/soa-client";
+import { DeviceHandler } from "@crosslab-ide/soa-client";
 import { APIClient } from "@cross-lab-project/api-client";
 import * as vscode from "vscode";
 
@@ -72,7 +72,7 @@ export async function activate(context: vscode.ExtensionContext) {
   console.log("crosslab services initialized successfully!");
   console.log(deviceHandler.getServiceMeta());
 
-  statusBarItem.text = "CrossLab: waiting";
+  statusBarItem.text = "CrossLab Experiment: waiting";
 
   if (instanceUrl && deviceToken) {
     const baseUrl = instanceUrl.slice(0, instanceUrl.indexOf("/devices"));
@@ -82,7 +82,7 @@ export async function activate(context: vscode.ExtensionContext) {
       const token = await apiClient.createWebsocketToken(instanceUrl);
       console.log(token);
 
-      statusBarItem.text = "CrossLab: connecting";
+      statusBarItem.text = "CrossLab Experiment: connecting";
 
       await deviceHandler.connect({
         endpoint: baseUrl + "/devices/websocket",
