@@ -11,19 +11,9 @@ WORKDIR /tmp/build/vscode
 RUN yarn
 RUN yarn gulp vscode-web-min
 
-FROM node:lts-bookworm
+FROM nginx
 
-ENV NODE_ENV=production
-
-WORKDIR /app
-
-COPY dist ./dist
-COPY package.json .
-COPY package-lock.json .
-COPY public ./public
-
-RUN npm ci --omit=dev
-
-COPY --from=build /tmp/build/vscode-web ./public/vscode-web
-
-ENTRYPOINT [ "node", "dist/index.mjs" ]
+COPY --from=build /tmp/build/vscode /tmp/vscode
+COPY public /usr/share/nginx/html
+COPY --from=build /tmp/build/vscode-web /usr/share/nginx/html/vscode-web
+COPY default.conf.template /etc/nginx/templates/

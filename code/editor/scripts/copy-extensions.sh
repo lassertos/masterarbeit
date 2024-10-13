@@ -7,6 +7,7 @@ cp -r ../base/extension/dist public/extensions/base/dist
 cp ../base/extension/package.json public/extensions/base
 
 mkdir public/extensions/filesystem
+cp -r ../filesystem/extension/src public/extensions/filesystem/src
 cp -r ../filesystem/extension/dist public/extensions/filesystem/dist
 cp ../filesystem/extension/package.json public/extensions/filesystem
 

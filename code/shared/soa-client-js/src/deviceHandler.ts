@@ -65,7 +65,6 @@ export class DeviceHandler extends TypedEmitter<DeviceHandlerEvents> {
         const authenticationMessage = JSON.parse(
           authenticationEvent.data as string
         );
-        console.log(JSON.stringify(authenticationMessage, null, 4));
         if (authenticationMessage.messageType === "authenticate") {
           if (authenticationMessage.authenticated) {
             resolve();
@@ -96,7 +95,6 @@ export class DeviceHandler extends TypedEmitter<DeviceHandlerEvents> {
 
     this.ws.onmessage = (event) => {
       const message = JSON.parse(event.data as string);
-      console.log(JSON.stringify(message, null, 4));
 
       if (isCommandMessage(message)) {
         if (isCreatePeerConnectionMessage(message)) {
@@ -129,7 +127,6 @@ export class DeviceHandler extends TypedEmitter<DeviceHandlerEvents> {
         "Can not create a connection. Connection Id is already present"
       );
     }
-    console.log(JSON.stringify(message, null, 4));
 
     if (message.connectionType === "local" && !this.bufferedLocalConnection) {
       this.bufferedLocalConnection = message;

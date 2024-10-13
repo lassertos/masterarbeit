@@ -33,14 +33,14 @@ test("simple experiment", async ({ page, browserName }) => {
     roles: [{ name: "server" }, { name: "client" }],
     serviceConfigurations: [
       {
-        serviceType: "http://localhost:8080/serviceTypes/compilation",
+        serviceType: "https://api.goldi-labs.de/serviceTypes/compilation",
         participants: [
           { role: "server", serviceId: "compilation", config: {} },
           { role: "client", serviceId: "compilation", config: {} },
         ],
       },
       {
-        serviceType: "http://localhost:8080/serviceTypes/filesystem",
+        serviceType: "https://api.goldi-labs.de/serviceTypes/filesystem",
         participants: [
           {
             role: "client",

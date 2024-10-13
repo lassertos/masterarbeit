@@ -1,0 +1,14 @@
+{
+  "name": "@crosslab-ide/editor-settings",
+  "version": "0.0.1",
+  "description": "A helper library for writing and reading editor settings in indexeddb.",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

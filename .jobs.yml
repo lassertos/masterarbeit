@@ -51,6 +51,14 @@ soa-client-js:
       dependencies:
         - soa-client-js:build
 
+editor-settings:
+  path: code/shared/editor-settings
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+
 electrical-connection-service-js:
   path: code/shared/electrical-connection-service-js
   jobs:
@@ -254,6 +262,7 @@ crosslab-base-extension:
         execute: npm run package-web
       dependencies:
         - soa-client-js:build
+        - editor-settings:build
 
 crosslab-filesystem-extension:
   path: code/filesystem/extension
@@ -266,6 +275,7 @@ crosslab-filesystem-extension:
         - soa-client-js:build
         - crosslab-filesystem-service:build
         - filesystem-messaging-protocol:build
+        - editor-settings:build
 
 crosslab-compilation-extension:
   path: code/compilation/extension
@@ -365,7 +375,7 @@ integration-test:
     install-deps:
       commands:
         prepare: npm ci
-        execute: npx playwright install-deps
+        execute: npx playwright install --with-deps
       include: [] 
       dependencies:
         - integration-test:build-test-files-vpspu

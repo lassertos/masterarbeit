@@ -58,7 +58,7 @@ test.describe.serial("global setup", () => {
         {
           serviceDirection: "producer",
           serviceId: "compilation",
-          serviceType: "http://localhost:8080/serviceTypes/compilation",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/compilation",
           supportedConnectionTypes: ["websocket"],
         },
       ],
@@ -73,7 +73,7 @@ test.describe.serial("global setup", () => {
         {
           serviceDirection: "consumer",
           serviceId: "compilation",
-          serviceType: "http://localhost:8080/serviceTypes/compilation",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/compilation",
           supportedConnectionTypes: ["webrtc", "websocket"],
         },
         {
@@ -81,6 +81,18 @@ test.describe.serial("global setup", () => {
           serviceId: "gpios",
           serviceType: "https://api.goldi-labs.de/serviceTypes/electrical",
           supportedConnectionTypes: ["webrtc", "websocket"],
+        },
+        {
+          serviceDirection: "producer",
+          serviceId: "filesystem",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/filesystem",
+          supportedConnectionTypes: ["websocket", "webrtc"],
+        },
+        {
+          serviceDirection: "consumer",
+          serviceId: "compilation:filesystem",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/filesystem",
+          supportedConnectionTypes: ["websocket", "webrtc"],
         },
       ],
     });

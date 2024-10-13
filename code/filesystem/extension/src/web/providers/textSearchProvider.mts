@@ -21,12 +21,31 @@ export class CrossLabTextSearchProvider implements vscode.TextSearchProvider {
     progress: vscode.Progress<vscode.TextSearchResult>,
     token: vscode.CancellationToken
   ): Promise<vscode.TextSearchComplete> {
-    const files = (await this.fs.getAllFiles()).map((file) => {
-      return {
-        uri: vscode.Uri.from({ scheme: "crosslabfs", path: file.path }),
-        content: new TextDecoder().decode(file.file.data),
-      };
-    });
+    const files = (await this.fs.getAllFiles())
+      .filter((file) =>
+        file.path.startsWith(
+          this.fs.currentProject
+            ? `/projects/${this.fs.currentProject}/`
+            : `/workspace/`
+        )
+      )
+      .map((file) => {
+        return {
+          ...file,
+          path: this.fs.currentProject
+            ? file.path.replace(
+                `/projects/${this.fs.currentProject}/`,
+                "/workspace/"
+              )
+            : file.path,
+        };
+      })
+      .map((file) => {
+        return {
+          uri: vscode.Uri.from({ scheme: "crosslabfs", path: file.path }),
+          content: new TextDecoder().decode(file.file.data),
+        };
+      });
 
     const results = [];
     for (const file of files) {

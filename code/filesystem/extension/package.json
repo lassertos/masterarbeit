@@ -21,16 +21,72 @@
   "contributes": {
     "commands": [
       {
-        "command": "crosslab-filesystem-extension.workspaceInit",
-        "title": "Setup Workspace",
-        "category": "CrossLab-Filesystem"
+        "command": "projects.view.createProject",
+        "title": "Create Project",
+        "icon": "$(new-folder)"
+      },
+      {
+        "command": "projects.view.openProject",
+        "title": "Open Project",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "projects.view.renameProject",
+        "title": "Rename Project",
+        "icon": "$(pencil)"
+      },
+      {
+        "command": "projects.view.deleteProject",
+        "title": "Delete Project",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "filesExplorer.copy",
+        "title": "Delete Project",
+        "icon": "$(trash)"
       }
     ],
     "menus": {
-      "commandPalette": [
+      "view/title": [
         {
-          "command": "crosslab-filesystem-extension.workspaceInit",
-          "when": "workbenchState != folder && workbenchState != workspace"
+          "command": "projects.view.createProject",
+          "when": "view == projects.view",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "projects.view.openProject",
+          "when": "view == projects.view && viewItem == project",
+          "group": "inline@1"
+        },
+        {
+          "command": "projects.view.renameProject",
+          "when": "view == projects.view && viewItem == project",
+          "group": "inline@2"
+        },
+        {
+          "command": "projects.view.deleteProject",
+          "when": "view == projects.view && viewItem == project",
+          "group": "inline@3"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "projects",
+          "title": "Projects",
+          "icon": "$(file-directory)"
+        }
+      ]
+    },
+    "views": {
+      "projects": [
+        {
+          "type": "tree",
+          "id": "projects.view",
+          "name": "Projects"
         }
       ]
     }
@@ -43,10 +99,10 @@
     "watch-web": "npm-run-all -p watch-web:*",
     "watch-web:esbuild": "node esbuild.js --watch",
     "watch-web:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package-web": "npm run check-types && npm run lint && node esbuild.js --production",
+    "package-web": "rm -rf dist && npm run check-types && npm run lint && node esbuild.js",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
+    "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --folder-uri=crosslabfs:/workspace"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
@@ -67,13 +123,16 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
+    "@crosslab-ide/abstract-messaging-channel": "file:../../shared/abstract-messaging-channel",
     "@crosslab-ide/crosslab-filesystem-service": "file:../service",
+    "@crosslab-ide/editor-settings": "file:../../shared/editor-settings",
     "@crosslab-ide/filesystem-messaging-protocol": "file:../libraries/filesystem-messaging-protocol",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@types/uuid": "^10.0.0",
     "diff": "^7.0.0",
     "esbuild-plugin-polyfill-node": "^0.3.0",
     "fuse.js": "^7.0.0",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "vscode-uri": "^3.0.8"
   }
 }

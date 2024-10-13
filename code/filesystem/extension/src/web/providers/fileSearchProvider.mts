@@ -21,12 +21,31 @@ export class CrossLabFileSearchProvider implements FileSearchProvider {
     options: FileSearchOptions,
     token: CancellationToken
   ): ProviderResult<Uri[]> {
-    const fuse = new Fuse(this.fs.getAllFilePaths(), {
-      ignoreLocation: true,
-    });
+    const fuse = new Fuse(
+      this.fs
+        .getAllFilePaths()
+        .filter((path) =>
+          path.startsWith(
+            this.fs.currentProject
+              ? `/projects/${this.fs.currentProject}/`
+              : `/workspace/`
+          )
+        )
+        .map((path) =>
+          this.fs.currentProject
+            ? path.replace(
+                `/projects/${this.fs.currentProject}/`,
+                "/workspace/"
+              )
+            : path
+        ),
+      {
+        ignoreLocation: true,
+      }
+    );
 
     const results = fuse.search(
-      query.pattern,
+      "/workspace/" + query.pattern,
       options.maxResults ? { limit: options.maxResults } : undefined
     );
 

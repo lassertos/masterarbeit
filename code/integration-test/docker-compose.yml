@@ -164,7 +164,7 @@ services:
   editor:
     image: crosslab-editor:latest
     ports:
-      - 3022:3022
+      - 3022:80
     networks:
       - service-network
     restart: on-failure
