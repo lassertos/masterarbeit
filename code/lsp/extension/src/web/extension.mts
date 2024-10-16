@@ -9,7 +9,6 @@ import {
   MessageService__Producer,
 } from "@crosslab-ide/soa-service-message";
 import path from "path";
-import { stringify } from "querystring";
 
 let client: LanguageClient | undefined;
 // this method is called when vs code is activated

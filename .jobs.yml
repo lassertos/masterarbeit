@@ -314,6 +314,8 @@ crosslab-lsp-extension:
       commands:
         prepare: npm ci
         execute: npm run package-web
+      dependencies:
+        - message-service-js:publish
 
 crosslab-filesystem-extension:
   path: code/filesystem/extension
@@ -414,23 +416,7 @@ test-page:
         execute: docker build -t test-page .
       dependencies:
         - test-page:build
-        - integration-test:install-deps
-
-integration-test:
-  path: code/integration-test
-  jobs:
-    build-test-files-vpspu:
-      commands:
-        execute: arduino-cli compile -b arduino:avr:mega -e tests/test-files/vpspu
-      include: ["tests/test-files/vpspu"]
-      exclude: ["tests/test-files/vpspu/build"]
-    install-deps:
-      commands:
-        prepare: npm ci
-        execute: npx playwright install --with-deps
-      include: [] 
-      dependencies:
-        - integration-test:build-test-files-vpspu
+        - arduino-language-server:build-docker
         - crosslab-editor:build-docker
         - arduino-cli-compilation-server:build-docker
         - crosslab/services/common:build
@@ -445,11 +431,41 @@ integration-test:
         - helper-gateway:build-docker
         - simavr-server:build-docker
         - vpspu:build-docker
+
+integration-test:
+  path: code/integration-test
+  jobs:
+    build-test-files-vpspu:
+      commands:
+        execute: arduino-cli compile -b arduino:avr:mega -e tests/test-files/vpspu
+      include: ["tests/test-files/vpspu"]
+      exclude: ["tests/test-files/vpspu/build"]
+    install-deps:
+      commands:
+        prepare: npm ci
+        execute: npx playwright install --with-deps
+      include: []
     test:
       commands:
         execute: bash scripts/test.sh
       dependencies:
         - integration-test:install-deps
+        - test-page:build
+        - arduino-language-server:build-docker
+        - crosslab-editor:build-docker
+        - arduino-cli-compilation-server:build-docker
+        - crosslab/services/common:build
+        - crosslab/services/auth:build-docker
+        - crosslab/services/authorization:build-docker
+        - crosslab/services/device:build-docker
+        - crosslab/services/experiment:build-docker
+        - crosslab/services/federation:build-docker
+        - crosslab/services/gateway:build-docker
+        - crosslab/services/forwarding:build-docker
+        - crosslab/clients/api/js:build
+        - helper-gateway:build-docker
+        - simavr-server:build-docker
+        - vpspu:build-docker
 
 ###############################################################################
 # CrossLab Jobs ###############################################################

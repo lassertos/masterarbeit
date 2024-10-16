@@ -76,16 +76,14 @@ export async function getSelectedUris(
   await vscode.env.clipboard.writeText(savedClipboard);
 
   return paths.split("\n").map((path) => {
-    const updatedPath =
-      path === "."
-        ? fileSystemProvider.currentProject
-          ? `/projects/${fileSystemProvider.currentProject}`
-          : "/workspace"
-        : path;
+    const replacement = fileSystemProvider.currentProject
+      ? `/projects/${fileSystemProvider.currentProject}`
+      : "/workspace";
+    const updatedPath = path === "." ? replacement : path;
     return fileSystemProvider.updateUri(
       vscode.Uri.from({
         scheme: "crosslabfs",
-        path: updatedPath.replace(/\\/g, "/"),
+        path: updatedPath.replace(/\\/g, "/").replace("~", replacement),
       })
     );
   });

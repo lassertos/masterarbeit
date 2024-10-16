@@ -102,7 +102,7 @@
     "package-web": "rm -rf dist && npm run check-types && npm run lint && node esbuild.js",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --folder-uri=crosslabfs:/workspace"
+    "run-in-browser": "npm run package-web && vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --folder-uri=crosslabfs:/workspace"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
