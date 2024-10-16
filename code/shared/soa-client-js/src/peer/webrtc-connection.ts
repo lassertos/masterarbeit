@@ -309,6 +309,7 @@ export class WebRTCPeerConnection
   teardown(): void {
     this.pc.close();
     if (this.state != "closed") {
+      console.log("tearing down webrtc connection!");
       this.state = "closed";
       this.emit("connectionChanged");
     }

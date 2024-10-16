@@ -15,22 +15,11 @@
   "contributes": {
     "commands": [
       {
-        "command": "crosslab-compilation-extension.helloWorld",
-        "title": "Hello World"
-      },
-      {
         "command": "crosslab-compilation-extension.compile",
         "title": "Compile",
         "icon": "$(run)",
         "shortTitle": "compile",
-        "enablement": "workbenchState == folder"
-      },
-      {
-        "command": "crosslab-compilation-extension.upload",
-        "title": "Upload",
-        "icon": "$(cloud-upload)",
-        "shortTitle": "upload",
-        "enablement": "workbenchState == folder"
+        "enablement": "workbenchState == folder && !crosslab.isCompiling"
       }
     ],
     "menus": {
@@ -72,11 +61,12 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@crosslab-ide/compilation-messaging-protocol": "file:../libraries/compilation-messaging-protocol",
     "@crosslab-ide/crosslab-compilation-service": "file:../service",
     "@crosslab-ide/crosslab-filesystem-service": "file:../../filesystem/service",
     "@crosslab-ide/filesystem-messaging-protocol": "file:../../filesystem/libraries/filesystem-messaging-protocol",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
+    "@crosslab-ide/soa-service-file": "file:../../shared/file-service-js",
     "@koa/router": "^13.0.0",
     "esbuild-plugin-polyfill-node": "^0.3.0"
   }

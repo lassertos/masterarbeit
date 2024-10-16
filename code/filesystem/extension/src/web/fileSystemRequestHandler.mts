@@ -127,14 +127,14 @@ export class FileSystemRequestHandler {
   private async _handleReadDirectoryRequest(
     request: ProtocolMessage<FileSystemProtocol, "readDirectory:request">
   ): Promise<ProtocolMessage<FileSystemProtocol, "readDirectory:response">> {
-    const content = await this._readDirectory(request.content.path);
+    const directory = await this._readDirectory(request.content.path);
 
     return {
       type: "readDirectory:response",
       content: {
         requestId: request.content.requestId,
         success: true,
-        content,
+        directory,
       },
     };
   }
@@ -154,7 +154,11 @@ export class FileSystemRequestHandler {
       content: {
         requestId: request.content.requestId,
         success: true,
-        content: new TextDecoder().decode(content),
+        file: {
+          name: path.basename(request.content.path),
+          type: "file",
+          content: content,
+        },
       },
     };
   }
@@ -216,11 +220,13 @@ export class FileSystemRequestHandler {
     };
   }
 
-  private async _readDirectory(
-    directoryPath: string
-  ): Promise<Directory["content"]> {
+  private async _readDirectory(directoryPath: string): Promise<Directory> {
     const uri = vscode.Uri.from({ scheme: "crosslabfs", path: directoryPath });
-    const content: Directory["content"] = [];
+    const directory: Directory = {
+      name: path.basename(directoryPath),
+      type: "directory",
+      content: [],
+    };
     const entries = await vscode.workspace.fs.readDirectory(uri);
 
     for (const entry of entries) {
@@ -228,30 +234,24 @@ export class FileSystemRequestHandler {
         case vscode.FileType.Unknown:
           break;
         case vscode.FileType.File:
-          content.push({
+          directory.content.push({
             type: "file",
             name: entry[0],
-            content: new TextDecoder().decode(
-              await vscode.workspace.fs.readFile(
-                vscode.Uri.joinPath(uri, entry[0])
-              )
+            content: await vscode.workspace.fs.readFile(
+              vscode.Uri.joinPath(uri, entry[0])
             ),
           });
           break;
         case vscode.FileType.Directory:
-          content.push({
-            type: "directory",
-            name: entry[0],
-            content: await this._readDirectory(
-              path.join(directoryPath, entry[0])
-            ),
-          });
+          directory.content.push(
+            await this._readDirectory(path.join(directoryPath, entry[0]))
+          );
           break;
         case vscode.FileType.SymbolicLink:
           break;
       }
     }
 
-    return content;
+    return directory;
   }
 }

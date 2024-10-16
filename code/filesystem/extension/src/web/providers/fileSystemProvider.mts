@@ -20,6 +20,7 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
   private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
   private indexeddbHandler = new IndexedDBHandler();
   private _currentProject: string | null = null;
+  private _projectChangedHandlers: ((project: vscode.Uri) => void)[] = [];
   public copied: vscode.Uri[] = [];
   public isCutting: boolean = false;
 
@@ -265,15 +266,29 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
     return this.indexeddbHandler.getAllDirectoryPaths();
   }
 
+  addProjectChangedHandler(handler: (project: vscode.Uri) => void) {
+    this._projectChangedHandlers.push(handler);
+  }
+
   async setProject(project: string | null) {
-    this._currentProject = project;
-    const settingsDatabase = await openSettingsDatabase();
-    await writeSetting(
-      settingsDatabase,
-      "crosslab.current-project",
-      project ? project : ""
-    );
-    vscode.commands.executeCommand("workbench.action.closeAllEditors");
+    if (project !== this._currentProject) {
+      for (const handler of this._projectChangedHandlers) {
+        handler(
+          vscode.Uri.from({
+            scheme: "crosslabfs",
+            path: project ? `/projects/${project}` : "/workspace",
+          })
+        );
+      }
+      this._currentProject = project;
+      const settingsDatabase = await openSettingsDatabase();
+      await writeSetting(
+        settingsDatabase,
+        "crosslab.current-project",
+        project ? project : ""
+      );
+      vscode.commands.executeCommand("workbench.action.closeAllEditors");
+    }
     vscode.commands.executeCommand(
       "workbench.files.action.refreshFilesExplorer"
     );

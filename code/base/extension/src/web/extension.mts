@@ -67,7 +67,9 @@ export async function activate(context: vscode.ExtensionContext) {
       extension.id.startsWith("crosslab") &&
       extension.id !== context.extension.id
     ) {
-      const api = await extension.activate();
+      const api = extension.isActive
+        ? extension.exports
+        : await extension.activate();
       if (api && api.addServices) {
         api.addServices(deviceHandler);
       }

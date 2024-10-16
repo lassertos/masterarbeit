@@ -101,6 +101,27 @@ file-service-js:
         - file-service-js:build
         - soa-client-js:publish
 
+message-service-js:
+  path: code/shared/message-service-js
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - soa-client-js:build
+    publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - message-service-js:build
+        - soa-client-js:publish
+
 compilation-messaging-protocol:
   path: code/compilation/libraries/compilation-messaging-protocol
   jobs:
@@ -176,16 +197,16 @@ crosslab-filesystem-service:
         - soa-client-js:publish
         - crosslab-messaging-channel:publish
         - filesystem-messaging-protocol:publish
-      publish:
-        helper-functions:
-          before:
-            - update-package-lock
-          after:
-            - revert-package-lock
-        commands:
-          execute: npm unpublish -f; npm publish
-        dependencies:
-          - crosslab-filesystem-service:build
+    publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - crosslab-filesystem-service:build
 
 arduino-cli-compilation-server:
   path: code/compilation/implementations/arduino-cli
@@ -207,6 +228,28 @@ arduino-cli-compilation-server:
         execute: docker build --network host -t arduino-cli-compilation-server .
       dependencies:
         - arduino-cli-compilation-server:build
+
+arduino-language-server:
+  path: code/lsp/implementations/arduino
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - soa-client-js:publish
+        - file-service-js:publish
+        - message-service-js:publish
+    build-docker:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: docker build --network host -t arduino-language-server .
+      dependencies:
+        - arduino-language-server:build
 
 simavr-node-addon:
   path: code/simulation/node-addon
@@ -264,6 +307,14 @@ crosslab-base-extension:
         - soa-client-js:build
         - editor-settings:build
 
+crosslab-lsp-extension:
+  path: code/lsp/extension
+  jobs:
+    package:
+      commands:
+        prepare: npm ci
+        execute: npm run package-web
+
 crosslab-filesystem-extension:
   path: code/filesystem/extension
   jobs:
@@ -314,6 +365,7 @@ crosslab-editor:
         execute: bash scripts/copy-extensions.sh
       dependencies:
         - crosslab-base-extension:package
+        - crosslab-lsp-extension:package
         - crosslab-filesystem-extension:package
         - crosslab-compilation-extension:package
         - crosslab-debugging-extension:package

@@ -1,0 +1,21 @@
+{
+  "name": "@crosslab-ide/arduino-cli-language-server",
+  "version": "0.0.1",
+  "description": "An arduino-cli language server.",
+  "main": "dist/index.mjs",
+  "dependencies": {
+    "express": "^4.21.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/typescript": "^0.4.29",
+    "@types/ws": "^8.5.12",
+    "typescript": "^5.6.3"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT"
+}

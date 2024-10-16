@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
 import { CompilationService__Consumer } from "@crosslab-ide/crosslab-compilation-service";
 import { FileSystemService__Consumer } from "@crosslab-ide/crosslab-filesystem-service";
-import { Directory } from "@crosslab-ide/filesystem-messaging-protocol";
+import { FileService__Producer } from "@crosslab-ide/soa-service-file";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log(
@@ -14,11 +14,18 @@ export function activate(context: vscode.ExtensionContext) {
   const compilationService__Consumer = new CompilationService__Consumer(
     "compilation"
   );
+  const fileService__Producer = new FileService__Producer("compilation:file");
+
+  const outputchannel = vscode.window.createOutputChannel("compilation");
 
   const compileDisposable = vscode.commands.registerCommand(
     "crosslab-compilation-extension.compile",
     async () => {
-      vscode.window.showInformationMessage("Trying to compile!");
+      await vscode.commands.executeCommand(
+        "setContext",
+        "crosslab.isCompiling",
+        true
+      );
 
       const workspaceFolder =
         Array.isArray(vscode.workspace.workspaceFolders) &&
@@ -33,78 +40,45 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      console.log(workspaceFolder);
-
-      const directory: Directory = {
-        type: "directory",
-        name: workspaceFolder.name,
-        content: await fileSystemService__Consumer.readDirectory(
-          workspaceFolder.uri.path
-        ),
-      };
-
-      console.log(JSON.stringify(directory, null, 4));
-
-      const result = await compilationService__Consumer.compile(
-        directory.content[0] as Directory
+      const directory = await fileSystemService__Consumer.readDirectory(
+        workspaceFolder.uri.path
       );
-
-      await fileSystemService__Consumer.writeFile(
-        "/projects/compilation-result.txt",
-        result.success
-          ? result.result
-          : result.message ?? "Something went wrong during the compilation!"
-      );
-    }
-  );
-
-  const uploadDisposable = vscode.commands.registerCommand(
-    "crosslab-compilation-extension.upload",
-    async () => {
-      vscode.window.showInformationMessage("Trying to upload!");
-
-      const workspaceFolder =
-        Array.isArray(vscode.workspace.workspaceFolders) &&
-        vscode.workspace.workspaceFolders.length > 0
-          ? (vscode.workspace.workspaceFolders[0] as vscode.WorkspaceFolder)
-          : undefined;
-
-      if (!workspaceFolder) {
-        vscode.window.showInformationMessage(
-          "Unable to compile since no workspace folder is open!"
-        );
-        return;
-      }
-
-      const directory: Directory = {
-        type: "directory",
-        name: workspaceFolder.name,
-        content: await fileSystemService__Consumer.readDirectory(
-          workspaceFolder.uri.path
-        ),
-      };
-
-      console.log(JSON.stringify(directory, null, 4));
 
       const result = await compilationService__Consumer.compile(directory);
 
-      await fileSystemService__Consumer.writeFile(
-        "/projects/compilation-result.txt",
+      outputchannel.clear();
+      await vscode.commands.executeCommand("workbench.panel.output.focus");
+      outputchannel.show();
+      outputchannel.appendLine("starting compilation!\n");
+
+      outputchannel.appendLine(
         result.success
-          ? result.result
+          ? result.message ?? "The compilation was successful!"
           : result.message ?? "Something went wrong during the compilation!"
+      );
+
+      if (result.success) {
+        outputchannel.appendLine("Uploading result!");
+        await fileService__Producer.sendFile("elf", result.result);
+        outputchannel.appendLine("Uploaded result!");
+      }
+
+      await vscode.commands.executeCommand(
+        "setContext",
+        "crosslab.isCompiling",
+        false
       );
     }
   );
 
   context.subscriptions.push(compileDisposable);
-  context.subscriptions.push(uploadDisposable);
 
   return {
     addServices: (deviceHandler: DeviceHandler) => {
       console.log("adding compilation services!");
       deviceHandler.addService(fileSystemService__Consumer);
       deviceHandler.addService(compilationService__Consumer);
+      deviceHandler.addService(fileService__Producer);
       console.log("added compilation services!");
     },
   };

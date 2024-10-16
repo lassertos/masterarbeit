@@ -5,7 +5,7 @@ import { MessagingProtocol } from "@crosslab-ide/abstract-messaging-channel";
 export const FileSchema = z.object({
   type: z.literal("file"),
   name: z.string(),
-  content: z.string(),
+  content: z.instanceof(Uint8Array),
 });
 export type File = z.infer<typeof FileSchema>;
 export function isFile(data: unknown): data is File {
@@ -46,7 +46,7 @@ export const compilationProtocol = {
         requestId: z.string(),
         success: z.literal(true),
         message: z.optional(z.string()),
-        result: z.string(),
+        result: z.instanceof(Uint8Array),
       }),
       z.object({
         requestId: z.string(),

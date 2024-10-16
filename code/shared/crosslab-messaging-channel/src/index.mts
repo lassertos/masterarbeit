@@ -6,6 +6,7 @@ import {
   OutgoingMessage,
   Role,
 } from "@crosslab-ide/abstract-messaging-channel";
+import { replacer, reviver } from "./util.mjs";
 
 export class CrossLabMessagingChannel<
   MP extends MessagingProtocol | undefined = undefined,
@@ -20,7 +21,7 @@ export class CrossLabMessagingChannel<
     this._channel.ondata = (data: unknown) => {
       console.log("received data", data);
       if (typeof data === "string") {
-        const message = JSON.parse(data);
+        const message = JSON.parse(data, reviver);
         console.log(message);
         console.log(
           protocol,
@@ -37,6 +38,6 @@ export class CrossLabMessagingChannel<
   }
 
   send(message: OutgoingMessage<MP, R>): Promise<void> | void {
-    this._channel.send(JSON.stringify(message));
+    this._channel.send(JSON.stringify(message, replacer));
   }
 }

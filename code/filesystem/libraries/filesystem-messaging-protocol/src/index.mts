@@ -5,7 +5,7 @@ import { z } from "zod";
 export const FileSchema = z.object({
   type: z.literal("file"),
   name: z.string(),
-  content: z.string(),
+  content: z.instanceof(Uint8Array),
 });
 export type File = z.infer<typeof FileSchema>;
 export function isFile(data: unknown): data is File {
@@ -125,7 +125,7 @@ export const fileSystemProtocol = {
       z.object({
         requestId: z.string(),
         success: z.literal(true),
-        content: z.array(z.union([DirectorySchema, FileSchema])),
+        directory: DirectorySchema,
       }),
       z.object({
         requestId: z.string(),
@@ -141,7 +141,7 @@ export const fileSystemProtocol = {
       z.object({
         requestId: z.string(),
         success: z.literal(true),
-        content: z.string(),
+        file: FileSchema,
       }),
       z.object({
         requestId: z.string(),
@@ -186,7 +186,7 @@ export const fileSystemProtocol = {
         type: z.literal("changed"),
         path: z.string(),
         newContent: z.union([
-          z.string(),
+          z.instanceof(Uint8Array),
           z.array(z.union([DirectorySchema, FileSchema])),
         ]),
       }),

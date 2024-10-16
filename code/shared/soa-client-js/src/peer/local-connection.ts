@@ -110,6 +110,7 @@ export class LocalPeerConnection
 
   teardown(): void {
     if (this.state !== "closed") {
+      console.log("tearing down local connection!");
       for (const key of this._channels.keys()) {
         this._channels.delete(key);
       }

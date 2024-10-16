@@ -2,6 +2,7 @@ const esbuild = require("esbuild");
 const glob = require("glob");
 const path = require("path");
 const polyfill = require("@esbuild-plugins/node-globals-polyfill");
+const polyfillNode = require("esbuild-plugin-polyfill-node");
 
 const production = process.argv.includes("--production");
 const watch = process.argv.includes("--watch");
@@ -65,6 +66,7 @@ async function main() {
   const ctx = await esbuild.context({
     entryPoints: [
       "src/web/extension.mts",
+      "src/web/server.mts",
       "src/web/test/suite/extensionTests.ts",
     ],
     bundle: true,
@@ -88,6 +90,11 @@ async function main() {
       }),
       testBundlePlugin,
       esbuildProblemMatcherPlugin /* add to the end of plugins array */,
+      polyfillNode.polyfillNode({
+        polyfills: {
+          path: true,
+        },
+      }),
     ],
   });
   if (watch) {

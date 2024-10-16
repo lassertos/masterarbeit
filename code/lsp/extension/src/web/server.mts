@@ -5,123 +5,97 @@ import {
   createConnection,
   Message,
   TextDocuments,
-} from "vscode-languageserver/browser";
-import { FileEventMessage } from "./types";
+} from "vscode-languageserver/browser.js";
 
 console.log("running server lsp-crosslab");
 
-class LanguageServerProvider {
-  private messageReader = new BrowserMessageReader(self);
-  private messageWriter = new BrowserMessageWriter(self);
-  private uriMapping: Map<string, string> = new Map();
-  private readonly uriRegex =
-    /(\w(\w|\d|[.+-])*:)(\/\/[^\/?#]*)?(\/[^?#"]+)(\?[^#"]+)?(#[^"]*)?/g;
-  private webSocket = new WebSocket("ws://localhost:3010");
-  private connection: ReturnType<typeof createConnection>;
-  private serverUriPrefix: string = "file://";
-  private openPromise: Promise<void>;
-
-  constructor() {
-    let resolve: () => void = () => {};
-    this.openPromise = new Promise<void>((_resolve) => {
-      resolve = _resolve;
-    });
-
-    this.registerWebSocketHandlers(resolve);
-
-    this.connection = createConnection(this.messageReader, this.messageWriter, {
-      messageStrategy: {
-        handleMessage: async (message) => {
-          await this.openPromise;
-          await this.handleMessage(message);
-        },
-      },
-    });
-
-    // Track open, change and close text document events
-    const documents = new TextDocuments(TextDocument);
-    documents.listen(this.connection);
-
-    this.connection.listen();
-  }
-
-  private registerWebSocketHandlers(resolve: () => void) {
-    this.webSocket.onclose = () => {
-      console.log(`webSocket connection has been closed`);
-    };
-    this.webSocket.onerror = () => {
-      console.error(`webSocket: An error has occurred!`);
-    };
-    this.webSocket.onmessage = (event) => {
-      const message = JSON.parse(event.data.toString());
-
-      if (message.type === "path") {
-        this.serverUriPrefix = `file://${message.path}`;
-        resolve();
-        return;
-      }
-
-      const data: string = message.data;
-
-      const uris = Array.from(data.match(this.uriRegex) ?? []);
-      let mappedMessageString = data;
-      for (const uri of uris) {
-        const mappedUri = this.uriMapping.get(uri);
-        if (!mappedUri) {
-          continue;
+new Promise<[string, MessagePort]>(
+  (resolve) =>
+    (self.onmessage = (event) => {
+      if (event.data.type === "init") {
+        if (event.ports.length > 0) {
+          resolve([event.data.data.projectName, event.ports[0]]);
         }
-        mappedMessageString = data.replace(uri, mappedUri);
+        self.onmessage = null;
       }
-      const mappedMessage = JSON.parse(mappedMessageString);
-      console.log(`incoming:`, mappedMessage);
-      this.messageWriter.write(mappedMessage);
-    };
-    this.webSocket.onopen = () => {
-      console.log("webSocket connection has been established!");
-    };
-  }
+    })
+).then(([projectName, port]) => {
+  const messageReader = new BrowserMessageReader(self);
+  const messageWriter = new BrowserMessageWriter(self);
 
-  private async handleMessage(message: Message) {
+  port.onmessage = (event) => {
+    console.log("sending command:", event.data);
+    webSocket.send(JSON.stringify(event.data));
+  };
+
+  let path = "";
+
+  const webSocket = new WebSocket("ws://localhost:3025");
+
+  webSocket.onclose = () => {
+    console.log(`webSocket connection has been closed`);
+  };
+
+  webSocket.onerror = () => {
+    console.error(`webSocket: An error has occurred!`);
+  };
+
+  webSocket.onmessage = (event) => {
+    const message = JSON.parse(event.data.toString());
+
+    console.log(message);
+
+    if (message.type === "path") {
+      port.postMessage(message.data);
+      path = message.data;
+      return;
+    }
+
+    const data = JSON.parse(message.data);
+
+    console.log(`incoming:`, data);
+    messageWriter.write(data);
+  };
+
+  webSocket.onopen = () => {
+    console.log("webSocket connection has been established!");
+  };
+
+  const connection = createConnection(messageReader, messageWriter, {
+    messageStrategy: {
+      handleMessage: async (message) => {
+        console.log("handling message!");
+        await handleMessage(message);
+      },
+    },
+  });
+
+  async function handleMessage(message: Message) {
+    console.log(message);
+    if ("method" in message && message.method === "initialize") {
+      console.log("updating initialize message");
+      (message as any).params.rootUri = `file://${path}/${projectName}`;
+      (
+        message as any
+      ).params.capabilities.workspace.semanticTokens.refreshSupport = false;
+      (
+        message as any
+      ).params.capabilities.workspace.didChangeWatchedFiles.dynamicRegistration =
+        false;
+      (
+        message as any
+      ).params.capabilities.workspace.didChangeWatchedFiles.relativePatternSupport =
+        false;
+    }
     const messageString = JSON.stringify(message);
-    const uris = Array.from(messageString.match(this.uriRegex) ?? []);
-    for (const uri of uris) {
-      if (!uri.startsWith("file:")) {
-        const mappedUri =
-          this.serverUriPrefix +
-          uri.slice(uri.indexOf(":") + 1).replace(/\/\/[^/]*\//, "/");
-        this.uriMapping.set(mappedUri, uri);
-        this.uriMapping.set(uri, mappedUri);
-      }
-    }
-    let mappedMessageString = messageString;
-    for (const uri of uris) {
-      const mappedUri = this.uriMapping.get(uri);
-      if (!mappedUri) {
-        continue;
-      }
-      mappedMessageString = messageString.replace(uri, mappedUri);
-    }
-    console.log("outgoing:", mappedMessageString);
-    this.webSocket.send(
-      JSON.stringify({ type: "data", data: mappedMessageString })
-    );
+    console.log("outgoing:", messageString);
+    webSocket.send(JSON.stringify({ type: "data", data: messageString }));
   }
 
-  public async forwardMessage(message: FileEventMessage) {
-    console.log("forwarding:", message);
-    await this.openPromise;
-    message.path = this.serverUriPrefix.replace("file://", "") + message.path;
-    this.webSocket.send(JSON.stringify(message));
-  }
-}
+  // Track open, change and close text document events
+  const documents = new TextDocuments(TextDocument);
+  documents.listen(connection);
 
-const languageServerProvider = new LanguageServerProvider();
-
-const originalOnMessage = self.onmessage?.bind(self);
-self.onmessage = (message) => {
-  console.log("handling:", message.data);
-  if ("type" in message.data && message.data.type === "file-event") {
-    return languageServerProvider.forwardMessage(message.data);
-  }
-  originalOnMessage ? originalOnMessage(message) : undefined;
-};
+  connection.listen();
+  console.log("connection is listening!");
+});

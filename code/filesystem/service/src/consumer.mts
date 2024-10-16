@@ -198,7 +198,7 @@ export class FileSystemService__Consumer implements Service {
     this._parseResponse(response, "move:response");
   }
 
-  async readDirectory(path: string): Promise<Directory["content"]> {
+  async readDirectory(path: string): Promise<Directory> {
     if (!this._messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
@@ -224,10 +224,10 @@ export class FileSystemService__Consumer implements Service {
 
     this._parseResponse(response, "readDirectory:response");
 
-    return response.content.content;
+    return response.content.directory;
   }
 
-  async readFile(path: string): Promise<string> {
+  async readFile(path: string): Promise<File> {
     if (!this._messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
@@ -244,7 +244,7 @@ export class FileSystemService__Consumer implements Service {
 
     this._parseResponse(response, "readFile:response");
 
-    return response.content.content;
+    return response.content.file;
   }
 
   async watch(path?: string): Promise<TypedEmitter<FileSystemWatcherEvents>> {

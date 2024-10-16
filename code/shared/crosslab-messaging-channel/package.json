@@ -13,7 +13,7 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
-    "@crosslab-ide/abstract-messaging-channel": "file:../abstract-messaging-channel"
+    "@crosslab-ide/abstract-messaging-channel": "file:../abstract-messaging-channel",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js"
   }
 }

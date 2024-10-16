@@ -91,7 +91,7 @@ void run(avr_t *avr, bool *stop_thread, std::queue<pin_event> *pin_events)
 {
 	while (!(*stop_thread))
 	{
-		if (pin_events->size() > 0)
+		while (!pin_events->empty())
 		{
 			pin_event event = pin_events->front();
 			pin_events->pop();
@@ -119,10 +119,31 @@ void Simulation::stop(const Napi::CallbackInfo &info)
 	this->stop_thread = true;
 	this->thread.join();
 	this->thread.~thread();
+	avr_reset(this->avr);
 
-	for (auto const &[key, val] : this->pin_callbacks)
+	Napi::Value value = this->listPins(info);
+	Napi::Array pins = value.As<Napi::Array>();
+
+	std::queue<pin_event> pin_events;
+	for (int i = 0; i < pins.Length(); i++)
 	{
-		val.Release();
+		char port = pins.Get(i).As<Napi::String>().Utf8Value()[0];
+		char index = pins.Get(i).As<Napi::String>().Utf8Value()[1] - 48;
+
+		pin_event event = {.port = port, .index = index, .value = 0};
+		pin_events.push(event);
+	}
+
+	while (!pin_events.empty())
+	{
+		pin_event event = pin_events.front();
+		pin_events.pop();
+		avr_raise_irq(
+			avr_io_getirq(
+				avr,
+				AVR_IOCTL_IOPORT_GETIRQ(event.port),
+				event.index),
+			event.value);
 	}
 }
 

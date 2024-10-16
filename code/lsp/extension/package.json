@@ -10,7 +10,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "browser": "./dist/web/extension.js",
   "contributes": {
     "commands": [
@@ -31,25 +33,28 @@
     "package-web": "npm run check-types && npm run lint && node esbuild.js --production",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
+    "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionPath=../../filesystem/extension --folder-uri=crosslabfs:/workspace"
   },
   "devDependencies": {
-    "@types/vscode": "^1.93.0",
-    "@types/mocha": "^10.0.7",
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@types/assert": "^1.5.10",
-    "eslint": "^9.9.1",
+    "@types/mocha": "^10.0.7",
+    "@types/vscode": "^1.93.0",
     "@typescript-eslint/eslint-plugin": "^8.3.0",
     "@typescript-eslint/parser": "^8.3.0",
-    "mocha": "^10.7.3",
-    "typescript": "^5.5.4",
     "@vscode/test-web": "^0.0.58",
+    "assert": "^2.1.0",
     "esbuild": "^0.23.1",
+    "eslint": "^9.9.1",
     "glob": "^11.0.0",
+    "mocha": "^10.7.3",
     "npm-run-all": "^4.1.5",
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-    "assert": "^2.1.0"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
+    "@crosslab-ide/soa-service-message": "file:../../shared/message-service-js",
+    "esbuild-plugin-polyfill-node": "^0.3.0",
     "vscode-languageclient": "^9.0.1",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.11"

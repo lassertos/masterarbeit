@@ -6,7 +6,7 @@ import {
 } from "@crosslab-ide/soa-service-electrical";
 import { Simulation } from "@crosslab-ide/simavr-node-addon";
 import { FileService__Consumer } from "@crosslab-ide/soa-service-file";
-import fs, { stat } from "fs";
+import fs from "fs";
 
 export class SimavrInstance {
   private _deviceHandler: DeviceHandler;
@@ -81,6 +81,7 @@ export class SimavrInstance {
     const fileService = new FileService__Consumer("program");
 
     fileService.on("file", (event) => {
+      console.log("received file:", event);
       const folderPath =
         "/tmp/" + Buffer.from(this._instanceUrl).toString("base64");
       const filePath = `${folderPath}/program.elf`;
@@ -94,6 +95,26 @@ export class SimavrInstance {
           this._simulation.stop();
         }
         this._simulation.load(filePath);
+        gpioService.interfaces.forEach((connectionInterface) => {
+          if (connectionInterface.interfaceType !== "gpio") {
+            return;
+          }
+
+          const gpioInterface = connectionInterface as GPIO.GPIOInterface;
+
+          if (
+            gpioInterface.configuration.direction === "in" ||
+            gpioInterface.configuration.direction === "inout"
+          ) {
+            this._simulation.setPinValue(
+              gpioInterface.signal,
+              gpioInterface.signalState === GPIO.GPIOState.WeakHigh ||
+                gpioInterface.signalState === GPIO.GPIOState.StrongHigh
+                ? 1
+                : 0
+            );
+          }
+        });
         this._simulation.start();
       });
     });

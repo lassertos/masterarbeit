@@ -27,6 +27,12 @@ export default async () => {
       services: [
         {
           serviceDirection: "producer",
+          serviceId: "compilation:file",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/file",
+          supportedConnectionTypes: ["webrtc", "websocket", "local"],
+        },
+        {
+          serviceDirection: "producer",
           serviceId: "filesystem",
           serviceType: "https://api.goldi-labs.de/serviceTypes/filesystem",
           supportedConnectionTypes: ["webrtc", "websocket", "local"],

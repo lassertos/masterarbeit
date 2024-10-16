@@ -156,6 +156,22 @@ export async function activate(context: vscode.ExtensionContext) {
   const fileSystemRequestHandler = new FileSystemRequestHandler();
 
   fileSystemServiceProducer.on("request", async (request) => {
+    if (request.type !== "unwatch:request") {
+      request.content.path = fileSystemProvider.updateUri(
+        vscode.Uri.from({
+          scheme: "crosslabfs",
+          path: request.content.path,
+        })
+      ).path;
+      if (request.type === "move:request") {
+        request.content.newPath = fileSystemProvider.updateUri(
+          vscode.Uri.from({
+            scheme: "crosslabfs",
+            path: request.content.newPath,
+          })
+        ).path;
+      }
+    }
     const response = await fileSystemRequestHandler.handleRequest(request);
     await fileSystemServiceProducer.send(response);
   });
@@ -178,6 +194,19 @@ export async function activate(context: vscode.ExtensionContext) {
       console.log("adding filesystem service producer!");
       deviceHandler.addService(fileSystemServiceProducer);
       console.log("added filesystem service producer!");
+    },
+    onProjectChanged: (
+      handler: (project: vscode.Uri) => Promise<void> | void
+    ) => {
+      fileSystemProvider.addProjectChangedHandler(handler);
+    },
+    getCurrentProject: (): vscode.Uri => {
+      return vscode.Uri.from({
+        scheme: "crosslabfs",
+        path: fileSystemProvider.currentProject
+          ? `/projects/${fileSystemProvider.currentProject}`
+          : "/workspace",
+      });
     },
   };
 }

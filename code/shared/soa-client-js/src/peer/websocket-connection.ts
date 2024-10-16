@@ -59,6 +59,7 @@ export class WebSocketPeerConnection
     this._webSocket = new WebSocket(this._connectionOptions.url);
 
     this._webSocket.onclose = () => {
+      console.log("closed websocket connection!");
       this.state = "closed";
       this.emit("connectionChanged");
     };
@@ -127,6 +128,7 @@ export class WebSocketPeerConnection
 
   teardown(): void {
     if (this.state !== "closed") {
+      console.log("tearing down websocket connection!");
       this._webSocket?.close();
       this.state = "closed";
       this.emit("connectionChanged");

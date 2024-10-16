@@ -46,9 +46,9 @@ export class ArduinoCliCompilationInstance {
       }
     );
     const token = await response.json();
-    // console.log("endpoint:", configuration.WEBSOCKET_ENDPOINT);
-    // console.log("id:", this._instanceUrl);
-    // console.log("token:", token);
+    console.log("endpoint:", configuration.WEBSOCKET_ENDPOINT);
+    console.log("id:", this._instanceUrl);
+    console.log("token:", token);
     await this._deviceHandler.connect({
       endpoint: configuration.WEBSOCKET_ENDPOINT,
       id: this._instanceUrl,
@@ -85,11 +85,11 @@ export class ArduinoCliCompilationInstance {
         { encoding: "utf-8", stdio: "pipe" }
       );
 
-      const hexFilePath = path.join(
+      const elfFilePath = path.join(
         buildDirectoryPath,
-        `${directory.name}.ino.hex`
+        `${directory.name}.ino.elf`
       );
-      const hexData = fs.readFileSync(hexFilePath, { encoding: "utf-8" });
+      const elfData = fs.readFileSync(elfFilePath);
 
       this._compilationServiceProducer.send({
         type: "compilation:response",
@@ -97,7 +97,7 @@ export class ArduinoCliCompilationInstance {
           requestId: request.requestId,
           success: true,
           message,
-          result: hexData,
+          result: elfData,
         },
       });
     } catch (error) {

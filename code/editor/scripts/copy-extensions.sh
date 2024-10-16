@@ -6,6 +6,10 @@ mkdir public/extensions/base
 cp -r ../base/extension/dist public/extensions/base/dist
 cp ../base/extension/package.json public/extensions/base
 
+mkdir public/extensions/lsp
+cp -r ../lsp/extension/dist public/extensions/lsp/dist
+cp ../lsp/extension/package.json public/extensions/lsp
+
 mkdir public/extensions/filesystem
 cp -r ../filesystem/extension/src public/extensions/filesystem/src
 cp -r ../filesystem/extension/dist public/extensions/filesystem/dist

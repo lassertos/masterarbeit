@@ -35,6 +35,13 @@ export default (deviceUrls: {
       ],
       serviceConfigurations: [
         {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/file",
+          participants: [
+            { role: "code-editor", config: {}, serviceId: "compilation:file" },
+            { role: "simulation", config: {}, serviceId: "program" },
+          ],
+        },
+        {
           serviceType: "https://api.goldi-labs.de/serviceTypes/filesystem",
           participants: [
             {
