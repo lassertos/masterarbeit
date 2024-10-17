@@ -4,7 +4,7 @@ export default (deviceUrls: {
   "code-editor": string;
 }): ExperimentServiceTypes.Template<"request"> => {
   return {
-    name: "Standalone Code Editor (Filesystem-only)",
+    name: "Standalone Code Editor",
     configuration: {
       devices: [
         {

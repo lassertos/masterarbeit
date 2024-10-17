@@ -7,7 +7,7 @@ export default (deviceUrls: {
   vpspu: string;
 }): ExperimentServiceTypes.Template<"request"> => {
   return {
-    name: "Simulated Microcontroller + Virtual Device (Compiler only)",
+    name: "Simulated Microcontroller + Virtual Device",
     configuration: {
       devices: [
         {

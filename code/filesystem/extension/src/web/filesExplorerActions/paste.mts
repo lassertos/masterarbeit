@@ -68,8 +68,10 @@ export function registerFilesExplorerPaste(
     }
 
     if (fileSystemProvider.isCutting) {
-      await vscode.commands.executeCommand("filesExplorer.cancelCut");
       fileSystemProvider.isCutting = false;
+      try {
+        await vscode.commands.executeCommand("filesExplorer.cancelCut");
+      } catch (error) {}
     }
 
     await vscode.commands.executeCommand(

@@ -143,6 +143,13 @@ export class ArduinoCliLanguageServerInstance {
   }
 
   private _receiveMessage(message: DataMessage) {
+    const parsedMessage = JSON.parse(message.data);
+    if (parsedMessage.method === "textDocument/didSave") {
+      fs.writeFileSync(
+        parsedMessage.params.textDocument.uri.replace("file://", ""),
+        parsedMessage.params.text
+      );
+    }
     const encodedMessage = new TextEncoder().encode(message.data);
     this._arduinoLanguageServerProcess?.stdin?.write(
       `Content-Length: ${encodedMessage.length}\r\n\r\n`

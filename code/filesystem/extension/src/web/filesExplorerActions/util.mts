@@ -64,12 +64,12 @@ export async function getSelectedUris(
   const clipboard = await vscode.env.clipboard.readText();
   console.log(clipboard);
 
-  const paths =
-    clipboard === savedClipboard
-      ? fileSystemProvider.currentProject
-        ? `/projects/${fileSystemProvider.currentProject}`
-        : "/workspace"
-      : await vscode.env.clipboard.readText();
+  const paths = await vscode.env.clipboard.readText();
+  // clipboard === savedClipboard
+  //   ? fileSystemProvider.currentProject
+  //     ? `/projects/${fileSystemProvider.currentProject}`
+  //     : "/workspace"
+  // : await vscode.env.clipboard.readText();
 
   console.log(paths);
 

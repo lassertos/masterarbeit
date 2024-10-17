@@ -95,15 +95,13 @@ async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
 
   fileSystemWatcher.onDidCreate(async (uri) => {
     console.log("created", uri);
+    const isDirectory =
+      (await vscode.workspace.fs.stat(uri)).type === vscode.FileType.Directory;
     if (!uri.path.startsWith(projectUri.path + "/")) return;
     commandPort1.postMessage({
       type: "filesystem:create",
       data: {
-        type:
-          (await vscode.workspace.fs.stat(uri)).type ===
-          vscode.FileType.Directory
-            ? "directory"
-            : "file",
+        type: isDirectory ? "directory" : "file",
         path: uri.path.replace(
           projectUri.path,
           path.join(lspPath, projectName)
@@ -111,8 +109,23 @@ async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
         content: "",
       },
     });
-    await vscode.commands.executeCommand("workbench.action.files.saveFiles");
-    await vscode.commands.executeCommand("workbench.action.files.save");
+
+    if (!isDirectory) {
+      await client?.sendNotification("textDocument/didSave", {
+        textDocument: {
+          uri: uri
+            .with({
+              scheme: "file",
+              path: uri.path.replace(
+                projectUri.path,
+                path.join(lspPath, projectName)
+              ),
+            })
+            .toString(true),
+        },
+        text: new TextDecoder().decode(await vscode.workspace.fs.readFile(uri)),
+      });
+    }
   });
 
   fileSystemWatcher.onDidDelete(async (uri) => {
@@ -121,11 +134,6 @@ async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
     commandPort1.postMessage({
       type: "filesystem:delete",
       data: {
-        type:
-          (await vscode.workspace.fs.stat(uri)).type ===
-          vscode.FileType.Directory
-            ? "directory"
-            : "file",
         path: uri.path.replace(
           projectUri.path,
           path.join(lspPath, projectName)
@@ -149,9 +157,11 @@ async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
         return value
           .with({
             scheme: "file",
-            path: value.path.replace("/workspace", `${lspPath}/${projectName}`),
+            path: value.path.startsWith(projectUri.path)
+              ? value.path.replace(projectUri.path, `${lspPath}/${projectName}`)
+              : value.path.replace("/workspace", `${lspPath}/${projectName}`),
           })
-          .toString();
+          .toString(true);
       },
       protocol2Code: (value) => {
         const uri = vscode.Uri.parse(value);
@@ -188,6 +198,9 @@ async function setupDirectory(
   });
   const entries = await vscode.workspace.fs.readDirectory(directoryUri);
   for (const entry of entries) {
+    const entryUri = directoryUri.with({
+      path: path.join(directoryUri.path, entry[0]),
+    });
     switch (entry[1]) {
       case vscode.FileType.Unknown:
         break;
@@ -196,17 +209,23 @@ async function setupDirectory(
           type: "filesystem:create",
           data: {
             type: "file",
-            path: path
-              .join(directoryUri.path, entry[0])
-              .replace("/workspace", pathReplacement),
+            path: entryUri.path.replace("/workspace", pathReplacement),
             content: new TextDecoder().decode(
-              await vscode.workspace.fs.readFile(
-                directoryUri.with({
-                  path: path.join(directoryUri.path, entry[0]),
-                })
-              )
+              await vscode.workspace.fs.readFile(entryUri)
             ),
           },
+        });
+        const document = await vscode.workspace.openTextDocument(entryUri);
+        await client?.sendNotification("textDocument/didClose", {
+          textDocument: {
+            uri: entryUri
+              .with({
+                scheme: "file",
+                path: entryUri.path.replace("/workspace", pathReplacement),
+              })
+              .toString(),
+          },
+          text: document.getText(),
         });
         break;
       case vscode.FileType.Directory:
