@@ -58,7 +58,7 @@ export async function deactivate(): Promise<void> {
 }
 
 async function stopClient(): Promise<void> {
-  await client?.stop();
+  if (client?.isRunning()) await client?.stop();
 }
 
 async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
@@ -182,6 +182,12 @@ async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
   );
 
   await client.start();
+
+  await setupFiles(
+    vscode.Uri.from({ scheme: "crosslabfs", path: "/workspace" }),
+    path.join(lspPath, projectName),
+    commandPort1
+  );
 }
 
 async function setupDirectory(
@@ -215,6 +221,34 @@ async function setupDirectory(
             ),
           },
         });
+        break;
+      case vscode.FileType.Directory:
+        await setupDirectory(
+          directoryUri.with({ path: path.join(directoryUri.path, entry[0]) }),
+          pathReplacement,
+          port
+        );
+        break;
+      case vscode.FileType.SymbolicLink:
+        break;
+    }
+  }
+}
+
+async function setupFiles(
+  directoryUri: vscode.Uri,
+  pathReplacement: string,
+  port: MessagePort
+) {
+  const entries = await vscode.workspace.fs.readDirectory(directoryUri);
+  for (const entry of entries) {
+    const entryUri = directoryUri.with({
+      path: path.join(directoryUri.path, entry[0]),
+    });
+    switch (entry[1]) {
+      case vscode.FileType.Unknown:
+        break;
+      case vscode.FileType.File:
         const document = await vscode.workspace.openTextDocument(entryUri);
         await client?.sendNotification("textDocument/didClose", {
           textDocument: {
