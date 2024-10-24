@@ -1,63 +1,39 @@
+import { DebuggingServiceConsumer } from "@crosslab-ide/crosslab-debugging-service";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
-import {
-  ElectricalConnectionService,
-  GPIO,
-} from "@crosslab-ide/soa-service-electrical";
 import * as vscode from "vscode";
+import { DebugAdapterDescriptorFactory } from "./debugAdapterDescriptorFactory.mjs";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log(
     'Congratulations, your extension "crosslab-debugging-extension" is now active in the web extension host!'
   );
-  const disposable = vscode.commands.registerCommand(
-    "crosslab-debugging-extension.helloWorld",
-    () => {
-      vscode.window.showInformationMessage(
-        "Hello World from crosslab-debugging-extension in a web extension host!"
+
+  vscode.commands.registerCommand(
+    "crosslab-debugging-extension.debug",
+    async () => {
+      await vscode.debug.startDebugging(
+        vscode.workspace.workspaceFolders
+          ? vscode.workspace.workspaceFolders[0]
+          : undefined
       );
     }
   );
-  context.subscriptions.push(disposable);
+
+  const debuggingServiceConsumer = new DebuggingServiceConsumer("debugging");
+
+  const debugAdapterDescriptorFactory = new DebugAdapterDescriptorFactory(
+    context,
+    debuggingServiceConsumer
+  );
+
+  vscode.debug.registerDebugAdapterDescriptorFactory(
+    "crosslab",
+    debugAdapterDescriptorFactory
+  );
 
   return {
     addServices: (deviceHandler: DeviceHandler) => {
-      const electicalConnectionService = new ElectricalConnectionService(
-        "gpios",
-        []
-      );
-
-      const gpioInterface = new GPIO.ConstructableGPIOInterface([]);
-      electicalConnectionService.addInterface(gpioInterface);
-
-      electicalConnectionService.on("newInterface", (event) => {
-        if (event.connectionInterface.interfaceType === "gpio") {
-          const connectionInterface =
-            event.connectionInterface as GPIO.GPIOInterface;
-          if (
-            connectionInterface.configuration.direction === "in" ||
-            connectionInterface.configuration.direction === "inout"
-          ) {
-            connectionInterface.on("signalChange", (signalChangeEvent) => {
-              console.log(
-                `new value for "${connectionInterface.signal}": ${signalChangeEvent.state}`
-              );
-            });
-            console.log(
-              `initial value for "${connectionInterface.signal}" (${connectionInterface.configuration.direction}): ${connectionInterface.signalState}`
-            );
-          }
-          if (
-            connectionInterface.configuration.direction === "out" ||
-            connectionInterface.configuration.direction === "inout"
-          ) {
-            console.log(
-              `initial value for "${connectionInterface.signal}" (${connectionInterface.configuration.direction}): ${connectionInterface.signalState}`
-            );
-          }
-        }
-      });
-
-      deviceHandler.addService(electicalConnectionService);
+      deviceHandler.addService(debuggingServiceConsumer);
     },
   };
 }

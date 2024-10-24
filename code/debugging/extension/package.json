@@ -13,12 +13,69 @@
   "activationEvents": [],
   "browser": "./dist/web/extension.js",
   "contributes": {
+    "breakpoints": [
+      {
+        "language": "cpp"
+      },
+      {
+        "language": "c"
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "crosslab",
+        "label": "CrossLab Debugger",
+        "languages": [
+          "cpp",
+          "c"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "properties": {
+              "args": {
+                "default": [],
+                "description": "Command line arguments",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "cwd": {},
+              "env": {},
+              "program": {
+                "default": "${file}",
+                "description": "Absolute path to the file.",
+                "type": "string"
+              },
+              "stopAtBeginningOfMainSubprogram": {},
+              "stopOnEntry": {
+                "description": "Whether or not to stop the debugger on the first line of the first file",
+                "default": true,
+                "type": "boolean"
+              },
+              "pid": {},
+              "target": {}
+            }
+          }
+        }
+      }
+    ],
     "commands": [
       {
-        "command": "crosslab-debugging-extension.helloWorld",
-        "title": "Hello World"
+        "command": "crosslab-debugging-extension.debug",
+        "title": "Debug",
+        "icon": "$(debug)",
+        "shortTitle": "debug",
+        "enablement": "workbenchState == folder && !crosslab.isCompiling"
       }
-    ]
+    ],
+    "menus": {
+      "editor/title/run": [
+        {
+          "command": "crosslab-debugging-extension.debug"
+        }
+      ]
+    }
   },
   "scripts": {
     "test": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/extensionTests.js",
@@ -50,6 +107,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@crosslab-ide/crosslab-debugging-service": "file:../service",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@crosslab-ide/soa-service-electrical": "file:../../shared/electrical-connection-service-js",
     "esbuild-plugin-polyfill-node": "^0.3.0"

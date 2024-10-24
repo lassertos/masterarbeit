@@ -1,0 +1,22 @@
+{
+  "name": "@crosslab-ide/gdb-debugging-server",
+  "version": "0.0.1",
+  "description": "A CrossLab compatible gdb debugging server.",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.7.8",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@crosslab-ide/crosslab-compilation-service": "file:../../compilation/service",
+    "@crosslab-ide/crosslab-debugging-service": "file:../service",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
+    "@types/express": "^4.17.21",
+    "express": "^4.21.1"
+  }
+}

@@ -13,34 +13,47 @@ import {
 } from "@crosslab-ide/abstract-messaging-channel";
 import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
 import {
+  buildCompilationProtocol,
   CompilationProtocol,
-  compilationProtocol,
+  ResultFormatsDescriptor,
 } from "@crosslab-ide/compilation-messaging-protocol";
 
-interface CompilationService__ProducerEvents {
+interface CompilationService__ProducerEvents<
+  F extends readonly string[],
+  R extends ResultFormatsDescriptor<F>
+> {
   "compilation:request": (
     request: ProtocolMessage<
-      CompilationProtocol,
+      CompilationProtocol<F, R>,
       "compilation:request"
     >["content"]
   ) => void;
 }
 
-export class CompilationService__Producer
-  extends TypedEmitter<CompilationService__ProducerEvents>
+export class CompilationService__Producer<
+    F extends readonly string[],
+    R extends ResultFormatsDescriptor<F>
+  >
+  extends TypedEmitter<CompilationService__ProducerEvents<F, R>>
   implements Service
 {
   private _messagingChannel?: CrossLabMessagingChannel<
-    CompilationProtocol,
+    CompilationProtocol<F, R>,
     "server"
   >;
+  private _resultFormatsDescription: R;
+  private _compilationProtocol: CompilationProtocol<F, R>;
   serviceType: string = "https://api.goldi-labs.de/serviceTypes/compilation";
   serviceId: string;
   serviceDirection: ServiceDirection = "producer";
 
-  constructor(serviceId: string) {
+  constructor(serviceId: string, resultFormatsDescription: R) {
     super();
     this.serviceId = serviceId;
+    this._resultFormatsDescription = resultFormatsDescription;
+    this._compilationProtocol = buildCompilationProtocol(
+      resultFormatsDescription
+    );
   }
 
   getMeta() {
@@ -60,7 +73,7 @@ export class CompilationService__Producer
     const channel = new DataChannel();
     this._messagingChannel = new CrossLabMessagingChannel(
       channel,
-      compilationProtocol,
+      this._compilationProtocol,
       "server"
     );
     this._messagingChannel.on("message", (message) =>
@@ -73,15 +86,24 @@ export class CompilationService__Producer
     }
   }
 
-  send(message: OutgoingMessage<CompilationProtocol, "server">) {
-    this._messagingChannel?.send(message);
+  send(message: OutgoingMessage<CompilationProtocol<F, R>, "server">) {
+    if (!this._messagingChannel) {
+      throw new Error("No messaging channel has been set up!");
+    }
+    this._messagingChannel.send(message);
   }
 
   private _handleMessage(
-    message: IncomingMessage<CompilationProtocol, "server">
+    message: IncomingMessage<CompilationProtocol<F, R>, "server">
   ) {
     switch (message.type) {
       case "compilation:request":
+        if (
+          message.content.format &&
+          !(message.content.format in (this._resultFormatsDescription ?? {}))
+        ) {
+          throw new Error(`Unrecognized message type "${message.type}"!`);
+        }
         this.emit("compilation:request", message.content);
         break;
       default:

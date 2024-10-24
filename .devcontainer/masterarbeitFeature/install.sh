@@ -79,7 +79,7 @@ echo "//verdaccio:4873/:username=admin" >> /home/vscode/.npmrc
 echo "//verdaccio:4873/:_password=admin" >> /home/vscode/.npmrc
 
 # build and install simavr
-apt update && apt install -y libelf-dev avr-libc libglut-dev
+apt update && apt install -y libelf-dev avr-libc freeglut3-dev gdb
 cd /tmp
 git clone https://github.com/buserror/simavr.git
 cd simavr
@@ -87,6 +87,24 @@ make install
 ldconfig
 cd ~ && rm -rf /tmp/simavr
 
+# build and install newest version of the avr-toolchain
+apt update && apt -y install wget make mingw-w64 gcc g++ bzip2 xz-utils autoconf texinfo libgmp-dev libmpfr-dev
+cd /tmp
+git clone https://github.com/ZakKemble/avr-gcc-build.git
+cd avr-gcc-build
+FOR_WINX64=0 bash avr-gcc-build.sh
+cp permissions.sh build/avr-gcc-14.1.0-x64-linux
+cd build/avr-gcc-14.1.0-x64-linux
+bash permissions.sh
+cp -r avr /usr/local/lib
+cp -r bin/* /usr/local/bin
+cp -r include/* /usr/local/include
+cp -r lib/* /usr/local/lib
+cp -r libexec/* /usr/local/libexec
+cp -r share/* /usr/local/share
+ldconfig
+cd ~ && rm -rf /tmp/avr-gcc-build
+
 # install arduino-cli
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=/usr/local/bin sh
-arduino-cli core install arduino:avr
+runuser -l vscode -c 'arduino-cli core install arduino:avr'

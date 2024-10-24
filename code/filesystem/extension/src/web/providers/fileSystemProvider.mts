@@ -169,12 +169,62 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
     const updatedOldUri = this.updateUri(oldUri);
     const updatedNewUri = this.updateUri(newUri);
 
+    const existed = this.indexeddbHandler.exists(updatedNewUri.path);
+
+    const sourceExists = this.indexeddbHandler.exists(updatedOldUri.path);
+    const destinationParentExists = this.indexeddbHandler.exists(
+      path.dirname(updatedNewUri.path)
+    );
+    const destinationExists = this.indexeddbHandler.exists(updatedNewUri.path);
+
+    if (!sourceExists) {
+      throw vscode.FileSystemError.FileNotFound(updatedOldUri);
+    }
+
+    if (!destinationParentExists) {
+      throw vscode.FileSystemError.FileNotFound(
+        updatedNewUri.with({ path: path.dirname(updatedNewUri.path) })
+      );
+    }
+
+    if (destinationExists && !options?.overwrite) {
+      throw vscode.FileSystemError.FileExists(updatedNewUri.path);
+    }
+
+    if (updatedNewUri.path.startsWith(updatedOldUri.path + "/")) {
+      throw new Error(
+        `Unable to move/copy when source '${updatedOldUri.toString()}' is parent of target '${updatedOldUri.toString()}'`
+      );
+    }
+
     if (updatedOldUri.path === updatedNewUri.path) {
       return;
     }
 
-    await this.copy(updatedOldUri, updatedNewUri, options);
+    await this.indexeddbHandler.copy(updatedOldUri.path, updatedNewUri.path);
     await this.indexeddbHandler.delete(updatedOldUri.path);
+
+    this._fireSoon(
+      {
+        type: vscode.FileChangeType.Changed,
+        uri: updatedOldUri.with({
+          path: path.posix.dirname(updatedOldUri.path),
+        }),
+      },
+      { uri: updatedOldUri, type: vscode.FileChangeType.Deleted }
+    );
+
+    if (!existed) {
+      this._fireSoon({
+        type: vscode.FileChangeType.Created,
+        uri: updatedNewUri,
+      });
+    } else {
+      this._fireSoon({
+        type: vscode.FileChangeType.Changed,
+        uri: updatedNewUri,
+      });
+    }
   }
 
   async copy(

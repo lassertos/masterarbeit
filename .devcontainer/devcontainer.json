@@ -24,7 +24,10 @@
         "connor4312.esbuild-problem-matchers",
         "redhat.vscode-yaml",
         "ms-vscode.cpptools-extension-pack",
-        "bierner.lit-html"
+        "bierner.lit-html",
+        "bierner.markdown-mermaid",
+        "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
+        "runem.lit-plugin"
       ]
     }
   },

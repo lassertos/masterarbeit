@@ -1,5 +1,9 @@
 import { ExtensionContext, Uri } from "vscode";
-import { LanguageClientOptions } from "vscode-languageclient";
+import {
+  CloseAction,
+  ErrorAction,
+  LanguageClientOptions,
+} from "vscode-languageclient";
 import * as vscode from "vscode";
 
 import { LanguageClient } from "vscode-languageclient/browser.js";
@@ -98,32 +102,23 @@ async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
     const isDirectory =
       (await vscode.workspace.fs.stat(uri)).type === vscode.FileType.Directory;
     if (!uri.path.startsWith(projectUri.path + "/")) return;
-    commandPort1.postMessage({
-      type: "filesystem:create",
-      data: {
-        type: isDirectory ? "directory" : "file",
-        path: uri.path.replace(
-          projectUri.path,
-          path.join(lspPath, projectName)
-        ),
-        content: "",
-      },
-    });
 
     if (!isDirectory) {
-      await client?.sendNotification("textDocument/didSave", {
-        textDocument: {
-          uri: uri
-            .with({
-              scheme: "file",
-              path: uri.path.replace(
-                projectUri.path,
-                path.join(lspPath, projectName)
-              ),
-            })
-            .toString(true),
+      console.log("sending didOpen notification from onDidCreate!");
+      await vscode.workspace.openTextDocument(uri);
+    } else {
+      commandPort1.postMessage({
+        type: "filesystem:create",
+        data: {
+          type: isDirectory ? "directory" : "file",
+          path: uri.path.replace(
+            projectUri.path,
+            path.join(lspPath, projectName)
+          ),
+          content: new TextDecoder().decode(
+            await vscode.workspace.fs.readFile(uri)
+          ),
         },
-        text: new TextDecoder().decode(await vscode.workspace.fs.readFile(uri)),
       });
     }
   });
@@ -181,6 +176,8 @@ async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
     worker
   );
 
+  client.error = () => {};
+
   await client.start();
 
   await setupFiles(
@@ -188,6 +185,29 @@ async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
     path.join(lspPath, projectName),
     commandPort1
   );
+
+  // const sketchUri = vscode.Uri.from({
+  //   scheme: "crosslabfs",
+  //   path: `/workspace/${path.basename(projectName)}.ino`,
+  // });
+  // try {
+  //   await vscode.workspace.fs.stat(sketchUri);
+  // } catch {
+  //   client.sendNotification("textDocument/didSave", {
+  //     textDocument: {
+  //       uri: sketchUri
+  //         .with({
+  //           scheme: "file",
+  //           path: sketchUri.path.replace(
+  //             "/workspace",
+  //             path.join(lspPath, projectName)
+  //           ),
+  //         })
+  //         .toString(true),
+  //     },
+  //     text: "",
+  //   });
+  // }
 }
 
 async function setupDirectory(
@@ -250,14 +270,15 @@ async function setupFiles(
         break;
       case vscode.FileType.File:
         const document = await vscode.workspace.openTextDocument(entryUri);
-        await client?.sendNotification("textDocument/didClose", {
+        console.log("sending didSave notification from setupFiles!");
+        await client?.sendNotification("textDocument/didSave", {
           textDocument: {
             uri: entryUri
               .with({
                 scheme: "file",
                 path: entryUri.path.replace("/workspace", pathReplacement),
               })
-              .toString(),
+              .toString(true),
           },
           text: document.getText(),
         });

@@ -11,26 +11,37 @@ import {
   ProtocolMessage,
 } from "@crosslab-ide/abstract-messaging-channel";
 import {
+  buildCompilationProtocol,
   CompilationProtocol,
-  compilationProtocol,
   Directory,
+  ResultFormatsDescriptor,
 } from "@crosslab-ide/compilation-messaging-protocol";
 import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
 import { PromiseManager } from "./promiseManager.mjs";
 import { v4 as uuidv4 } from "uuid";
 
-export class CompilationService__Consumer implements Service {
+export class CompilationService__Consumer<
+  F extends readonly string[],
+  R extends ResultFormatsDescriptor<F>
+> implements Service
+{
   private _messagingChannel?: CrossLabMessagingChannel<
-    CompilationProtocol,
+    CompilationProtocol<F, R>,
     "client"
   >;
   private _promiseManager: PromiseManager = new PromiseManager();
-  serviceType: string = "https://api.goldi-labs.de/service-types/compilation";
+  private _resultFormatsDescription: R;
+  private _compilationProtocol: CompilationProtocol<F, R>;
+  serviceType: string = "https://api.goldi-labs.de/serviceTypes/compilation";
   serviceId: string;
   serviceDirection: ServiceDirection = "consumer";
 
-  constructor(serviceId: string) {
+  constructor(serviceId: string, resultFormatsDescription: R) {
     this.serviceId = serviceId;
+    this._resultFormatsDescription = resultFormatsDescription;
+    this._compilationProtocol = buildCompilationProtocol(
+      resultFormatsDescription
+    );
   }
 
   getMeta() {
@@ -51,7 +62,7 @@ export class CompilationService__Consumer implements Service {
     const channel = new DataChannel();
     this._messagingChannel = new CrossLabMessagingChannel(
       channel,
-      compilationProtocol,
+      this._compilationProtocol,
       "client"
     );
     console.log(this._messagingChannel);
@@ -66,7 +77,7 @@ export class CompilationService__Consumer implements Service {
   }
 
   private _handleMessage(
-    message: IncomingMessage<CompilationProtocol, "client">
+    message: IncomingMessage<CompilationProtocol<F, R>, "client">
   ) {
     switch (message.type) {
       case "compilation:response":
@@ -80,7 +91,10 @@ export class CompilationService__Consumer implements Service {
   async compile(
     directory: Directory
   ): Promise<
-    ProtocolMessage<CompilationProtocol, "compilation:response">["content"]
+    ProtocolMessage<
+      CompilationProtocol<F, R>,
+      "compilation:response"
+    >["content"]
   > {
     if (!this._messagingChannel) {
       throw new Error("No messaging channel has been set up!");
@@ -97,7 +111,11 @@ export class CompilationService__Consumer implements Service {
     const response = await promise;
 
     if (
-      !isProtocolMessage(compilationProtocol, "compilation:response", response)
+      !isProtocolMessage(
+        this._compilationProtocol,
+        "compilation:response",
+        response
+      )
     ) {
       throw new Error(
         'Received message is not of expected type "compilation:response"!'

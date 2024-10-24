@@ -5,6 +5,8 @@
   "main": "dist/index.mjs",
   "dependencies": {
     "express": "^4.21.1",
+    "queue": "^7.0.0",
+    "tiny-typed-emitter": "^2.1.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {

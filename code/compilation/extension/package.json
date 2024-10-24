@@ -19,14 +19,29 @@
         "title": "Compile",
         "icon": "$(run)",
         "shortTitle": "compile",
-        "enablement": "workbenchState == folder && !crosslab.isCompiling"
+        "enablement": "workbenchState == folder && !crosslab.isCompiling",
+        "category": "compile"
+      },
+      {
+        "command": "crosslab-compilation-extension.upload",
+        "title": "Upload",
+        "icon": "$(cloud-upload)",
+        "shortTitle": "upload",
+        "enablement": "workbenchState == folder && !crosslab.isCompiling",
+        "category": "upload"
       }
     ],
     "menus": {
-      "editor/title/run": [
+      "editor/title": [
         {
           "command": "crosslab-compilation-extension.compile",
-          "when": "workbenchState == folder"
+          "when": "workbenchState == folder",
+          "group": "navigation@1"
+        },
+        {
+          "command": "crosslab-compilation-extension.upload",
+          "when": "workbenchState == folder",
+          "group": "navigation@2"
         }
       ]
     }

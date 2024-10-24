@@ -10,10 +10,17 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 import { execSync } from "child_process";
+import {
+  ArduinoCliResultFormatsDescription,
+  arduinoCliResultFormatsDescription,
+} from "./types.mjs";
 
 export class ArduinoCliCompilationInstance {
   private _deviceHandler: DeviceHandler;
-  private _compilationServiceProducer: CompilationService__Producer;
+  private _compilationServiceProducer: CompilationService__Producer<
+    ArduinoCliResultFormatsDescription["formatNames"],
+    ArduinoCliResultFormatsDescription
+  >;
   private _instanceUrl: string;
   private _deviceToken: string;
 
@@ -24,7 +31,8 @@ export class ArduinoCliCompilationInstance {
     this._deviceHandler = new DeviceHandler();
 
     this._compilationServiceProducer = new CompilationService__Producer(
-      "compilation"
+      "compilation",
+      arduinoCliResultFormatsDescription
     );
 
     this._compilationServiceProducer.on("compilation:request", (request) =>
@@ -58,7 +66,10 @@ export class ArduinoCliCompilationInstance {
 
   private _handleCompilationRequest(
     request: ProtocolMessage<
-      CompilationProtocol,
+      CompilationProtocol<
+        ArduinoCliResultFormatsDescription["formatNames"],
+        ArduinoCliResultFormatsDescription
+      >,
       "compilation:request"
     >["content"]
   ) {
@@ -84,22 +95,29 @@ export class ArduinoCliCompilationInstance {
         `arduino-cli compile -b arduino:avr:mega ${projectDirectoryPath} --build-path ${buildDirectoryPath}`,
         { encoding: "utf-8", stdio: "pipe" }
       );
-
       const elfFilePath = path.join(
         buildDirectoryPath,
         `${directory.name}.ino.elf`
       );
       const elfData = fs.readFileSync(elfFilePath);
 
-      this._compilationServiceProducer.send({
-        type: "compilation:response",
-        content: {
-          requestId: request.requestId,
-          success: true,
-          message,
-          result: elfData,
-        },
-      });
+      if (request.format) {
+        // TODO: handle format
+      } else {
+        this._compilationServiceProducer.send({
+          type: "compilation:response",
+          content: {
+            requestId: request.requestId,
+            success: true,
+            message,
+            result: {
+              type: "file",
+              name: "sketch.ino.elf",
+              content: elfData,
+            },
+          },
+        });
+      }
     } catch (error) {
       this._compilationServiceProducer.send({
         type: "compilation:response",
@@ -118,13 +136,24 @@ export class ArduinoCliCompilationInstance {
   private _recreateDirectory(directory: Directory, basePath: string) {
     const directoryPath = path.join(basePath, directory.name);
     fs.mkdirSync(directoryPath);
-    for (const entry of directory.content) {
-      const entryPath = path.join(directoryPath, entry.name);
+    for (const name in directory.content) {
+      const entryPath = path.join(directoryPath, name);
+      const entry = directory.content[name];
       if (entry.type === "directory") {
-        this._recreateDirectory(entry, directoryPath);
+        this._recreateDirectory({ ...entry, name }, directoryPath);
       } else {
         fs.writeFileSync(entryPath, entry.content);
       }
     }
   }
+
+  private _sendResult(
+    request: ProtocolMessage<
+      CompilationProtocol<
+        ArduinoCliResultFormatsDescription["formatNames"],
+        ArduinoCliResultFormatsDescription
+      >,
+      "compilation:request"
+    >
+  ) {}
 }
