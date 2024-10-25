@@ -1,4 +1,4 @@
-import { string, z } from "zod";
+import { z } from "zod";
 
 type UniqueArray<T extends readonly string[], U = T> = T extends []
   ? U
@@ -285,7 +285,7 @@ export function buildCompilationProtocol<
   F extends readonly string[],
   R extends ResultFormatsDescriptor<F>
 >(
-  resultFormatsDescriptor: ResultFormatsDescriptor<F>
+  resultFormatsDescriptor?: ResultFormatsDescriptor<F>
 ): CompilationProtocol<F, R> {
   return {
     messageTypes: ["compilation:request", "compilation:response"],
@@ -293,8 +293,8 @@ export function buildCompilationProtocol<
       "compilation:request": z.object({
         requestId: z.string(),
         directory: DirectorySchema,
-        format:
-          resultFormatsDescriptor.formatNames.length === 0
+        format: resultFormatsDescriptor
+          ? resultFormatsDescriptor.formatNames.length === 0
             ? z.undefined()
             : resultFormatsDescriptor.formatNames.length === 1
             ? z.optional(z.literal(resultFormatsDescriptor.formatNames[0]))
@@ -306,7 +306,8 @@ export function buildCompilationProtocol<
                     .slice(2)
                     .map((formatName) => z.literal(formatName)),
                 ])
-              ),
+              )
+          : z.optional(z.string()),
       }),
       "compilation:response": z.union([
         z.object({
@@ -320,12 +321,14 @@ export function buildCompilationProtocol<
           success: z.literal(false),
           message: z.optional(z.string()),
         }),
-        ...resultFormatsDescriptor.formatNames.map((formatName) =>
-          buildResponseSchemaFromResultFormat<F, ResultFormatsDescriptor<F>>(
-            resultFormatsDescriptor,
-            formatName
-          )
-        ),
+        ...(resultFormatsDescriptor
+          ? resultFormatsDescriptor.formatNames.map((formatName) =>
+              buildResponseSchemaFromResultFormat<
+                F,
+                ResultFormatsDescriptor<F>
+              >(resultFormatsDescriptor, formatName)
+            )
+          : []),
       ]),
     },
     roles: ["client", "server"],

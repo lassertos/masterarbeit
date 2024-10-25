@@ -41,16 +41,14 @@ export class CompilationService__Producer<
     CompilationProtocol<F, R>,
     "server"
   >;
-  private _resultFormatsDescription: R;
   private _compilationProtocol: CompilationProtocol<F, R>;
   serviceType: string = "https://api.goldi-labs.de/serviceTypes/compilation";
   serviceId: string;
   serviceDirection: ServiceDirection = "producer";
 
-  constructor(serviceId: string, resultFormatsDescription: R) {
+  constructor(serviceId: string, resultFormatsDescription?: R) {
     super();
     this.serviceId = serviceId;
-    this._resultFormatsDescription = resultFormatsDescription;
     this._compilationProtocol = buildCompilationProtocol(
       resultFormatsDescription
     );
@@ -98,12 +96,6 @@ export class CompilationService__Producer<
   ) {
     switch (message.type) {
       case "compilation:request":
-        if (
-          message.content.format &&
-          !(message.content.format in (this._resultFormatsDescription ?? {}))
-        ) {
-          throw new Error(`Unrecognized message type "${message.type}"!`);
-        }
         this.emit("compilation:request", message.content);
         break;
       default:

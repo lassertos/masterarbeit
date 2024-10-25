@@ -30,15 +30,13 @@ export class CompilationService__Consumer<
     "client"
   >;
   private _promiseManager: PromiseManager = new PromiseManager();
-  private _resultFormatsDescription: R;
   private _compilationProtocol: CompilationProtocol<F, R>;
   serviceType: string = "https://api.goldi-labs.de/serviceTypes/compilation";
   serviceId: string;
   serviceDirection: ServiceDirection = "consumer";
 
-  constructor(serviceId: string, resultFormatsDescription: R) {
+  constructor(serviceId: string, resultFormatsDescription?: R) {
     this.serviceId = serviceId;
-    this._resultFormatsDescription = resultFormatsDescription;
     this._compilationProtocol = buildCompilationProtocol(
       resultFormatsDescription
     );

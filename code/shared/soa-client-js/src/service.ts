@@ -8,7 +8,7 @@ export const Prosumer: ServiceDirection = "prosumer";
 export { ServiceConfiguration };
 
 export interface Service<T extends string = string> {
-  resultFormats: () => {
+  getMeta: () => {
     serviceId: string;
     serviceType: T;
     serviceDirection: ServiceDirection;

@@ -57,9 +57,9 @@ export function activate(context: vscode.ExtensionContext) {
           : result.message ?? "Something went wrong during the compilation!"
       );
 
-      if (result.success) {
+      if (result.success && result.result.type === "file") {
         outputchannel.appendLine("Uploading result!");
-        await fileService__Producer.sendFile("elf", result.result);
+        await fileService__Producer.sendFile("elf", result.result.content);
         outputchannel.appendLine("Uploaded result!");
       }
 

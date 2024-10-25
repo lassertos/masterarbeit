@@ -225,7 +225,7 @@ export class FileSystemRequestHandler {
     const directory: Directory = {
       name: path.basename(directoryPath),
       type: "directory",
-      content: [],
+      content: {},
     };
     const entries = await vscode.workspace.fs.readDirectory(uri);
 
@@ -234,17 +234,16 @@ export class FileSystemRequestHandler {
         case vscode.FileType.Unknown:
           break;
         case vscode.FileType.File:
-          directory.content.push({
+          directory.content[entry[0]] = {
             type: "file",
-            name: entry[0],
             content: await vscode.workspace.fs.readFile(
               vscode.Uri.joinPath(uri, entry[0])
             ),
-          });
+          };
           break;
         case vscode.FileType.Directory:
-          directory.content.push(
-            await this._readDirectory(path.join(directoryPath, entry[0]))
+          directory.content[entry[0]] = await this._readDirectory(
+            path.join(directoryPath, entry[0])
           );
           break;
         case vscode.FileType.SymbolicLink:

@@ -1,33 +1,48 @@
 import { MessagingProtocol } from "@crosslab-ide/abstract-messaging-channel";
 import { z } from "zod";
 
-// declare File type + typeguard
-export const FileSchema = z.object({
+// declare schemas and types for files without a name
+
+export const FileWithoutNameSchema = z.object({
   type: z.literal("file"),
-  name: z.string(),
   content: z.instanceof(Uint8Array),
 });
-export type File = z.infer<typeof FileSchema>;
-export function isFile(data: unknown): data is File {
-  return FileSchema.safeParse(data).success;
-}
+export type FileWithoutName = z.infer<typeof FileWithoutNameSchema>;
 
-// declare Directory type + typeguard
-const DirectoryBaseSchema = z.object({
-  type: z.literal("directory"),
+// declare schemas and types for files with a name
+
+export const FileSchema = FileWithoutNameSchema.extend({
   name: z.string(),
 });
-export type Directory = z.infer<typeof DirectoryBaseSchema> & {
-  content: (File | Directory)[];
+export type File = z.infer<typeof FileSchema>;
+
+// declare schemas and types for directories without a name
+
+const DirectoryWithoutNameBaseSchema = z.object({
+  type: z.literal("directory"),
+});
+export type DirectoryWithoutName = z.infer<
+  typeof DirectoryWithoutNameBaseSchema
+> & {
+  content: Record<string, FileWithoutName | DirectoryWithoutName>;
 };
-export const DirectorySchema: z.ZodType<Directory> = DirectoryBaseSchema.extend(
-  {
-    content: z.lazy(() => z.array(z.union([DirectorySchema, FileSchema]))),
-  }
-);
-export function isDirectory(data: unknown): data is Directory {
-  return DirectorySchema.safeParse(data).success;
-}
+export const DirectoryWithoutNameSchema: z.Schema<DirectoryWithoutName> =
+  DirectoryWithoutNameBaseSchema.extend({
+    content: z.lazy(() =>
+      z.record(z.union([DirectoryWithoutNameSchema, FileWithoutNameSchema]))
+    ),
+  });
+
+// declare schemas and types for directories with a name
+
+export const DirectorySchema = z.object({
+  type: z.literal("directory"),
+  name: z.string(),
+  content: z.record(
+    z.union([DirectoryWithoutNameSchema, FileWithoutNameSchema])
+  ),
+});
+export type Directory = z.infer<typeof DirectorySchema>;
 
 type FileSystemProtocolMessageType =
   | "createDirectory:request"
@@ -187,7 +202,9 @@ export const fileSystemProtocol = {
         path: z.string(),
         newContent: z.union([
           z.instanceof(Uint8Array),
-          z.array(z.union([DirectorySchema, FileSchema])),
+          z.record(
+            z.union([DirectoryWithoutNameSchema, FileWithoutNameSchema])
+          ),
         ]),
       }),
       z.object({

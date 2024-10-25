@@ -232,7 +232,7 @@ export class DeviceHandler extends TypedEmitter<DeviceHandlerEvents> {
 
   getServiceMeta() {
     return Array.from(this.services.values()).map((service) => {
-      const meta = service.resultFormats();
+      const meta = service.getMeta();
       return {
         ...meta,
         supportedConnectionTypes: meta.supportedConnectionTypes.filter(
