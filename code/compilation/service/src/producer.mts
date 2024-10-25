@@ -19,29 +19,25 @@ import {
 } from "@crosslab-ide/compilation-messaging-protocol";
 
 interface CompilationService__ProducerEvents<
-  F extends readonly string[],
-  R extends ResultFormatsDescriptor<F>
+  R extends ResultFormatsDescriptor
 > {
   "compilation:request": (
     request: ProtocolMessage<
-      CompilationProtocol<F, R>,
+      CompilationProtocol<R>,
       "compilation:request"
     >["content"]
   ) => void;
 }
 
-export class CompilationService__Producer<
-    F extends readonly string[],
-    R extends ResultFormatsDescriptor<F>
-  >
-  extends TypedEmitter<CompilationService__ProducerEvents<F, R>>
+export class CompilationService__Producer<R extends ResultFormatsDescriptor>
+  extends TypedEmitter<CompilationService__ProducerEvents<R>>
   implements Service
 {
   private _messagingChannel?: CrossLabMessagingChannel<
-    CompilationProtocol<F, R>,
+    CompilationProtocol<R>,
     "server"
   >;
-  private _compilationProtocol: CompilationProtocol<F, R>;
+  private _compilationProtocol: CompilationProtocol<R>;
   serviceType: string = "https://api.goldi-labs.de/serviceTypes/compilation";
   serviceId: string;
   serviceDirection: ServiceDirection = "producer";
@@ -84,7 +80,7 @@ export class CompilationService__Producer<
     }
   }
 
-  send(message: OutgoingMessage<CompilationProtocol<F, R>, "server">) {
+  send(message: OutgoingMessage<CompilationProtocol<R>, "server">) {
     if (!this._messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
@@ -92,7 +88,7 @@ export class CompilationService__Producer<
   }
 
   private _handleMessage(
-    message: IncomingMessage<CompilationProtocol<F, R>, "server">
+    message: IncomingMessage<CompilationProtocol<R>, "server">
   ) {
     switch (message.type) {
       case "compilation:request":

@@ -21,16 +21,15 @@ import { PromiseManager } from "./promiseManager.mjs";
 import { v4 as uuidv4 } from "uuid";
 
 export class CompilationService__Consumer<
-  F extends readonly string[],
-  R extends ResultFormatsDescriptor<F>
+  R extends ResultFormatsDescriptor = ResultFormatsDescriptor
 > implements Service
 {
   private _messagingChannel?: CrossLabMessagingChannel<
-    CompilationProtocol<F, R>,
+    CompilationProtocol<R>,
     "client"
   >;
   private _promiseManager: PromiseManager = new PromiseManager();
-  private _compilationProtocol: CompilationProtocol<F, R>;
+  private _compilationProtocol: CompilationProtocol<R>;
   serviceType: string = "https://api.goldi-labs.de/serviceTypes/compilation";
   serviceId: string;
   serviceDirection: ServiceDirection = "consumer";
@@ -75,7 +74,7 @@ export class CompilationService__Consumer<
   }
 
   private _handleMessage(
-    message: IncomingMessage<CompilationProtocol<F, R>, "client">
+    message: IncomingMessage<CompilationProtocol<R>, "client">
   ) {
     switch (message.type) {
       case "compilation:response":
@@ -89,10 +88,7 @@ export class CompilationService__Consumer<
   async compile(
     directory: Directory
   ): Promise<
-    ProtocolMessage<
-      CompilationProtocol<F, R>,
-      "compilation:response"
-    >["content"]
+    ProtocolMessage<CompilationProtocol<R>, "compilation:response">["content"]
   > {
     if (!this._messagingChannel) {
       throw new Error("No messaging channel has been set up!");
