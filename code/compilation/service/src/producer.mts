@@ -80,11 +80,11 @@ export class CompilationService__Producer<R extends ResultFormatsDescriptor>
     }
   }
 
-  send(message: OutgoingMessage<CompilationProtocol<R>, "server">) {
+  async send(message: OutgoingMessage<CompilationProtocol<R>, "server">) {
     if (!this._messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
-    this._messagingChannel.send(message);
+    await this._messagingChannel.send(message);
   }
 
   private _handleMessage(

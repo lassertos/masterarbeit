@@ -17,10 +17,7 @@ import {
 
 export class ArduinoCliCompilationInstance {
   private _deviceHandler: DeviceHandler;
-  private _compilationServiceProducer: CompilationService__Producer<
-    ArduinoCliResultFormatsDescription["formatNames"],
-    ArduinoCliResultFormatsDescription
-  >;
+  private _compilationServiceProducer: CompilationService__Producer<ArduinoCliResultFormatsDescription>;
   private _instanceUrl: string;
   private _deviceToken: string;
 
@@ -54,9 +51,6 @@ export class ArduinoCliCompilationInstance {
       }
     );
     const token = await response.json();
-    console.log("endpoint:", configuration.WEBSOCKET_ENDPOINT);
-    console.log("id:", this._instanceUrl);
-    console.log("token:", token);
     await this._deviceHandler.connect({
       endpoint: configuration.WEBSOCKET_ENDPOINT,
       id: this._instanceUrl,
@@ -66,10 +60,7 @@ export class ArduinoCliCompilationInstance {
 
   private _handleCompilationRequest(
     request: ProtocolMessage<
-      CompilationProtocol<
-        ArduinoCliResultFormatsDescription["formatNames"],
-        ArduinoCliResultFormatsDescription
-      >,
+      CompilationProtocol<ArduinoCliResultFormatsDescription>,
       "compilation:request"
     >["content"]
   ) {
@@ -95,28 +86,145 @@ export class ArduinoCliCompilationInstance {
         `arduino-cli compile -b arduino:avr:mega ${projectDirectoryPath} --build-path ${buildDirectoryPath}`,
         { encoding: "utf-8", stdio: "pipe" }
       );
-      const elfFilePath = path.join(
-        buildDirectoryPath,
-        `${directory.name}.ino.elf`
-      );
-      const elfData = fs.readFileSync(elfFilePath);
 
-      if (request.format) {
-        // TODO: handle format
-      } else {
-        this._compilationServiceProducer.send({
-          type: "compilation:response",
-          content: {
-            requestId: request.requestId,
-            success: true,
-            message,
-            result: {
-              type: "file",
-              name: "sketch.ino.elf",
-              content: elfData,
+      const files = {
+        "sketch.ino.elf": fs.readFileSync(
+          path.join(buildDirectoryPath, `${directory.name}.ino.elf`)
+        ),
+        "sketch.ino.hex": fs.readFileSync(
+          path.join(buildDirectoryPath, `${directory.name}.ino.hex`)
+        ),
+        "sketch.ino.with_bootloader.bin": fs.readFileSync(
+          path.join(
+            buildDirectoryPath,
+            `${directory.name}.ino.with_bootloader.bin`
+          )
+        ),
+        "sketch.ino.with_bootloader.hex": fs.readFileSync(
+          path.join(
+            buildDirectoryPath,
+            `${directory.name}.ino.with_bootloader.hex`
+          )
+        ),
+      };
+
+      switch (request.format) {
+        case "build directory":
+          this._compilationServiceProducer.send({
+            type: "compilation:response",
+            content: {
+              requestId: request.requestId,
+              success: true,
+              message,
+              format: "build directory",
+              result: {
+                type: "directory",
+                name: "build",
+                content: {
+                  "sketch.ino.elf": {
+                    type: "file",
+                    content: files["sketch.ino.elf"],
+                  },
+                  "sketch.ino.hex": {
+                    type: "file",
+                    content: files["sketch.ino.hex"],
+                  },
+                  "sketch.ino.with_bootloader.bin": {
+                    type: "file",
+                    content: files["sketch.ino.with_bootloader.bin"],
+                  },
+                  "sketch.ino.bootloader.hex": {
+                    type: "file",
+                    content: files["sketch.ino.with_bootloader.hex"],
+                  },
+                },
+              },
             },
-          },
-        });
+          });
+          break;
+        case "elf":
+          this._compilationServiceProducer.send({
+            type: "compilation:response",
+            content: {
+              requestId: request.requestId,
+              success: true,
+              message,
+              format: "elf",
+              result: {
+                type: "file",
+                name: "sketch.ino.elf",
+                content: files["sketch.ino.elf"],
+              },
+            },
+          });
+          break;
+        case "hex":
+          this._compilationServiceProducer.send({
+            type: "compilation:response",
+            content: {
+              requestId: request.requestId,
+              success: true,
+              message,
+              format: "hex",
+              result: {
+                type: "file",
+                name: "sketch.ino.hex",
+                content: files["sketch.ino.hex"],
+              },
+            },
+          });
+          break;
+        case "bin with bootloader":
+          this._compilationServiceProducer.send({
+            type: "compilation:response",
+            content: {
+              requestId: request.requestId,
+              success: true,
+              message,
+              format: "bin with bootloader",
+              result: {
+                type: "file",
+                name: "sketch.ino.with_bootloader.bin",
+                content: files["sketch.ino.with_bootloader.bin"],
+              },
+            },
+          });
+          break;
+        case "hex with bootloader":
+          this._compilationServiceProducer.send({
+            type: "compilation:response",
+            content: {
+              requestId: request.requestId,
+              success: true,
+              message,
+              format: "hex with bootloader",
+              result: {
+                type: "file",
+                name: "sketch.ino.with_bootloader.hex",
+                content: files["sketch.ino.with_bootloader.hex"],
+              },
+            },
+          });
+          break;
+        default:
+          this._compilationServiceProducer.send({
+            type: "compilation:response",
+            content: {
+              requestId: request.requestId,
+              success: true,
+              message,
+              format: "elf",
+              result: {
+                type: "file",
+                name: "sketch.ino.elf",
+                content: files["sketch.ino.elf"],
+              },
+            },
+          });
+          break;
+      }
+      if (request.format) {
+      } else {
       }
     } catch (error) {
       this._compilationServiceProducer.send({
@@ -146,14 +254,4 @@ export class ArduinoCliCompilationInstance {
       }
     }
   }
-
-  private _sendResult(
-    request: ProtocolMessage<
-      CompilationProtocol<
-        ArduinoCliResultFormatsDescription["formatNames"],
-        ArduinoCliResultFormatsDescription
-      >,
-      "compilation:request"
-    >
-  ) {}
 }

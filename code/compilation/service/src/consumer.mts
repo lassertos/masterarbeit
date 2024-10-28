@@ -21,7 +21,7 @@ import { PromiseManager } from "./promiseManager.mjs";
 import { v4 as uuidv4 } from "uuid";
 
 export class CompilationService__Consumer<
-  R extends ResultFormatsDescriptor = ResultFormatsDescriptor
+  R extends ResultFormatsDescriptor = {}
 > implements Service
 {
   private _messagingChannel?: CrossLabMessagingChannel<
@@ -74,7 +74,7 @@ export class CompilationService__Consumer<
   }
 
   private _handleMessage(
-    message: IncomingMessage<CompilationProtocol<R>, "client">
+    message: IncomingMessage<CompilationProtocol, "client">
   ) {
     switch (message.type) {
       case "compilation:response":
