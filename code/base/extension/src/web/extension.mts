@@ -32,14 +32,18 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(statusBarItem);
 
+  console.log("extensionUri:", context.extensionUri);
+
   const settingsDatabase = await openSettingsDatabase();
-  const configuration = vscode.workspace.getConfiguration();
-  const instanceUrl =
-    configuration.get("crosslab.instanceUrl") ??
-    (await readSetting(settingsDatabase, "crosslab.instanceUrl"));
-  const deviceToken =
-    configuration.get("crosslab.deviceToken") ??
-    (await readSetting(settingsDatabase, "crosslab.deviceToken"));
+  // const configuration = vscode.workspace.getConfiguration();
+  const instanceUrl = new URLSearchParams(context.extensionUri.query).get(
+    "instanceUrl"
+  );
+  const deviceToken = new URLSearchParams(context.extensionUri.query).get(
+    "deviceToken"
+  );
+  console.log("instanceUrl:", instanceUrl);
+  console.log("deviceToken:", deviceToken);
 
   if (typeof instanceUrl !== "string") {
     throw new Error(
@@ -99,7 +103,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       console.log("connection established successfully!");
     } catch (error) {
-      console.error(error);
+      console.error("connection failed:", error);
     }
   }
 }

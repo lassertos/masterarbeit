@@ -12,6 +12,6 @@
   },
   "latex-workshop.latex.rootFile.indicator": "\\begin{document}",
   "latex-workshop.latex.outDir": "%DIR%/dist",
-  "editor.wordWrap": "on",
-  "workbench.colorTheme": "Default Light Modern"
+  "latex-workshop.formatting.latex": "latexindent",
+  "editor.wordWrap": "on"
 }

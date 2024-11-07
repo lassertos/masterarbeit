@@ -7,31 +7,27 @@ import {
   ServiceDirection,
 } from "@crosslab-ide/soa-client";
 import { TypedEmitter } from "tiny-typed-emitter";
-import { debuggingProtocol, DebuggingProtocol } from "./protocol.mjs";
 import {
-  IncomingMessage,
-  OutgoingMessage,
-} from "@crosslab-ide/abstract-messaging-channel";
-import { Directory } from "./types.mjs";
+  debuggingTargetProtocol,
+  DebuggingTargetProtocol,
+} from "./protocol.mjs";
+import { OutgoingMessage } from "@crosslab-ide/abstract-messaging-channel";
 
-interface DebuggingServiceProducerEvents {
-  "new-session": (sessionInfo: {
-    id: string;
-    directory: Directory;
-    configuration: unknown;
-  }) => void;
-  message: (sessionId: string, message: unknown) => void;
+interface DebuggingTargetServiceProducerEvents {
+  "debugging:start": (requestId: string, program: Uint8Array) => void;
+  "debugging:end": (requestId: string) => void;
 }
 
-export class DebuggingServiceProducer
-  extends TypedEmitter<DebuggingServiceProducerEvents>
+export class DebuggingTargetServiceProducer
+  extends TypedEmitter<DebuggingTargetServiceProducerEvents>
   implements Service
 {
   private _messagingChannel?: CrossLabMessagingChannel<
-    DebuggingProtocol,
-    "server"
+    DebuggingTargetProtocol,
+    "target"
   >;
-  serviceType: string = "https://api.goldi-labs.de/serviceTypes/debugging";
+  serviceType: string =
+    "https://api.goldi-labs.de/serviceTypes/debugging-target";
   serviceId: string;
   serviceDirection: ServiceDirection = "producer";
 
@@ -57,12 +53,24 @@ export class DebuggingServiceProducer
     const channel = new DataChannel();
     this._messagingChannel = new CrossLabMessagingChannel(
       channel,
-      debuggingProtocol,
-      "server"
+      debuggingTargetProtocol,
+      "target"
     );
-    this._messagingChannel.on("message", (message) =>
-      this._handleMessage(message)
-    );
+    this._messagingChannel.on("message", (message) => {
+      switch (message.type) {
+        case "debugging:start:request":
+          console.log("Emitting debugging:start");
+          this.emit(
+            "debugging:start",
+            message.content.requestId,
+            message.content.program
+          );
+          break;
+        case "debugging:end:request":
+          this.emit("debugging:end", message.content.requestId);
+          break;
+      }
+    });
     if (connection.tiebreaker) {
       connection.transmit(serviceConfig, "data", channel);
     } else {
@@ -70,25 +78,10 @@ export class DebuggingServiceProducer
     }
   }
 
-  async send(message: OutgoingMessage<DebuggingProtocol, "server">) {
+  async send(message: OutgoingMessage<DebuggingTargetProtocol, "target">) {
     if (!this._messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
     await this._messagingChannel.send(message);
-  }
-
-  private _handleMessage(
-    message: IncomingMessage<DebuggingProtocol, "server">
-  ) {
-    switch (message.type) {
-      case "message:dap":
-        return this.emit(
-          "message",
-          message.content.sessionId,
-          message.content.message
-        );
-      case "session:start:request":
-        return this.emit("new-session", message.content);
-    }
   }
 }

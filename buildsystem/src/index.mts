@@ -36,7 +36,7 @@ if (!args.values.path) {
 }
 
 const basePath = args.values.path;
-const data = fs.readFileSync(path.join(basePath, ".jobs.yml"), {
+const data = fs.readFileSync(path.join(basePath, ".buildsystem.yml"), {
   encoding: "utf8",
 });
 const projectDescriptions = YAML.parse(data);

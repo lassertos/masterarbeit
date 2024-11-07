@@ -40,7 +40,7 @@ PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 npm ci --prefix /home/vscode/buildsystem && npm run build --prefix /home/vscode/buildsystem
 cat > /usr/local/bin/buildsystem << EOL 
 path=\$(pwd)
-    while [[ "\$path" != "" && ! -e "\$path/.jobs.yml" ]]; do
+    while [[ "\$path" != "" && ! -e "\$path/.buildsystem.yml" ]]; do
         path=\${path%/*}
     done
 path="\$path"
@@ -51,10 +51,10 @@ EOL
 cat > /home/vscode/.bash_completion << EOL
 _buildsystem(){
   path=\$(pwd)
-  while [[ "\$path" != "" && ! -e "\$path/.jobs.yml" ]]; do
+  while [[ "\$path" != "" && ! -e "\$path/.buildsystem.yml" ]]; do
     path=\${path%/*}
   done
-  path="\$path/.jobs.yml"
+  path="\$path/.buildsystem.yml"
   projects=\$(yq -r 'keys | join(" ")' \$path)
   if [ \${#COMP_WORDS[@]} == 2 ]; then
     COMPREPLY=( \$(compgen -W "\$projects" -- "\$2") )

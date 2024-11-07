@@ -1,0 +1,12 @@
+diff --git a/avr-gcc-build.sh b/avr-gcc-build.sh
+index fa2c48a..0fc3acd 100644
+--- a/avr-gcc-build.sh
++++ b/avr-gcc-build.sh
+@@ -122,6 +122,7 @@ OPTS_GCC="
+ OPTS_GDB="
+ 	--target=avr
+ 	--with-static-standard-libraries
++	--with-python
+ "
+ 
+ OPTS_LIBC=""

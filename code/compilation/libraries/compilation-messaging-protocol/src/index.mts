@@ -1,4 +1,3 @@
-import { IncomingMessage } from "@crosslab-ide/abstract-messaging-channel";
 import { z } from "zod";
 
 // declare schemas and types for files without a name
@@ -103,24 +102,34 @@ type DirectoryResultFormat = z.infer<typeof DirectoryResultFormatSchema>;
 
 // declare types for result formats
 
-type ResultFormatArrayId<R extends ResultFormat[]> = R extends [
-  infer Head extends ResultFormat,
-  ...infer Tail extends ResultFormat[]
-]
-  ? Head["id"] | ResultFormatArrayId<Tail>
-  : never;
+export type UniqueResultFormatArray<R extends readonly ResultFormat[]> =
+  R extends readonly [
+    infer Head extends ResultFormat,
+    ...infer Tail extends ResultFormat[]
+  ]
+    ? Head["id"] extends IdArray<Tail>[number]
+      ? never
+      : [Head, ...UniqueResultFormatArray<Tail>]
+    : R;
 
-type ResultFormat = {
+export type IdArray<A extends readonly { id: string }[]> = A extends [
+  infer Head extends { id: string },
+  ...infer Tail extends readonly { id: string }[]
+]
+  ? [Head["id"], ...IdArray<Tail>]
+  : [];
+
+export type ResultFormat = {
   id: string;
-  description: string;
+  description?: string;
   result: FileResultFormat | DirectoryResultFormat;
 };
 
-type FormattedResult<R extends ResultFormats[], K extends keyof R> = {
-  type: R[K]["result"]["type"];
-  name: R[K]["result"]["name"];
-  content: R[K]["result"] extends DirectoryResultFormat
-    ? FormattedDirectoryResultContent<R[K]["result"]>
+type FormattedResult<R extends ResultFormat> = {
+  type: R["result"]["type"];
+  name: R["result"]["name"];
+  content: R["result"] extends DirectoryResultFormat
+    ? FormattedDirectoryResultContent<R["result"]>
     : Uint8Array;
 };
 
@@ -142,35 +151,30 @@ type FormattedDirectoryResultContent<
 };
 
 type FormattedResponse<
-  R extends ResultFormatsDescriptor,
-  U = keyof R extends string ? ToTuple<keyof R> : undefined
-> = U extends undefined
+  R extends ResultFormat[],
+  sawEntry extends boolean = false
+> = R extends [
+  infer Head extends ResultFormat,
+  ...infer Tail extends ResultFormat[]
+]
+  ?
+      | {
+          requestId: string;
+          success: true;
+          message?: string;
+          format: Head["id"];
+          result: FormattedResult<Head>;
+        }
+      | FormattedResponse<Tail, true>
+  : sawEntry extends false
   ? {
       requestId: string;
       success: true;
       message?: string;
       format?: string;
-      result: File | Directory;
+      result: Directory | File;
     }
-  : U extends readonly [infer Head, ...infer Tail]
-  ? Head extends keyof R
-    ?
-        | {
-            requestId: string;
-            success: true;
-            message?: string;
-            format: Head;
-            result: FormattedResult<R, Head>;
-          }
-        | (Tail extends readonly string[] ? FormattedResponse<R, Tail> : never)
-    : never
   : never;
-
-function test<R extends ResultFormatsDescriptor>(
-  message: IncomingMessage<CompilationProtocol<R>, "client">
-) {
-  const test: ToTuple<keyof R> extends string[] ? true : false = true;
-}
 
 function buildDirectoryContentSchema(
   directory: DirectoryResultFormatWithoutName
@@ -195,53 +199,77 @@ function buildDirectoryContentSchema(
   );
 }
 
-function buildResultSchemaFromResultFormat<
-  R extends ResultFormatsDescriptor,
-  K extends keyof R
->(resultFormatsDescriptor: R, formatName: K): z.Schema<FormattedResult<R, K>> {
+function buildResultSchemaFromResultFormat<R extends ResultFormat>(
+  resultFormat: R
+): z.Schema<FormattedResult<R>> {
   return z.object({
-    type: z.literal(
-      resultFormatsDescriptor[formatName].result.type
-    ) as z.ZodType<FormattedResult<R, K>["type"]>,
-    name: z.literal(
-      resultFormatsDescriptor[formatName].result.name
-    ) as z.ZodType<FormattedResult<R, K>["name"]>,
+    type: z.literal(resultFormat.result.type),
+    name: z.literal(resultFormat.result.name),
     content:
-      resultFormatsDescriptor[formatName].result.type === "file"
-        ? (z.instanceof(Uint8Array) as z.ZodType<
-            FormattedResult<R, K>["content"]
-          >)
-        : (buildDirectoryContentSchema(
-            resultFormatsDescriptor[formatName].result
-          ) as z.ZodType<FormattedResult<R, K>["content"]>),
-  }) as unknown as z.Schema<FormattedResult<R, K>>;
+      resultFormat.result.type === "file"
+        ? z.instanceof(Uint8Array)
+        : buildDirectoryContentSchema(resultFormat.result),
+  }) as z.Schema<FormattedResult<R>>;
 }
 
-function buildResponseSchemaFromResultFormat<R extends ResultFormatsDescriptor>(
-  resultFormatsDescriptor: R,
-  formatName: keyof R
+function buildResponseSchemaFromResultFormats<R extends ResultFormat[]>(
+  resultFormatsInput?: R
 ): z.Schema<FormattedResponse<R>> {
-  return z.object({
-    requestId: z.string(),
-    success: z.literal(true),
-    message: z.optional(z.string()),
-    format: z.literal(formatName),
-    result: buildResultSchemaFromResultFormat(
-      resultFormatsDescriptor,
-      formatName
-    ),
-  }) as unknown as z.Schema<FormattedResponse<R>>;
+  const resultFormats = resultFormatsInput ?? [];
+  if (resultFormats.length === 0) {
+    return z.object({
+      requestId: z.string(),
+      success: z.literal(true),
+      message: z.optional(z.string()),
+      format: z.optional(z.string()),
+      result: z.union([DirectorySchema, FileSchema]),
+    }) as unknown as z.Schema<FormattedResponse<R>>;
+  } else if (resultFormats.length === 1) {
+    return z.object({
+      requestId: z.string(),
+      success: z.literal(true),
+      message: z.optional(z.string()),
+      format: z.literal(resultFormats[0].id),
+      result: buildResultSchemaFromResultFormat(resultFormats[0]),
+    }) as unknown as z.Schema<FormattedResponse<R>>;
+  } else {
+    return z.union([
+      z.object({
+        requestId: z.string(),
+        success: z.literal(true),
+        message: z.optional(z.string()),
+        format: z.literal(resultFormats[0].id),
+        result: buildResultSchemaFromResultFormat(resultFormats[0]),
+      }),
+      z.object({
+        requestId: z.string(),
+        success: z.literal(true),
+        message: z.optional(z.string()),
+        format: z.literal(resultFormats[1].id),
+        result: buildResultSchemaFromResultFormat(resultFormats[1]),
+      }),
+      ...resultFormats.slice(2).map((resultFormat) => {
+        return z.object({
+          requestId: z.string(),
+          success: z.literal(true),
+          message: z.optional(z.string()),
+          format: z.literal(resultFormat.id),
+          result: buildResultSchemaFromResultFormat(resultFormat),
+        });
+      }),
+    ]) as unknown as z.Schema<FormattedResponse<R>>;
+  }
 }
 
 // declare type for compilation protocol
 
-export type CompilationProtocol<R extends ResultFormatsDescriptor = {}> = {
+export type CompilationProtocol<R extends ResultFormat[] = []> = {
   messageTypes: ["compilation:request", "compilation:response"];
   messages: {
     "compilation:request": z.ZodType<{
       requestId: string;
       directory: Directory;
-      format?: keyof R;
+      format?: IdArray<R>[number];
     }>;
     "compilation:response": z.ZodType<
       | {
@@ -271,10 +299,10 @@ export type CompilationProtocol<R extends ResultFormatsDescriptor = {}> = {
   };
 };
 
-export function buildCompilationProtocol<
-  R extends ResultFormatsDescriptor = {}
->(resultFormatsDescriptor?: R): CompilationProtocol<R> {
-  const formatNames = Object.keys(resultFormatsDescriptor ?? {});
+export function buildCompilationProtocol<R extends ResultFormat[] = []>(
+  resultFormatsInput?: R
+): CompilationProtocol<R> {
+  const resultFormats = resultFormatsInput ?? [];
   return {
     messageTypes: ["compilation:request", "compilation:response"],
     messages: {
@@ -282,17 +310,17 @@ export function buildCompilationProtocol<
         requestId: z.string(),
         directory: DirectorySchema,
         format:
-          formatNames.length === 0
+          resultFormats.length === 0
             ? z.optional(z.string())
-            : formatNames.length === 1
-            ? z.optional(z.literal(formatNames[0]))
+            : resultFormats.length === 1
+            ? z.optional(z.literal(resultFormats[0].id))
             : z.optional(
                 z.union([
-                  z.literal(formatNames[0]),
-                  z.literal(formatNames[1]),
-                  ...formatNames
+                  z.literal(resultFormats[0].id),
+                  z.literal(resultFormats[1].id),
+                  ...resultFormats
                     .slice(2)
-                    .map((formatName) => z.literal(formatName)),
+                    .map((resultFormat) => z.literal(resultFormat.id)),
                 ])
               ),
       }),
@@ -308,23 +336,8 @@ export function buildCompilationProtocol<
           success: z.literal(false),
           message: z.optional(z.string()),
         }),
-        ...(resultFormatsDescriptor && formatNames.length > 0
-          ? formatNames.map((formatName) =>
-              buildResponseSchemaFromResultFormat(
-                resultFormatsDescriptor,
-                formatName
-              )
-            )
-          : [
-              z.object({
-                requestId: z.string(),
-                success: z.literal(true),
-                message: z.optional(z.string()),
-                format: z.optional(z.string()),
-                result: z.union([FileSchema, DirectorySchema]),
-              }),
-            ]),
-      ]),
+        buildResponseSchemaFromResultFormats(resultFormats),
+      ]) as unknown as CompilationProtocol<R>["messages"]["compilation:response"],
     },
     roles: ["client", "server"],
     roleMessages: {

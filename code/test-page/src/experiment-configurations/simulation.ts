@@ -3,6 +3,7 @@ import { ExperimentServiceTypes } from "@cross-lab-project/api-client";
 export default (deviceUrls: {
   "code-editor": string;
   compiler: string;
+  debugger: string;
   simulation: string;
   vpspu: string;
 }): ExperimentServiceTypes.Template<"request"> => {
@@ -19,6 +20,10 @@ export default (deviceUrls: {
           role: "compiler",
         },
         {
+          device: deviceUrls["debugger"],
+          role: "debugger",
+        },
+        {
           device: deviceUrls["simulation"],
           role: "simulation",
         },
@@ -30,10 +35,88 @@ export default (deviceUrls: {
       roles: [
         { name: "code-editor" },
         { name: "compiler" },
+        { name: "debugger" },
         { name: "simulation" },
         { name: "vpspu" },
       ],
       serviceConfigurations: [
+        {
+          serviceType:
+            "https://api.goldi-labs.de/serviceTypes/debugging-adapter",
+          participants: [
+            {
+              role: "code-editor",
+              config: {},
+              serviceId: "debugging:debugging-adapter",
+            },
+            {
+              role: "debugger",
+              config: {},
+              serviceId: "debugging-adapter",
+            },
+          ],
+        },
+        {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/messaging",
+          participants: [
+            {
+              role: "debugger",
+              config: {},
+              serviceId: "messaging",
+            },
+            {
+              role: "simulation",
+              config: {},
+              serviceId: "messaging",
+            },
+          ],
+        },
+        {
+          serviceType:
+            "https://api.goldi-labs.de/serviceTypes/debugging-target",
+          participants: [
+            {
+              role: "debugger",
+              config: {},
+              serviceId: "debugging-target",
+            },
+            {
+              role: "simulation",
+              config: {},
+              serviceId: "debugging-target",
+            },
+          ],
+        },
+        {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/compilation",
+          participants: [
+            {
+              role: "compiler",
+              config: {},
+              serviceId: "compilation",
+            },
+            {
+              role: "debugger",
+              config: {},
+              serviceId: "compilation",
+            },
+          ],
+        },
+        {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/filesystem",
+          participants: [
+            {
+              role: "code-editor",
+              config: {},
+              serviceId: "debugging:filesystem",
+            },
+            {
+              role: "code-editor",
+              config: {},
+              serviceId: "filesystem",
+            },
+          ],
+        },
         {
           serviceType: "https://api.goldi-labs.de/serviceTypes/file",
           participants: [

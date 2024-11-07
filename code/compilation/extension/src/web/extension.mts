@@ -18,6 +18,18 @@ export function activate(context: vscode.ExtensionContext) {
 
   const outputchannel = vscode.window.createOutputChannel("compilation");
 
+  const compilationServiceProducerId = new Promise<string>((resolve) => {
+    compilationService__Consumer.once("new-producer", (producerId) =>
+      resolve(producerId)
+    );
+  });
+
+  const fileSystemServiceProducerId = new Promise<string>((resolve) => {
+    fileSystemService__Consumer.once("new-producer", (producerId) =>
+      resolve(producerId)
+    );
+  });
+
   const compileDisposable = vscode.commands.registerCommand(
     "crosslab-compilation-extension.compile",
     async () => {
@@ -41,10 +53,14 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       const directory = await fileSystemService__Consumer.readDirectory(
+        await fileSystemServiceProducerId,
         workspaceFolder.uri.path
       );
 
-      const result = await compilationService__Consumer.compile(directory);
+      const result = await compilationService__Consumer.compile(
+        await compilationServiceProducerId,
+        directory
+      );
 
       outputchannel.clear();
       await vscode.commands.executeCommand("workbench.panel.output.focus");

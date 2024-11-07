@@ -10,7 +10,8 @@ typedef enum
     CREATED,
     PROGRAMMED,
     RUNNING,
-    STOPPED
+    STOPPED,
+    TERMINATED
 } simulation_status;
 
 typedef struct
@@ -43,4 +44,7 @@ public:
     Napi::Value listPins(const Napi::CallbackInfo &info);
     void registerPinCallback(const Napi::CallbackInfo &info);
     Napi::Value getStatus(const Napi::CallbackInfo &info);
+    void startDebugging(const Napi::CallbackInfo &info);
+    void endDebugging(const Napi::CallbackInfo &info);
+    void terminate(const Napi::CallbackInfo &info);
 };

@@ -19,16 +19,9 @@ export class CrossLabMessagingChannel<
     this._channel = channel;
     this._channel.ready().then(() => this.emit("ready"));
     this._channel.ondata = (data: unknown) => {
-      console.log("received data", data);
+      console.log(`received data: ${data}`);
       if (typeof data === "string") {
         const message = JSON.parse(data, reviver);
-        console.log(message);
-        console.log(
-          protocol,
-          role,
-          message,
-          isIncomingMessage(protocol, role, message)
-        );
         if (isIncomingMessage(protocol, role, message)) {
           console.log("emitting message", message);
           this.emit("message", message);
@@ -38,6 +31,7 @@ export class CrossLabMessagingChannel<
   }
 
   send(message: OutgoingMessage<MP, R>): Promise<void> | void {
+    console.log(`sending message: ${JSON.stringify(message, replacer)}`);
     this._channel.send(JSON.stringify(message, replacer));
   }
 }

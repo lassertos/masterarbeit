@@ -10,14 +10,11 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 import { execSync } from "child_process";
-import {
-  ArduinoCliResultFormatsDescription,
-  arduinoCliResultFormatsDescription,
-} from "./types.mjs";
+import { arduinoCliResultFormats, ArduinoCliResultFormats } from "./types.mjs";
 
 export class ArduinoCliCompilationInstance {
   private _deviceHandler: DeviceHandler;
-  private _compilationServiceProducer: CompilationService__Producer<ArduinoCliResultFormatsDescription>;
+  private _compilationServiceProducer: CompilationService__Producer<ArduinoCliResultFormats>;
   private _instanceUrl: string;
   private _deviceToken: string;
 
@@ -29,11 +26,12 @@ export class ArduinoCliCompilationInstance {
 
     this._compilationServiceProducer = new CompilationService__Producer(
       "compilation",
-      arduinoCliResultFormatsDescription
+      arduinoCliResultFormats
     );
 
-    this._compilationServiceProducer.on("compilation:request", (request) =>
-      this._handleCompilationRequest(request)
+    this._compilationServiceProducer.on(
+      "compilation:request",
+      (clientId, request) => this._handleCompilationRequest(clientId, request)
     );
 
     this._deviceHandler.addService(this._compilationServiceProducer);
@@ -59,8 +57,9 @@ export class ArduinoCliCompilationInstance {
   }
 
   private _handleCompilationRequest(
+    clientId: string,
     request: ProtocolMessage<
-      CompilationProtocol<ArduinoCliResultFormatsDescription>,
+      CompilationProtocol<ArduinoCliResultFormats>,
       "compilation:request"
     >["content"]
   ) {
@@ -83,8 +82,12 @@ export class ArduinoCliCompilationInstance {
 
     try {
       const message = execSync(
-        `arduino-cli compile -b arduino:avr:mega ${projectDirectoryPath} --build-path ${buildDirectoryPath}`,
-        { encoding: "utf-8", stdio: "pipe" }
+        `arduino-cli compile -b arduino:avr:mega ${projectDirectoryPath} --build-path ${buildDirectoryPath} --build-property "build.extra_flags=-fdebug-prefix-map=${path.dirname(
+          projectDirectoryPath
+        )}=." --build-property "compiler.c.elf.extra_flags=-fdebug-prefix-map=${path.dirname(
+          projectDirectoryPath
+        )}=."`,
+        { encoding: "utf-8", stdio: "pipe", cwd: sourceDirectoryPath }
       );
 
       const files = {
@@ -110,7 +113,7 @@ export class ArduinoCliCompilationInstance {
 
       switch (request.format) {
         case "build directory":
-          this._compilationServiceProducer.send({
+          this._compilationServiceProducer.send(clientId, {
             type: "compilation:response",
             content: {
               requestId: request.requestId,
@@ -143,7 +146,7 @@ export class ArduinoCliCompilationInstance {
           });
           break;
         case "elf":
-          this._compilationServiceProducer.send({
+          this._compilationServiceProducer.send(clientId, {
             type: "compilation:response",
             content: {
               requestId: request.requestId,
@@ -159,7 +162,7 @@ export class ArduinoCliCompilationInstance {
           });
           break;
         case "hex":
-          this._compilationServiceProducer.send({
+          this._compilationServiceProducer.send(clientId, {
             type: "compilation:response",
             content: {
               requestId: request.requestId,
@@ -175,7 +178,7 @@ export class ArduinoCliCompilationInstance {
           });
           break;
         case "bin with bootloader":
-          this._compilationServiceProducer.send({
+          this._compilationServiceProducer.send(clientId, {
             type: "compilation:response",
             content: {
               requestId: request.requestId,
@@ -191,7 +194,7 @@ export class ArduinoCliCompilationInstance {
           });
           break;
         case "hex with bootloader":
-          this._compilationServiceProducer.send({
+          this._compilationServiceProducer.send(clientId, {
             type: "compilation:response",
             content: {
               requestId: request.requestId,
@@ -207,7 +210,7 @@ export class ArduinoCliCompilationInstance {
           });
           break;
         default:
-          this._compilationServiceProducer.send({
+          this._compilationServiceProducer.send(clientId, {
             type: "compilation:response",
             content: {
               requestId: request.requestId,
@@ -223,11 +226,8 @@ export class ArduinoCliCompilationInstance {
           });
           break;
       }
-      if (request.format) {
-      } else {
-      }
     } catch (error) {
-      this._compilationServiceProducer.send({
+      this._compilationServiceProducer.send(clientId, {
         type: "compilation:response",
         content: {
           requestId: request.requestId,

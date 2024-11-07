@@ -26,6 +26,19 @@ export default async () => {
       codeUrl: configuration.codeEditorUrl,
       services: [
         {
+          serviceDirection: "consumer",
+          serviceId: "debugging:debugging-adapter",
+          serviceType:
+            "https://api.goldi-labs.de/serviceTypes/debugging-adapter",
+          supportedConnectionTypes: ["webrtc", "websocket", "local"],
+        },
+        {
+          serviceDirection: "consumer",
+          serviceId: "debugging:filesystem",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/filesystem",
+          supportedConnectionTypes: ["webrtc", "websocket", "local"],
+        },
+        {
           serviceDirection: "producer",
           serviceId: "compilation:file",
           serviceType: "https://api.goldi-labs.de/serviceTypes/file",

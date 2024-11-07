@@ -59,6 +59,28 @@ editor-settings:
         prepare: npm ci
         execute: npm run build
 
+messaging-service:
+  path: code/shared/messaging-service
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - abstract-messaging-channel:publish
+        - crosslab-messaging-channel:publish
+        - soa-client-js:publish
+    publish: 
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - messaging-service:build
+
 electrical-connection-service-js:
   path: code/shared/electrical-connection-service-js
   jobs:
@@ -185,6 +207,51 @@ crosslab-compilation-service:
       dependencies:
         - crosslab-compilation-service:build
 
+crosslab-debugging-adapter-service:
+  path: code/debugging/services/adapter
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - abstract-messaging-channel:publish
+        - soa-client-js:publish
+        - crosslab-messaging-channel:publish
+    publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - crosslab-debugging-adapter-service:build
+
+
+crosslab-debugging-target-service:
+  path: code/debugging/services/target
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - abstract-messaging-channel:publish
+        - soa-client-js:publish
+        - crosslab-messaging-channel:publish
+    publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - crosslab-debugging-target-service:build
+
 crosslab-filesystem-service:
   path: code/filesystem/service
   jobs:
@@ -251,6 +318,29 @@ arduino-language-server:
       dependencies:
         - arduino-language-server:build
 
+gdb-server:
+  path: code/debugging/server
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - soa-client-js:publish
+        - crosslab-compilation-service:publish
+        - crosslab-debugging-adapter-service:publish
+        - crosslab-debugging-target-service:publish
+    build-docker:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: docker build --network host -t gdb-server .
+      dependencies:
+        - gdb-server:build
+
 simavr-node-addon:
   path: code/simulation/node-addon
   jobs:
@@ -283,6 +373,7 @@ simavr-server:
       dependencies:
         - soa-client-js:publish
         - electrical-connection-service-js:publish
+        - crosslab-debugging-target-service:publish
         - simavr-node-addon:publish
         - file-service-js:publish
     build-docker:
@@ -316,6 +407,14 @@ crosslab-lsp-extension:
         execute: npm run package-web
       dependencies:
         - message-service-js:publish
+
+crosslab-testing-extension:
+  path: code/testing/extension
+  jobs:
+    package:
+      commands:
+        prepare: npm ci
+        execute: npm run package-web
 
 crosslab-filesystem-extension:
   path: code/filesystem/extension
@@ -352,22 +451,19 @@ crosslab-debugging-extension:
         prepare: npm ci
         execute: npm run package-web
       dependencies:
+        - crosslab-debugging-adapter-service:build
         - electrical-connection-service-js:build
-        - soa-client-js:build
 
 crosslab-editor:
   path: code/editor
   jobs:
-    build:
-      commands:
-        prepare: npm ci
-        execute: npm run build
     copy-extensions:
       commands:
         execute: bash scripts/copy-extensions.sh
       dependencies:
         - crosslab-base-extension:package
         - crosslab-lsp-extension:package
+        - crosslab-testing-extension:package
         - crosslab-filesystem-extension:package
         - crosslab-compilation-extension:package
         - crosslab-debugging-extension:package
@@ -375,7 +471,6 @@ crosslab-editor:
       commands:
         execute: docker build --network host -t crosslab-editor .
       dependencies:
-        - crosslab-editor:build
         - crosslab-editor:copy-extensions
 
 helper-gateway:
@@ -431,6 +526,7 @@ test-page:
         - helper-gateway:build-docker
         - simavr-server:build-docker
         - vpspu:build-docker
+        - gdb-server:build-docker
 
 integration-test:
   path: code/integration-test

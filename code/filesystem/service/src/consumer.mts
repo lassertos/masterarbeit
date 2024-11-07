@@ -31,11 +31,18 @@ interface FileSystemWatcherEvents {
   moved: (oldPath: string, newPath: string) => void;
 }
 
-export class FileSystemService__Consumer implements Service {
-  private _messagingChannel?: CrossLabMessagingChannel<
-    FileSystemProtocol,
-    "consumer"
-  >;
+interface FileSystemServiceConsumerEvents {
+  "new-producer": (producerId: string) => void;
+}
+
+export class FileSystemService__Consumer
+  extends TypedEmitter<FileSystemServiceConsumerEvents>
+  implements Service
+{
+  private _producers: Map<
+    string,
+    CrossLabMessagingChannel<FileSystemProtocol, "consumer">
+  > = new Map();
   private _promiseManager: PromiseManager = new PromiseManager();
   private _fileSystemWatchers: Map<
     string,
@@ -46,6 +53,7 @@ export class FileSystemService__Consumer implements Service {
   serviceDirection: ServiceDirection = "consumer";
 
   constructor(serviceId: string) {
+    super();
     this.serviceId = serviceId;
   }
 
@@ -62,15 +70,16 @@ export class FileSystemService__Consumer implements Service {
     connection: PeerConnection,
     serviceConfig: ServiceConfiguration
   ): void {
+    // TODO: add checkConfig function
     console.log("setting up filesystem service consumer!");
+    const producerId = uuidv4();
     const channel = new DataChannel();
-    this._messagingChannel = new CrossLabMessagingChannel(
+    const messagingChannel = new CrossLabMessagingChannel(
       channel,
       fileSystemProtocol,
       "consumer"
     );
-    console.log(this._messagingChannel);
-    this._messagingChannel.on("message", (message) =>
+    messagingChannel.on("message", (message) =>
       this._handleIncomingMessage(message)
     );
     if (connection.tiebreaker) {
@@ -78,6 +87,8 @@ export class FileSystemService__Consumer implements Service {
     } else {
       connection.receive(serviceConfig, "data", channel);
     }
+    this._producers.set(producerId, messagingChannel);
+    this.emit("new-producer", producerId);
   }
 
   private _handleIncomingMessage(
@@ -144,15 +155,20 @@ export class FileSystemService__Consumer implements Service {
     }
   }
 
-  async createDirectory(path: string, content?: (Directory | File)[]) {
-    if (!this._messagingChannel) {
+  async createDirectory(
+    producerId: string,
+    path: string,
+    content?: (Directory | File)[]
+  ) {
+    const messagingChannel = this._producers.get(producerId);
+    if (!messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
 
     const requestId = uuidv4();
     const promise = this._promiseManager.add(requestId);
 
-    await this._messagingChannel.send({
+    await messagingChannel.send({
       type: "createDirectory:request",
       content: { requestId, path, content },
     });
@@ -162,15 +178,16 @@ export class FileSystemService__Consumer implements Service {
     this._parseResponse(response, "createDirectory:response");
   }
 
-  async delete(path: string) {
-    if (!this._messagingChannel) {
+  async delete(producerId: string, path: string) {
+    const messagingChannel = this._producers.get(producerId);
+    if (!messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
 
     const requestId = uuidv4();
     const promise = this._promiseManager.add(requestId);
 
-    await this._messagingChannel.send({
+    await messagingChannel.send({
       type: "delete:request",
       content: { requestId, path },
     });
@@ -180,15 +197,16 @@ export class FileSystemService__Consumer implements Service {
     this._parseResponse(response, "delete:response");
   }
 
-  async move(path: string, newPath: string) {
-    if (!this._messagingChannel) {
+  async move(producerId: string, path: string, newPath: string) {
+    const messagingChannel = this._producers.get(producerId);
+    if (!messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
 
     const requestId = uuidv4();
     const promise = this._promiseManager.add(requestId);
 
-    await this._messagingChannel.send({
+    await messagingChannel.send({
       type: "move:request",
       content: { requestId, path, newPath },
     });
@@ -198,20 +216,26 @@ export class FileSystemService__Consumer implements Service {
     this._parseResponse(response, "move:response");
   }
 
-  async readDirectory(path: string): Promise<Directory> {
-    if (!this._messagingChannel) {
+  async readDirectory(producerId: string, path: string): Promise<Directory> {
+    const messagingChannel = this._producers.get(producerId);
+    if (!messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
 
     const requestId = uuidv4();
     const promise = this._promiseManager.add(requestId);
+    console.log(
+      this.serviceId,
+      "ids:",
+      JSON.stringify(this._promiseManager.getIds())
+    );
 
     console.log("sending readDirectory request!", {
       type: "readDirectory:request",
       content: { requestId, path },
     });
 
-    await this._messagingChannel.send({
+    await messagingChannel.send({
       type: "readDirectory:request",
       content: { requestId, path },
     });
@@ -227,15 +251,16 @@ export class FileSystemService__Consumer implements Service {
     return response.content.directory;
   }
 
-  async readFile(path: string): Promise<File> {
-    if (!this._messagingChannel) {
+  async readFile(producerId: string, path: string): Promise<File> {
+    const messagingChannel = this._producers.get(producerId);
+    if (!messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
 
     const requestId = uuidv4();
     const promise = this._promiseManager.add(requestId);
 
-    await this._messagingChannel.send({
+    await messagingChannel.send({
       type: "readFile:request",
       content: { requestId, path },
     });
@@ -247,15 +272,19 @@ export class FileSystemService__Consumer implements Service {
     return response.content.file;
   }
 
-  async watch(path?: string): Promise<TypedEmitter<FileSystemWatcherEvents>> {
-    if (!this._messagingChannel) {
+  async watch(
+    producerId: string,
+    path?: string
+  ): Promise<TypedEmitter<FileSystemWatcherEvents>> {
+    const messagingChannel = this._producers.get(producerId);
+    if (!messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
 
     const requestId = uuidv4();
     const promise = this._promiseManager.add(requestId);
 
-    await this._messagingChannel.send({
+    await messagingChannel.send({
       type: "watch:request",
       content: { requestId, path },
     });
@@ -271,15 +300,16 @@ export class FileSystemService__Consumer implements Service {
     return fileSystemWatcher;
   }
 
-  async writeFile(path: string, content: string) {
-    if (!this._messagingChannel) {
+  async writeFile(producerId: string, path: string, content: string) {
+    const messagingChannel = this._producers.get(producerId);
+    if (!messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
 
     const requestId = uuidv4();
     const promise = this._promiseManager.add(requestId);
 
-    await this._messagingChannel.send({
+    await messagingChannel.send({
       type: "writeFile:request",
       content: { requestId, path, content },
     });

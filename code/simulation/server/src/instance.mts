@@ -7,12 +7,22 @@ import {
 import { Simulation } from "@crosslab-ide/simavr-node-addon";
 import { FileService__Consumer } from "@crosslab-ide/soa-service-file";
 import fs from "fs";
+import fsPromises from "fs/promises";
+import { DebuggingTargetServiceProducer } from "@crosslab-ide/crosslab-debugging-target-service";
+import { getFreePort } from "./util.mjs";
+import net from "net";
+import { MessagingServiceProsumer } from "@crosslab-ide/messaging-service";
 
 export class SimavrInstance {
   private _deviceHandler: DeviceHandler;
   private _simulation: Simulation;
   private _instanceUrl: string;
   private _deviceToken: string;
+  private _isDebugging: boolean = false;
+  private _gpioService: ElectricalConnectionService;
+  private _fileServiceConsumer: FileService__Consumer;
+  private _debuggingTargetServiceProducer: DebuggingTargetServiceProducer;
+  private _messagingService: MessagingServiceProsumer;
 
   constructor(instanceUrl: string, deviceToken: string) {
     this._instanceUrl = instanceUrl;
@@ -22,27 +32,32 @@ export class SimavrInstance {
 
     this._deviceHandler = new DeviceHandler();
 
-    const gpioService = new ElectricalConnectionService("gpios", [
+    this._gpioService = new ElectricalConnectionService("gpios", [
       ...this._simulation.listPins(),
+      ...this._simulation.listPins().map((pin) => `${pin}-debug`),
       "active",
     ]);
     const gpioInterface = new GPIO.ConstructableGPIOInterface([
       ...this._simulation.listPins(),
+      ...this._simulation.listPins().map((pin) => `${pin}-debug`),
       "active",
     ]);
-    gpioService.addInterface(gpioInterface);
+    this._gpioService.addInterface(gpioInterface);
 
-    gpioService.on("newInterface", (event) => {
+    this._gpioService.on("newInterface", (event) => {
       if (event.connectionInterface.interfaceType === "gpio") {
         const connectionInterface =
           event.connectionInterface as GPIO.GPIOInterface;
+        const signal = connectionInterface.signal.endsWith("-debug")
+          ? connectionInterface.signal.replace("-debug", "")
+          : connectionInterface.signal;
         if (
           connectionInterface.configuration.direction === "in" ||
           connectionInterface.configuration.direction === "inout"
         ) {
           connectionInterface.on("signalChange", (signalChangeEvent) => {
             this._simulation.setPinValue(
-              connectionInterface.signal,
+              signal,
               signalChangeEvent.state === GPIO.GPIOState.StrongHigh ||
                 signalChangeEvent.state === GPIO.GPIOState.WeakHigh
                 ? 1
@@ -50,7 +65,7 @@ export class SimavrInstance {
             );
           });
           this._simulation.setPinValue(
-            connectionInterface.signal,
+            signal,
             connectionInterface.signalState === GPIO.GPIOState.StrongHigh ||
               connectionInterface.signalState === GPIO.GPIOState.WeakHigh
               ? 1
@@ -61,16 +76,13 @@ export class SimavrInstance {
           connectionInterface.configuration.direction === "out" ||
           connectionInterface.configuration.direction === "inout"
         ) {
-          this._simulation.registerPinCallback(
-            connectionInterface.signal,
-            (value) => {
-              connectionInterface.changeDriver(
-                value ? GPIO.GPIOState.StrongHigh : GPIO.GPIOState.StrongLow
-              );
-            }
-          );
+          this._simulation.registerPinCallback(signal, (value) => {
+            connectionInterface.changeDriver(
+              value ? GPIO.GPIOState.StrongHigh : GPIO.GPIOState.StrongLow
+            );
+          });
           connectionInterface.changeDriver(
-            this._simulation.getPinValue(connectionInterface.signal)
+            this._simulation.getPinValue(signal)
               ? GPIO.GPIOState.StrongHigh
               : GPIO.GPIOState.StrongLow
           );
@@ -78,49 +90,114 @@ export class SimavrInstance {
       }
     });
 
-    const fileService = new FileService__Consumer("program");
+    this._messagingService = new MessagingServiceProsumer(
+      "messaging",
+      undefined,
+      undefined
+    );
 
-    fileService.on("file", (event) => {
-      console.log("received file:", event);
-      const folderPath =
-        "/tmp/" + Buffer.from(this._instanceUrl).toString("base64");
-      const filePath = `${folderPath}/program.elf`;
+    this._debuggingTargetServiceProducer = new DebuggingTargetServiceProducer(
+      "debugging-target"
+    );
 
-      if (!fs.existsSync(folderPath)) {
-        fs.mkdirSync(folderPath);
-      }
-
-      fs.writeFile(filePath, event.file, () => {
-        if (this._simulation.status === "running") {
-          this._simulation.stop();
+    this._debuggingTargetServiceProducer.on(
+      "debugging:start",
+      async (requestId, program) => {
+        console.log("starting debugging");
+        try {
+          const port = await getFreePort({ start: 3000 });
+          if (!port) {
+            throw Error("No available port found!");
+          }
+          console.log(`Found free port: ${port}`);
+          await this._program(program);
+          console.log("Programmed successfully");
+          this._simulation.startDebugging(port);
+          console.log("Debugging started");
+          this._simulation.start();
+          console.log("Simulation started");
+          const socket = net.connect(port, undefined, () => {
+            console.log("Socket connected");
+            this._messagingService.on("message", (message) => {
+              if (message.content instanceof Uint8Array) {
+                socket.write(message.content);
+              }
+            });
+            this._debuggingTargetServiceProducer.send({
+              type: "debugging:start:response",
+              content: {
+                requestId,
+                success: true,
+                message: "Debugging started successfully",
+              },
+            });
+          });
+          socket.on("data", async (data) => {
+            console.log("Socket received data:", data);
+            await this._messagingService.send({
+              type: "debugging:message",
+              content: data,
+            });
+          });
+          socket.on("error", (error) => {
+            // TODO: more errorhandling necessary?
+            console.error(error);
+          });
+        } catch (error) {
+          this._debuggingTargetServiceProducer.send({
+            type: "debugging:start:response",
+            content: {
+              requestId,
+              success: false,
+              message:
+                error instanceof Error
+                  ? error.message
+                  : "Something went wrong while trying to start debugging!",
+            },
+          });
         }
-        this._simulation.load(filePath);
-        gpioService.interfaces.forEach((connectionInterface) => {
-          if (connectionInterface.interfaceType !== "gpio") {
-            return;
-          }
+      }
+    );
 
-          const gpioInterface = connectionInterface as GPIO.GPIOInterface;
+    this._debuggingTargetServiceProducer.on("debugging:end", (requestId) => {
+      try {
+        this._simulation.endDebugging();
 
-          if (
-            gpioInterface.configuration.direction === "in" ||
-            gpioInterface.configuration.direction === "inout"
-          ) {
-            this._simulation.setPinValue(
-              gpioInterface.signal,
-              gpioInterface.signalState === GPIO.GPIOState.WeakHigh ||
-                gpioInterface.signalState === GPIO.GPIOState.StrongHigh
-                ? 1
-                : 0
-            );
-          }
+        this._debuggingTargetServiceProducer.send({
+          type: "debugging:end:response",
+          content: {
+            requestId,
+            success: true,
+            message: "Debugging ended successfully",
+          },
         });
-        this._simulation.start();
-      });
+      } catch (error) {
+        this._debuggingTargetServiceProducer.send({
+          type: "debugging:end:response",
+          content: {
+            requestId,
+            success: false,
+            message:
+              error instanceof Error
+                ? error.message
+                : "Something went wrong while trying to end debugging!",
+          },
+        });
+      }
     });
 
-    this._deviceHandler.addService(gpioService);
-    this._deviceHandler.addService(fileService);
+    this._fileServiceConsumer = new FileService__Consumer("program");
+
+    this._fileServiceConsumer.on("file", async (event) => {
+      console.log("received file:", event);
+      await this._program(event.file);
+      this._simulation.start();
+    });
+
+    this._deviceHandler.addService(this._gpioService);
+    this._deviceHandler.addService(this._debuggingTargetServiceProducer);
+    this._deviceHandler.addService(this._fileServiceConsumer);
+    this._deviceHandler.addService(this._messagingService);
 
     this._deviceHandler.on("experimentStatusChanged", (event) => {
       console.log(
@@ -170,6 +247,43 @@ export class SimavrInstance {
       endpoint: configuration.WEBSOCKET_ENDPOINT,
       id: this._instanceUrl,
       token: token,
+    });
+  }
+
+  private async _program(program: Uint8Array) {
+    const folderPath =
+      "/tmp/" + Buffer.from(this._instanceUrl).toString("base64");
+    const filePath = `${folderPath}/program.elf`;
+
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath);
+    }
+
+    await fsPromises.writeFile(filePath, program);
+
+    if (this._simulation.status === "running") {
+      this._simulation.stop();
+    }
+    this._simulation.load(filePath);
+    this._gpioService.interfaces.forEach((connectionInterface) => {
+      if (connectionInterface.interfaceType !== "gpio") {
+        return;
+      }
+
+      const gpioInterface = connectionInterface as GPIO.GPIOInterface;
+
+      if (
+        gpioInterface.configuration.direction === "in" ||
+        gpioInterface.configuration.direction === "inout"
+      ) {
+        this._simulation.setPinValue(
+          gpioInterface.signal,
+          gpioInterface.signalState === GPIO.GPIOState.WeakHigh ||
+            gpioInterface.signalState === GPIO.GPIOState.StrongHigh
+            ? 1
+            : 0
+        );
+      }
     });
   }
 }

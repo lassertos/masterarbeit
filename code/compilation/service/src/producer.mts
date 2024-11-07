@@ -15,13 +15,15 @@ import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-chann
 import {
   buildCompilationProtocol,
   CompilationProtocol,
-  ResultFormatsDescriptor,
+  ResultFormat,
+  UniqueResultFormatArray,
 } from "@crosslab-ide/compilation-messaging-protocol";
+import { v4 as uuidv4 } from "uuid";
 
-interface CompilationService__ProducerEvents<
-  R extends ResultFormatsDescriptor
-> {
+interface CompilationService__ProducerEvents<R extends ResultFormat[] = []> {
+  "new-client": (clientId: string) => void;
   "compilation:request": (
+    clientId: string,
     request: ProtocolMessage<
       CompilationProtocol<R>,
       "compilation:request"
@@ -29,20 +31,30 @@ interface CompilationService__ProducerEvents<
   ) => void;
 }
 
-export class CompilationService__Producer<R extends ResultFormatsDescriptor>
-  extends TypedEmitter<CompilationService__ProducerEvents<R>>
+export class CompilationService__Producer<R extends ResultFormat[]>
+  extends TypedEmitter<
+    CompilationService__ProducerEvents<UniqueResultFormatArray<R>>
+  >
   implements Service
 {
-  private _messagingChannel?: CrossLabMessagingChannel<
-    CompilationProtocol<R>,
-    "server"
-  >;
-  private _compilationProtocol: CompilationProtocol<R>;
+  private _compilationProtocol: CompilationProtocol<UniqueResultFormatArray<R>>;
+  private _clients: Map<
+    string,
+    {
+      messagingChannel: CrossLabMessagingChannel<
+        CompilationProtocol<UniqueResultFormatArray<R>>,
+        "server"
+      >;
+    }
+  > = new Map();
   serviceType: string = "https://api.goldi-labs.de/serviceTypes/compilation";
   serviceId: string;
   serviceDirection: ServiceDirection = "producer";
 
-  constructor(serviceId: string, resultFormatsDescription?: R) {
+  constructor(
+    serviceId: string,
+    resultFormatsDescription?: UniqueResultFormatArray<R>
+  ) {
     super();
     this.serviceId = serviceId;
     this._compilationProtocol = buildCompilationProtocol(
@@ -64,35 +76,57 @@ export class CompilationService__Producer<R extends ResultFormatsDescriptor>
     serviceConfig: ServiceConfiguration
   ): void {
     // TODO: add checkConfig function
+    const clientId = uuidv4();
     const channel = new DataChannel();
-    this._messagingChannel = new CrossLabMessagingChannel(
+    const messagingChannel = new CrossLabMessagingChannel(
       channel,
       this._compilationProtocol,
       "server"
     );
-    this._messagingChannel.on("message", (message) =>
-      this._handleMessage(message)
+
+    messagingChannel.on("message", (message) =>
+      this._handleMessage(clientId, message)
     );
     if (connection.tiebreaker) {
       connection.transmit(serviceConfig, "data", channel);
     } else {
       connection.receive(serviceConfig, "data", channel);
     }
+
+    this._clients.set(clientId, { messagingChannel });
+    this.emit("new-client", clientId);
   }
 
-  async send(message: OutgoingMessage<CompilationProtocol<R>, "server">) {
-    if (!this._messagingChannel) {
-      throw new Error("No messaging channel has been set up!");
+  async send(
+    clientId: string,
+    message: OutgoingMessage<
+      CompilationProtocol<UniqueResultFormatArray<R>>,
+      "server"
+    >
+  ) {
+    const client = this._clients.get(clientId);
+
+    if (!client) {
+      throw new Error(`Could not find client with id "${clientId}"`);
     }
-    await this._messagingChannel.send(message);
+
+    await client.messagingChannel.send(message);
   }
 
   private _handleMessage(
-    message: IncomingMessage<CompilationProtocol<R>, "server">
+    clientId: string,
+    message: IncomingMessage<
+      CompilationProtocol<UniqueResultFormatArray<R>>,
+      "server"
+    >
   ) {
+    if (!this._clients.has(clientId)) {
+      throw new Error(`Could not find client with id "${clientId}"`);
+    }
+
     switch (message.type) {
       case "compilation:request":
-        this.emit("compilation:request", message.content);
+        this.emit("compilation:request", clientId, message.content);
         break;
       default:
         throw new Error(`Unrecognized message type "${message.type}"!`);

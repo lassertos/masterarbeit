@@ -1,0 +1,20 @@
+{
+  "name": "@crosslab-ide/messaging-service",
+  "version": "0.0.1",
+  "description": "A crosslab messaging service.",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT",
+  "dependencies": {
+    "@crosslab-ide/abstract-messaging-channel": "file:../abstract-messaging-channel",
+    "@crosslab-ide/crosslab-messaging-channel": "file:../crosslab-messaging-channel",
+    "@crosslab-ide/soa-client": "file:../soa-client-js",
+    "tiny-typed-emitter": "^2.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

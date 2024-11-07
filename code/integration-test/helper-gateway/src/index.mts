@@ -23,6 +23,7 @@ app.ws("*", function (ws, req) {
   const proxyWs = new WebSocket(
     "ws://" + DOCKER_DOMAIN + req.url.replace("/.websocket", "")
   );
+
   ws.on("message", (message) => {
     if (proxyWs.readyState === WebSocket.OPEN) {
       console.log("sending proxy websocket message!");
@@ -32,6 +33,10 @@ app.ws("*", function (ws, req) {
       proxyWsBuffer.push(message);
     }
   });
+  ws.on("close", () => {
+    proxyWs.close();
+  });
+
   proxyWs.on("open", () => {
     console.log("proxy websocket opened!");
     for (const message of proxyWsBuffer) {
@@ -42,6 +47,9 @@ app.ws("*", function (ws, req) {
       console.log("sending websocket message!");
       ws.send(message.toString().replaceAll(DOCKER_DOMAIN, LOCAL_DOMAIN));
     });
+  });
+  proxyWs.on("close", () => {
+    ws.close();
   });
 });
 

@@ -2,6 +2,7 @@
 #include <sim_avr.h>
 #include <sim_elf.h>
 #include <avr_ioport.h>
+#include <sim_gdb.h>
 #include <thread>
 #include <chrono>
 #include <algorithm>
@@ -23,6 +24,9 @@ Napi::Object Simulation::Init(Napi::Env env, Napi::Object exports)
 			InstanceMethod<&Simulation::getPinValue>("getPinValue", static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
 			InstanceMethod<&Simulation::listPins>("listPins", static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
 			InstanceMethod<&Simulation::registerPinCallback>("registerPinCallback", static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
+			InstanceMethod<&Simulation::startDebugging>("startDebugging", static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
+			InstanceMethod<&Simulation::endDebugging>("endDebugging", static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
+			InstanceMethod<&Simulation::terminate>("terminate", static_cast<napi_property_attributes>(napi_writable | napi_configurable)),
 			InstanceAccessor<&Simulation::getStatus>("status"),
 		});
 
@@ -89,6 +93,11 @@ void Simulation::load(const Napi::CallbackInfo &info)
 
 void run(avr_t *avr, bool *stop_thread, std::queue<pin_event> *pin_events)
 {
+	if (avr->state == cpu_Stopped)
+	{
+		printf("CPU is currently stopped!\n");
+	}
+
 	while (!(*stop_thread))
 	{
 		while (!pin_events->empty())
@@ -102,12 +111,19 @@ void run(avr_t *avr, bool *stop_thread, std::queue<pin_event> *pin_events)
 					event.index),
 				event.value);
 		}
-		avr_run(avr);
+
+		int state = avr_run(avr);
+
+		if (state == cpu_Done || state == cpu_Crashed)
+			break;
 	}
+
+	printf("Left the simulation run loop!\n");
 }
 
 void Simulation::start(const Napi::CallbackInfo &info)
 {
+	printf("Starting the simulation! %d\n", this->status);
 	this->status = RUNNING;
 	this->stop_thread = false;
 	this->thread = std::thread(&run, this->avr, &this->stop_thread, &this->pin_events);
@@ -115,10 +131,10 @@ void Simulation::start(const Napi::CallbackInfo &info)
 
 void Simulation::stop(const Napi::CallbackInfo &info)
 {
+	printf("Stopping the simulation!\n");
 	this->status = STOPPED;
 	this->stop_thread = true;
 	this->thread.join();
-	this->thread.~thread();
 	avr_reset(this->avr);
 
 	Napi::Value value = this->listPins(info);
@@ -365,6 +381,58 @@ Napi::Value Simulation::getStatus(const Napi::CallbackInfo &info)
 		return Napi::String::New(info.Env(), "running");
 	if (this->status == STOPPED)
 		return Napi::String::New(info.Env(), "stopped");
+	if (this->status == TERMINATED)
+		return Napi::String::New(info.Env(), "terminated");
 
 	return info.Env().Null();
+}
+
+void Simulation::startDebugging(const Napi::CallbackInfo &info)
+{
+	if (info.Length() != 1)
+	{
+		Napi::Error error = Napi::Error::New(info.Env(), "Expected one argument!");
+		error.ThrowAsJavaScriptException();
+	}
+
+	if (!info[0].IsNumber())
+	{
+		Napi::Error error = Napi::Error::New(info.Env(), "Expected first argument to be a number!");
+		error.ThrowAsJavaScriptException();
+	}
+
+	Napi::Number port = info[0].As<Napi::Number>();
+
+	if (this->avr->gdb)
+	{
+		Napi::Error error = Napi::Error::New(info.Env(), "Simulation is already being debugged!");
+		error.ThrowAsJavaScriptException();
+	}
+
+	this->avr->gdb_port = port.Uint32Value();
+
+	this->avr->state = cpu_Stopped;
+	avr_gdb_init(this->avr);
+}
+
+void Simulation::endDebugging(const Napi::CallbackInfo &info)
+{
+	if (!this->avr->gdb)
+		return;
+
+	avr_deinit_gdb(this->avr);
+
+	this->avr->state = cpu_Running;
+}
+
+void Simulation::terminate(const Napi::CallbackInfo &info)
+{
+	if (this->status == RUNNING)
+	{
+		this->stop(info);
+	}
+
+	avr_terminate(this->avr);
+
+	this->status = TERMINATED;
 }

@@ -10,6 +10,8 @@ export class SimavrServer {
       const instanceUrl = req.query.instanceUrl;
       const deviceToken = req.query.deviceToken;
 
+      console.log(`Instantiating a new simavr instance at "${instanceUrl}"!`);
+
       if (typeof instanceUrl !== "string") {
         throw new Error(
           `Expected parameter "instanceUrl" to be of type "string" instead got "${typeof instanceUrl}"`
@@ -29,6 +31,10 @@ export class SimavrServer {
       } catch (error) {
         return res.status(400).send();
       }
+
+      console.log(
+        `Successfully instantiated a new simavr instance at "${instanceUrl}"!`
+      );
 
       return res.status(201).send();
     });

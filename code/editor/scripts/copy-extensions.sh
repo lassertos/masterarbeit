@@ -20,5 +20,10 @@ cp -r ../compilation/extension/dist public/extensions/compilation/dist
 cp ../compilation/extension/package.json public/extensions/compilation
 
 mkdir public/extensions/debugging
+cp -r ../debugging/extension/src public/extensions/debugging/src
 cp -r ../debugging/extension/dist public/extensions/debugging/dist
 cp ../debugging/extension/package.json public/extensions/debugging
+
+mkdir public/extensions/testing
+cp -r ../testing/extension/dist public/extensions/testing/dist
+cp ../testing/extension/package.json public/extensions/testing

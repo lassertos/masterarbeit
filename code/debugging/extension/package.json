@@ -32,29 +32,16 @@
         "configurationAttributes": {
           "launch": {
             "properties": {
-              "args": {
-                "default": [],
-                "description": "Command line arguments",
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
+              "stopAtBeginningOfMainSubprogram": {
+                "description": "Whether or not to stop the debugger at the beginning of the main subprogram",
+                "default": true,
+                "type": "boolean"
               },
-              "cwd": {},
-              "env": {},
-              "program": {
-                "default": "${file}",
-                "description": "Absolute path to the file.",
-                "type": "string"
-              },
-              "stopAtBeginningOfMainSubprogram": {},
               "stopOnEntry": {
                 "description": "Whether or not to stop the debugger on the first line of the first file",
                 "default": true,
                 "type": "boolean"
-              },
-              "pid": {},
-              "target": {}
+              }
             }
           }
         }
@@ -85,7 +72,7 @@
     "watch-web": "npm-run-all -p watch-web:*",
     "watch-web:esbuild": "node esbuild.js --watch",
     "watch-web:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package-web": "npm run check-types && npm run lint && node esbuild.js --production",
+    "package-web": "npm run check-types && npm run lint && node esbuild.js",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
@@ -107,7 +94,8 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@crosslab-ide/crosslab-debugging-service": "file:../service",
+    "@crosslab-ide/crosslab-debugging-adapter-service": "file:../services/adapter",
+    "@crosslab-ide/crosslab-filesystem-service": "file:../../filesystem/service",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@crosslab-ide/soa-service-electrical": "file:../../shared/electrical-connection-service-js",
     "esbuild-plugin-polyfill-node": "^0.3.0"

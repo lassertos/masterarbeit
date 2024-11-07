@@ -1,5 +1,9 @@
-export function replacer(key: string, value: unknown) {
+export function replacer(_key: string, value: unknown) {
   if (value instanceof Uint8Array) {
+    console.log(value, {
+      type: "Uint8Array",
+      data: Array.from(value),
+    });
     return {
       type: "Uint8Array",
       data: Array.from(value),
@@ -8,16 +12,18 @@ export function replacer(key: string, value: unknown) {
   return value;
 }
 
-export function reviver(key: string, value: unknown) {
+export function reviver(_key: string, value: unknown) {
   if (
     value &&
     typeof value === "object" &&
     "type" in value &&
     (value.type === "Uint8Array" || value.type === "Buffer")
   ) {
-    return Uint8Array.from(
+    const result = Uint8Array.from(
       "data" in value && Array.isArray(value.data) ? value.data : []
     );
+    console.log(value, result, result instanceof Uint8Array);
+    return result;
   }
   return value;
 }

@@ -24,6 +24,14 @@ x-config: &common-config
   FORWARDING_SERVICE_DOMAIN: "forwarding:3020"
 
 services:
+  # =============== LOGGING =========================
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 8082:8080
   # =============== CROSSLAB SERVICES ===============
   gateway:
     image: gateway-service:latest
@@ -126,6 +134,11 @@ services:
     networks:
       - service-network
     restart: on-failure
+  gdb-server:
+    image: gdb-server:latest
+    networks:
+      - service-network
+    restart: on-failure
   test-page:
     image: test-page:latest
     restart: on-failure
@@ -137,6 +150,7 @@ services:
       - API_URL=http://localhost:8080
       - CODE_EDITOR_URL=http://localhost:3022
       - COMPILER_URL=http://compilation:3021
+      - DEBUGGER_URL=http://gdb-server:3000
       - LANGUAGE_SERVER_URL=http://language-server:3025
       - SIMULATION_URL=http://simavr:3023
       - VPSPU_URL=http://localhost:3024

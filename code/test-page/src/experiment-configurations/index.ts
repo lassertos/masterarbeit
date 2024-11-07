@@ -6,6 +6,7 @@ const deviceUrls = {
   "code-editor": await getDeviceUrl("code-editor"),
   compiler: await getDeviceUrl("compiler"),
   languageServer: await getDeviceUrl("language-server"),
+  debugger: await getDeviceUrl("debugger"),
   simulation: await getDeviceUrl("simulation"),
   vpspu: await getDeviceUrl("vpspu"),
 };

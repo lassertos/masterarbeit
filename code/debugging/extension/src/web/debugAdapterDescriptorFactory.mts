@@ -1,20 +1,26 @@
 import vscode from "vscode";
 import { DebugAdapter } from "./debugAdapter.mjs";
-import { DebuggingServiceConsumer } from "@crosslab-ide/crosslab-debugging-service";
+import { DebuggingAdapterServiceConsumer } from "@crosslab-ide/crosslab-debugging-adapter-service";
 
 export class DebugAdapterDescriptorFactory
   implements vscode.DebugAdapterDescriptorFactory
 {
   constructor(
-    private readonly context: vscode.ExtensionContext,
-    private readonly debuggingServiceConsumer: DebuggingServiceConsumer
+    private readonly _context: vscode.ExtensionContext,
+    private readonly _debuggingAdapterServiceConsumer: DebuggingAdapterServiceConsumer
   ) {}
 
   createDebugAdapterDescriptor(
     session: vscode.DebugSession
   ): vscode.ProviderResult<vscode.DebugAdapterDescriptor> {
-    return new vscode.DebugAdapterInlineImplementation(
-      new DebugAdapter(session, this.context, this.debuggingServiceConsumer)
+    const debugAdapter = new DebugAdapter(
+      session,
+      this._context,
+      this._debuggingAdapterServiceConsumer
     );
+    debugAdapter.onDidSendMessage((message) => {
+      console.log("debug adapter did send message:", message);
+    });
+    return new vscode.DebugAdapterInlineImplementation(debugAdapter);
   }
 }

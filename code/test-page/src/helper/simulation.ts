@@ -37,6 +37,19 @@ export default async () => {
           serviceType: "https://api.goldi-labs.de/serviceTypes/electrical",
           supportedConnectionTypes: ["websocket"],
         },
+        {
+          serviceDirection: "prosumer",
+          serviceId: "messaging",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/messaging",
+          supportedConnectionTypes: ["websocket"],
+        },
+        {
+          serviceDirection: "producer",
+          serviceId: "debugging-target",
+          serviceType:
+            "https://api.goldi-labs.de/serviceTypes/debugging-target",
+          supportedConnectionTypes: ["websocket"],
+        },
       ],
       isPublic: true,
     })

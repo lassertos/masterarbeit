@@ -1,13 +1,13 @@
 # Debugging
 
-- [Service](#service)
+- [Services](#services)
   - [Session Start](#session-start)
   - [Message Exchange](#message-exchange)
 - [Server](#server)
   - [Start Debug Session](#start-debug-session)
 - [Extension](#extension)
 
-## Service
+## Services
 
 The debugging service is implemented in two parts: one consumer and one producer.
 

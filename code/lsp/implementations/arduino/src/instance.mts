@@ -70,6 +70,7 @@ export class ArduinoCliLanguageServerInstance {
       `${this._tmpPath}`,
     ]);
     this._arduinoLanguageServerProcess.on("exit", (code) => {
+      console.log(`arduino language server process exited with code ${code}`);
       if (code !== 0) {
         // TODO: handle crashed server
       }
@@ -108,7 +109,7 @@ export class ArduinoCliLanguageServerInstance {
     });
 
     this._arduinoLanguageServerProcess.on("close", (code) => {
-      console.log(`arduino language server process exited with code ${code}`);
+      console.log(`arduino language server process closed with code ${code}`);
     });
 
     this._webSocket.on("message", async (data) => {

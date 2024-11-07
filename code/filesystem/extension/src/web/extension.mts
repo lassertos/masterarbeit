@@ -155,7 +155,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   const fileSystemRequestHandler = new FileSystemRequestHandler();
 
-  fileSystemServiceProducer.on("request", async (request) => {
+  fileSystemServiceProducer.on("request", async (consumerId, request) => {
     if (request.type !== "unwatch:request") {
       request.content.path = fileSystemProvider.updateUri(
         vscode.Uri.from({
@@ -173,7 +173,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     }
     const response = await fileSystemRequestHandler.handleRequest(request);
-    await fileSystemServiceProducer.send(response);
+    await fileSystemServiceProducer.send(consumerId, response);
   });
 
   vscode.window.createTreeView("projects.view", {

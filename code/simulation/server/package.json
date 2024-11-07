@@ -16,6 +16,8 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
+    "@crosslab-ide/crosslab-debugging-target-service": "file:../../debugging/services/target",
+    "@crosslab-ide/messaging-service": "file:../../shared/messaging-service",
     "@crosslab-ide/simavr-node-addon": "file:../node-addon",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@crosslab-ide/soa-service-electrical": "file:../../shared/electrical-connection-service-js",

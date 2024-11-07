@@ -1,3 +1,9 @@
+import {
+  IncomingMessage,
+  MessagingProtocol,
+  OutgoingMessage,
+  Role,
+} from "@crosslab-ide/abstract-messaging-channel";
 import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
 import {
   DataChannel,
@@ -6,33 +12,34 @@ import {
   ServiceConfiguration,
   ServiceDirection,
 } from "@crosslab-ide/soa-client";
-import { debuggingProtocol, DebuggingProtocol } from "./protocol.mjs";
-import {
-  IncomingMessage,
-  OutgoingMessage,
-} from "@crosslab-ide/abstract-messaging-channel";
 import { TypedEmitter } from "tiny-typed-emitter";
 
-interface DebuggingServiceConsumerEvents {
-  message: (message: IncomingMessage<DebuggingProtocol, "client">) => void;
+interface MessagingServiceProsumerEvents<
+  MP extends MessagingProtocol | undefined,
+  R extends Role<MP> | undefined
+> {
+  message: (message: IncomingMessage<MP, R>) => void;
 }
 
-export class DebuggingServiceConsumer
-  extends TypedEmitter<DebuggingServiceConsumerEvents>
+export class MessagingServiceProsumer<
+    MP extends MessagingProtocol | undefined = undefined,
+    R extends Role<MP> | undefined = undefined
+  >
+  extends TypedEmitter<MessagingServiceProsumerEvents<MP, R>>
   implements Service
 {
-  private _messagingChannel?: CrossLabMessagingChannel<
-    DebuggingProtocol,
-    "client"
-  >;
-  private _sessions: Map<string, unknown> = new Map();
-  serviceType: string = "https://api.goldi-labs.de/serviceTypes/debugging";
+  private _messagingChannel?: CrossLabMessagingChannel<MP, R>;
+  private _messagingProtocol: MP;
+  private _role: R;
+  serviceType: string = "https://api.goldi-labs.de/serviceTypes/messaging";
   serviceId: string;
-  serviceDirection: ServiceDirection = "consumer";
+  serviceDirection: ServiceDirection = "prosumer";
 
-  constructor(serviceId: string) {
+  constructor(serviceId: string, messagingProtocol: MP, role: R) {
     super();
     this.serviceId = serviceId;
+    this._messagingProtocol = messagingProtocol;
+    this._role = role;
   }
 
   getMeta() {
@@ -40,7 +47,7 @@ export class DebuggingServiceConsumer
       serviceId: this.serviceId,
       serviceType: this.serviceType,
       serviceDirection: this.serviceDirection,
-      supportedConnectionTypes: ["webrtc", "websocket"],
+      supportedConnectionTypes: ["local", "websocket", "webrtc"],
     };
   }
 
@@ -52,8 +59,8 @@ export class DebuggingServiceConsumer
     const channel = new DataChannel();
     this._messagingChannel = new CrossLabMessagingChannel(
       channel,
-      debuggingProtocol,
-      "client"
+      this._messagingProtocol,
+      this._role
     );
     this._messagingChannel.on("message", (message) =>
       this.emit("message", message)
@@ -65,12 +72,11 @@ export class DebuggingServiceConsumer
     }
   }
 
-  async send(message: OutgoingMessage<DebuggingProtocol, "server">) {
+  async send(message: OutgoingMessage<MP, R>) {
     if (!this._messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }
+
     await this._messagingChannel.send(message);
   }
-
-  async startSession(session: { id: string }, configuration: unknown) {}
 }

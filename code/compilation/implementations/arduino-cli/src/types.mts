@@ -1,7 +1,8 @@
-import { ResultFormatsDescriptor } from "@crosslab-ide/compilation-messaging-protocol";
+import { ResultFormat } from "@crosslab-ide/compilation-messaging-protocol";
 
-export const arduinoCliResultFormatsDescription = {
-  elf: {
+export const arduinoCliResultFormats = [
+  {
+    id: "elf",
     description: "Returns only the compiled elf file.",
     result: {
       type: "file",
@@ -9,7 +10,8 @@ export const arduinoCliResultFormatsDescription = {
       description: "The compiled elf file.",
     },
   },
-  hex: {
+  {
+    id: "hex",
     description: "Returns only the compiled hex file.",
     result: {
       type: "file",
@@ -17,7 +19,8 @@ export const arduinoCliResultFormatsDescription = {
       description: "The compiled hex file.",
     },
   },
-  "bin with bootloader": {
+  {
+    id: "bin with bootloader",
     description:
       "Returns only the compiled binary file with the arduino bootloader.",
     result: {
@@ -26,7 +29,8 @@ export const arduinoCliResultFormatsDescription = {
       description: "The compiled binary file with the arduino bootloader.",
     },
   },
-  "hex with bootloader": {
+  {
+    id: "hex with bootloader",
     description:
       "Returns only the compiled hex file with the arduino bootloader.",
     result: {
@@ -35,7 +39,8 @@ export const arduinoCliResultFormatsDescription = {
       description: "The compiled hex file with the arduino bootloader.",
     },
   },
-  "build directory": {
+  {
+    id: "build directory",
     description: "Returns the build directory containing all compiled files.",
     result: {
       type: "directory",
@@ -61,7 +66,6 @@ export const arduinoCliResultFormatsDescription = {
       },
     },
   },
-} as const satisfies ResultFormatsDescriptor;
+] as const satisfies ResultFormat[];
 
-export type ArduinoCliResultFormatsDescription =
-  typeof arduinoCliResultFormatsDescription;
+export type ArduinoCliResultFormats = typeof arduinoCliResultFormats;

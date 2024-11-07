@@ -56,6 +56,10 @@
           scheme: "http",
           authority: "localhost:3022",
           path: "/extensions/base",
+          query: new URLSearchParams({
+            instanceUrl: queryParameters.get("instanceUrl"),
+            deviceToken: queryParameters.get("deviceToken")
+          }).toString()
         },
         {
           scheme: "http",
@@ -76,6 +80,11 @@
           scheme: "http",
           authority: "localhost:3022",
           path: "/extensions/lsp",
+        },
+        {
+          scheme: "http",
+          authority: "localhost:3022",
+          path: "/extensions/testing",
         },
       ],
       configurationDefaults: {
