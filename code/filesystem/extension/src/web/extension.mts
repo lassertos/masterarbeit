@@ -13,6 +13,9 @@ import {
 import { registerFilesExplorerCopy } from "./filesExplorerActions/copy.mjs";
 import { registerFilesExplorerPaste } from "./filesExplorerActions/paste.mjs";
 import { registerFilesExplorerCut } from "./filesExplorerActions/cut.mjs";
+import { IndexedDBFileSystemProvider } from "./providers/subproviders/indexeddb.mjs";
+import { MemoryFileSystemProvider } from "./providers/subproviders/memory.mjs";
+import { CrossLabFileSystemSubProvider } from "./providers/subproviders/index.mjs";
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log(
@@ -20,12 +23,20 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   const fileSystemProvider = new CrossLabFileSystemProvider();
+  const projectsProvider = new IndexedDBFileSystemProvider();
+  await projectsProvider.initialize();
+  fileSystemProvider.addMount("/projects", projectsProvider);
+  fileSystemProvider.addMount("/workspace", new MemoryFileSystemProvider());
   await fileSystemProvider.initialize();
 
   const fileSearchProvider = new CrossLabFileSearchProvider(fileSystemProvider);
   const textSearchProvider = new CrossLabTextSearchProvider(fileSystemProvider);
 
   const projectViewDataProvider = new ProjectViewDataProvider();
+  projectViewDataProvider.addProjectRootFolder(
+    "Local Projects",
+    vscode.Uri.from({ scheme: "crosslabfs", path: "/projects" })
+  );
 
   context.subscriptions.push(
     vscode.workspace.registerFileSystemProvider(
@@ -62,17 +73,25 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      await vscode.workspace.fs.createDirectory(
-        vscode.Uri.from({
-          scheme: "crosslabfs",
-          path: `/projects/${name}`,
-        })
-      );
+      const projectUri = vscode.Uri.from({
+        scheme: "crosslabfs",
+        path: `/projects/${name}`,
+      });
+      await vscode.workspace.fs.createDirectory(projectUri);
       projectViewDataProvider.refresh();
 
       const settingsDatabase = await openSettingsDatabase();
-      await writeSetting(settingsDatabase, "crosslab.current-project", name);
-      fileSystemProvider.setProject(name);
+      await writeSetting(
+        settingsDatabase,
+        "crosslab.current-project",
+        projectUri.toString()
+      );
+      await writeSetting(
+        settingsDatabase,
+        "crosslab.current-project-name",
+        name
+      );
+      fileSystemProvider.setProject(projectUri);
     }),
     vscode.commands.registerCommand(
       "projects.view.openProject",
@@ -92,18 +111,19 @@ export async function activate(context: vscode.ExtensionContext) {
           return;
         }
 
-        await vscode.workspace.fs.rename(
-          vscode.Uri.from({
-            scheme: "crosslabfs",
-            path: `/projects/${projectName}`,
-          }),
-          vscode.Uri.from({
-            scheme: "crosslabfs",
-            path: `/projects/${name}`,
-          })
-        );
-        if (fileSystemProvider.currentProject === projectName) {
-          await fileSystemProvider.setProject(name);
+        const oldProjectUri = vscode.Uri.from({
+          scheme: "crosslabfs",
+          path: `/projects/${projectName}`,
+        });
+        const newProjectUri = vscode.Uri.from({
+          scheme: "crosslabfs",
+          path: `/projects/${name}`,
+        });
+
+        await vscode.workspace.fs.rename(oldProjectUri, newProjectUri);
+
+        if (fileSystemProvider.currentProjectUri === projectName) {
+          await fileSystemProvider.setProject(newProjectUri);
         }
         projectViewDataProvider.refresh();
       }
@@ -118,7 +138,7 @@ export async function activate(context: vscode.ExtensionContext) {
           }),
           { recursive: true }
         );
-        if (fileSystemProvider.currentProject === projectName) {
+        if (fileSystemProvider.currentProjectUri === projectName) {
           await fileSystemProvider.setProject(null);
         }
         projectViewDataProvider.refresh();
@@ -189,6 +209,21 @@ export async function activate(context: vscode.ExtensionContext) {
   // override the filesExplorer.paste command
   registerFilesExplorerPaste(context, fileSystemProvider);
 
+  vscode.workspace.onDidOpenTextDocument((event) => {
+    console.log("filesystem-extension: opened text document", event.uri.path);
+  });
+
+  vscode.workspace.onDidChangeTextDocument((event) => {
+    console.log(
+      "filesystem-extension: changed text document",
+      event.document.uri.path
+    );
+  });
+
+  vscode.workspace.onDidCloseTextDocument((event) => {
+    console.log("filesystem-extension: closed text document", event.uri.path);
+  });
+
   return {
     addServices: (deviceHandler: DeviceHandler) => {
       console.log("adding filesystem service producer!");
@@ -203,10 +238,26 @@ export async function activate(context: vscode.ExtensionContext) {
     getCurrentProject: (): vscode.Uri => {
       return vscode.Uri.from({
         scheme: "crosslabfs",
-        path: fileSystemProvider.currentProject
-          ? `/projects/${fileSystemProvider.currentProject}`
+        path: fileSystemProvider.currentProjectUri
+          ? fileSystemProvider.currentProjectUri.path
           : "/workspace",
       });
+    },
+    addMount: async (path: string, type: "indexeddb" | "memory") => {
+      const provider: CrossLabFileSystemSubProvider =
+        type === "indexeddb"
+          ? new IndexedDBFileSystemProvider()
+          : new MemoryFileSystemProvider();
+      fileSystemProvider.addMount(path, provider);
+      if (provider.initialize) {
+        await provider?.initialize();
+      }
+    },
+    addProjectRootFolder: (title: string, uri: vscode.Uri) => {
+      projectViewDataProvider.addProjectRootFolder(title, uri);
+    },
+    refreshProjectsView: () => {
+      projectViewDataProvider.refresh();
     },
   };
 }

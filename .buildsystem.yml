@@ -275,6 +275,50 @@ crosslab-filesystem-service:
       dependencies:
         - crosslab-filesystem-service:build
 
+crosslab-testing-service:
+  path: code/testing/service
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - abstract-messaging-channel:publish
+        - soa-client-js:publish
+        - crosslab-messaging-channel:publish
+    publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - crosslab-testing-service:build
+
+crosslab-collaboration-service:
+  path: code/collaboration/service
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - abstract-messaging-channel:publish
+        - soa-client-js:publish
+        - crosslab-messaging-channel:publish
+    publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - crosslab-collaboration-service:build
+
 arduino-cli-compilation-server:
   path: code/compilation/implementations/arduino-cli
   jobs:
@@ -376,6 +420,7 @@ simavr-server:
         - crosslab-debugging-target-service:publish
         - simavr-node-addon:publish
         - file-service-js:publish
+        - crosslab-testing-service:publish
     build-docker:
       helper-functions:
         before:
@@ -415,6 +460,23 @@ crosslab-testing-extension:
       commands:
         prepare: npm ci
         execute: npm run package-web
+      dependencies:
+        - crosslab-testing-service:build
+
+crosslab-collaboration-extension:
+  path: code/collaboration/extension
+  jobs:
+    package:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        prepare: npm ci 
+        execute: npm run package-web
+      dependencies:
+        - crosslab-collaboration-service:publish
 
 crosslab-filesystem-extension:
   path: code/filesystem/extension
@@ -467,6 +529,7 @@ crosslab-editor:
         - crosslab-filesystem-extension:package
         - crosslab-compilation-extension:package
         - crosslab-debugging-extension:package
+        - crosslab-collaboration-extension:package
     build-docker:
       commands:
         execute: docker build --network host -t crosslab-editor .
@@ -507,8 +570,13 @@ test-page:
       dependencies:
         - crosslab/clients/api/js:build
     build-docker:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
       commands:
-        execute: docker build -t test-page .
+        execute: docker build --network host -t test-page .
       dependencies:
         - test-page:build
         - arduino-language-server:build-docker

@@ -1,5 +1,6 @@
 {
   "name": "@crosslab-ide/crosslab-collaboration-extension",
+  "publisher": "crosslab",
   "displayName": "crosslab-collaboration-extension",
   "description": "An extension adding a crosslab collaboration service prosumer.",
   "version": "0.0.1",
@@ -39,32 +40,37 @@
     "watch-web": "npm-run-all -p watch-web:*",
     "watch-web:esbuild": "node esbuild.js --watch",
     "watch-web:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package-web": "npm run check-types && npm run lint && node esbuild.js --production",
+    "package-web": "npm run check-types && npm run lint && node esbuild.js",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
   },
   "devDependencies": {
-    "@types/vscode": "^1.93.0",
-    "@types/mocha": "^10.0.7",
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@types/assert": "^1.5.10",
-    "eslint": "^9.9.1",
+    "@types/mocha": "^10.0.7",
+    "@types/vscode": "^1.93.0",
+    "@types/ws": "^8.5.13",
     "@typescript-eslint/eslint-plugin": "^8.3.0",
     "@typescript-eslint/parser": "^8.3.0",
-    "mocha": "^10.7.3",
-    "typescript": "^5.5.4",
     "@vscode/test-web": "^0.0.58",
+    "assert": "^2.1.0",
     "esbuild": "^0.23.1",
+    "esbuild-plugin-polyfill-node": "^0.3.0",
+    "eslint": "^9.9.1",
     "glob": "^11.0.0",
+    "mocha": "^10.7.3",
     "npm-run-all": "^4.1.5",
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-    "assert": "^2.1.0"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@vscode/webview-ui-toolkit": "^1.4.0",
+    "@crosslab-ide/crosslab-collaboration-service": "file:../service",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
+    "@vscode-elements/elements": "^1.8.0",
     "async-mutex": "^0.5.0",
     "lit": "^3.1.4",
-    "y-websocket": "^2.0.3",
-    "yjs": "^13.6.15"
+    "y-websocket": "^2.0.4",
+    "yjs": "^13.6.20",
+    "zod": "^3.23.8"
   }
 }

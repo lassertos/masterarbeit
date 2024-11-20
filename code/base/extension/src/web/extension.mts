@@ -13,6 +13,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   const deviceHandler = new DeviceHandler();
+  deviceHandler.supportedConnectionTypes = ["websocket", "local"];
 
   const disposable = vscode.commands.registerCommand(
     "crosslab-base-extension.helloWorld",

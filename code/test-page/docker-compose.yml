@@ -142,11 +142,9 @@ services:
   test-page:
     image: test-page:latest
     restart: on-failure
-    ports:
-      - 8081:80
-    networks:
-      - service-network
+    network_mode: host
     environment:
+      - URL=http://localhost:8081
       - API_URL=http://localhost:8080
       - CODE_EDITOR_URL=http://localhost:3022
       - COMPILER_URL=http://compilation:3021

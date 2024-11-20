@@ -12,17 +12,19 @@ import { DebuggingTargetServiceProducer } from "@crosslab-ide/crosslab-debugging
 import { getFreePort } from "./util.mjs";
 import net from "net";
 import { MessagingServiceProsumer } from "@crosslab-ide/messaging-service";
+import { TestingServiceProducer } from "@crosslab-ide/crosslab-testing-service";
 
 export class SimavrInstance {
   private _deviceHandler: DeviceHandler;
   private _simulation: Simulation;
   private _instanceUrl: string;
   private _deviceToken: string;
-  private _isDebugging: boolean = false;
   private _gpioService: ElectricalConnectionService;
   private _fileServiceConsumer: FileService__Consumer;
   private _debuggingTargetServiceProducer: DebuggingTargetServiceProducer;
   private _messagingService: MessagingServiceProsumer;
+  private _testingServiceProducer: TestingServiceProducer;
+  private _currentProgram?: Uint8Array;
 
   constructor(instanceUrl: string, deviceToken: string) {
     this._instanceUrl = instanceUrl;
@@ -194,10 +196,142 @@ export class SimavrInstance {
       this._simulation.start();
     });
 
+    this._testingServiceProducer = new TestingServiceProducer("testing");
+
+    this._testingServiceProducer.registerFunction("stop", [], undefined, () => {
+      this._simulation.stop();
+    });
+
+    this._testingServiceProducer.registerFunction(
+      "start",
+      [],
+      undefined,
+      () => {
+        this._simulation.start();
+      }
+    );
+
+    this._testingServiceProducer.registerFunction(
+      "setPinValue",
+      [
+        {
+          type: "string",
+        } as const,
+        {
+          type: "number",
+        } as const,
+      ] as const,
+      undefined,
+      (pin, value) => {
+        this._simulation.setPinValue(pin, value);
+      }
+    );
+
+    this._testingServiceProducer.registerFunction(
+      "getPinValue",
+      [
+        {
+          type: "string",
+        } as const,
+      ] as const,
+      {
+        type: "number",
+      } as const,
+      (pin) => {
+        return this._simulation.getPinValue(pin);
+      }
+    );
+
+    this._testingServiceProducer.on(
+      "call-function",
+      async (consumerId, requestId, functionName, args) => {
+        console.log(
+          `Calling function "${functionName}" with following arguments: ${JSON.stringify(
+            args
+          )}`
+        );
+
+        try {
+          const returnValue =
+            await this._testingServiceProducer.executeFunction(
+              functionName,
+              ...args
+            );
+
+          await this._testingServiceProducer.send(consumerId, {
+            type: "testing:function:return",
+            content: {
+              requestId,
+              success: true,
+              message: `Function "${functionName}"executed successfully!`,
+              returnValue,
+            },
+          });
+        } catch (error) {
+          await this._testingServiceProducer.send(consumerId, {
+            type: "testing:function:return",
+            content: {
+              requestId,
+              success: false,
+              message: error instanceof Error ? error.message : undefined,
+            },
+          });
+        }
+      }
+    );
+
+    this._testingServiceProducer.on(
+      "start-testing",
+      async (consumerId, requestId) => {
+        console.log("Starting testing!");
+
+        this._simulation.stop();
+
+        await this._testingServiceProducer.send(consumerId, {
+          type: "testing:start:response",
+          content: {
+            requestId,
+            success: true,
+            message: "Testing started successfully!",
+          },
+        });
+      }
+    );
+
+    this._testingServiceProducer.on(
+      "end-testing",
+      async (consumerId, requestId) => {
+        console.log("Ending testing!");
+
+        this._simulation.stop();
+        if (this._currentProgram) {
+          await this._program(this._currentProgram);
+        }
+        this._simulation.start();
+
+        await this._testingServiceProducer.send(consumerId, {
+          type: "testing:end:response",
+          content: {
+            requestId,
+            success: true,
+            message: "Testing ended successfully!",
+          },
+        });
+      }
+    );
+
+    // NOTE: is this necessary?
+    this._testingServiceProducer.on("new-consumer", (consumerId) => {
+      console.log(
+        `Added new testing service consumer with id "${consumerId}"!`
+      );
+    });
+
     this._deviceHandler.addService(this._gpioService);
     this._deviceHandler.addService(this._debuggingTargetServiceProducer);
     this._deviceHandler.addService(this._fileServiceConsumer);
     this._deviceHandler.addService(this._messagingService);
+    this._deviceHandler.addService(this._testingServiceProducer);
 
     this._deviceHandler.on("experimentStatusChanged", (event) => {
       console.log(
@@ -265,6 +399,7 @@ export class SimavrInstance {
       this._simulation.stop();
     }
     this._simulation.load(filePath);
+    this._currentProgram = program;
     this._gpioService.interfaces.forEach((connectionInterface) => {
       if (connectionInterface.interfaceType !== "gpio") {
         return;

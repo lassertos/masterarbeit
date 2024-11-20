@@ -1,12 +1,12 @@
 import path from "path";
 import * as vscode from "vscode";
-import { IndexedDBHandler } from "./indexeddbHandler.mjs";
 import * as Diff from "diff";
 import {
   openSettingsDatabase,
   readSetting,
   writeSetting,
 } from "@crosslab-ide/editor-settings";
+import { CrossLabFileSystemSubProvider } from "./subproviders/index.mjs";
 
 type CustomFileChangedEvent = vscode.FileChangeEvent & {
   changes?: {
@@ -18,21 +18,28 @@ type CustomFileChangedEvent = vscode.FileChangeEvent & {
 
 export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
   private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
-  private indexeddbHandler = new IndexedDBHandler();
-  private _currentProject: string | null = null;
+  private _currentProjectUri: vscode.Uri | null = null;
   private _projectChangedHandlers: ((project: vscode.Uri) => void)[] = [];
+  private _mounts: Map<string, CrossLabFileSystemSubProvider> = new Map();
   public copied: vscode.Uri[] = [];
   public isCutting: boolean = false;
 
-  get currentProject(): string | null {
-    return this._currentProject;
+  get currentProjectUri(): vscode.Uri | null {
+    return this._currentProjectUri;
+  }
+
+  addMount(path: string, provider: CrossLabFileSystemSubProvider) {
+    if (this._mounts.has(path)) {
+      throw new Error(`Path "${path}" already has a defined mount!`);
+    }
+    this._mounts.set(path, provider);
   }
 
   onDidChangeFile: vscode.Event<CustomFileChangedEvent[]> = this._emitter.event;
 
   watch(
-    uri: vscode.Uri,
-    options: {
+    _uri: vscode.Uri,
+    _options: {
       readonly recursive: boolean;
       readonly excludes: readonly string[];
     }
@@ -43,29 +50,21 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
 
   async stat(uri: vscode.Uri): Promise<vscode.FileStat> {
     console.log("executing stat!", uri);
-    const updatedUri = this.updateUri(uri);
-    if (!this.indexeddbHandler.exists(updatedUri.path)) {
-      throw vscode.FileSystemError.FileNotFound(updatedUri);
-    }
-
-    return await this.indexeddbHandler.read(updatedUri.path);
+    const [provider, providerUri] = this._getProviderAndUri(uri);
+    return await provider.stat(providerUri);
   }
 
   async readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
     console.log("executing readDirectory!", uri);
-    const updatedUri = this.updateUri(uri);
-    return this.indexeddbHandler.getDirectoryEntries(updatedUri.path);
+    const [provider, providerUri] = this._getProviderAndUri(uri);
+    return await provider.readDirectory(providerUri);
   }
 
   async createDirectory(uri: vscode.Uri): Promise<void> {
     console.log("executing createDirectory!", uri);
     const updatedUri = this.updateUri(uri);
-    await this.indexeddbHandler.write(updatedUri.path, {
-      ctime: Date.now(),
-      mtime: Date.now(),
-      size: 0,
-      type: vscode.FileType.Directory,
-    });
+    const [provider, providerUri] = this._getProviderAndUri(uri);
+    await provider.createDirectory(providerUri);
 
     this._fireSoon(
       {
@@ -78,11 +77,8 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
 
   async readFile(uri: vscode.Uri): Promise<Uint8Array> {
     console.log("executing readFile!", uri);
-    const updatedUri = this.updateUri(uri);
-    return (
-      (await this.indexeddbHandler.read(updatedUri.path)).data ??
-      new Uint8Array()
-    );
+    const [provider, providerUri] = this._getProviderAndUri(uri);
+    return await provider.readFile(providerUri);
   }
 
   async writeFile(
@@ -96,11 +92,10 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
   ): Promise<void> {
     console.log("executing writeFile!", uri, content, options);
     const updatedUri = this.updateUri(uri);
-    const existed = this.indexeddbHandler.exists(updatedUri.path);
+    const [provider, providerUri] = this._getProviderAndUri(uri);
+    const existed = provider.exists(providerUri);
     const oldData = existed
-      ? new TextDecoder().decode(
-          (await this.indexeddbHandler.read(updatedUri.path)).data
-        )
+      ? new TextDecoder().decode(await provider.readFile(providerUri))
       : "";
     const newData = new TextDecoder().decode(content);
     const diffs = Diff.diffChars(oldData, newData);
@@ -124,7 +119,7 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
       index += diff.value.length;
     }
 
-    await this.indexeddbHandler.writeData(updatedUri.path, content);
+    await provider.writeFile(providerUri, content, options);
 
     if (!existed) {
       this._fireSoon({ type: vscode.FileChangeType.Created, uri: updatedUri });
@@ -143,13 +138,14 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
   ): Promise<void> {
     console.log("executing delete!", uri, options);
     const updatedUri = this.updateUri(uri);
-    if (!this.indexeddbHandler.exists(updatedUri.path)) {
+    const [provider, providerUri] = this._getProviderAndUri(uri);
+    if (!provider.exists(providerUri)) {
       throw vscode.FileSystemError.FileNotFound(
         "the following file was not found:" + updatedUri.toString()
       );
     }
 
-    await this.indexeddbHandler.delete(updatedUri.path, options?.recursive);
+    await provider.delete(providerUri, options);
 
     this._fireSoon(
       {
@@ -168,14 +164,16 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
     console.log("executing rename!", oldUri, newUri, options);
     const updatedOldUri = this.updateUri(oldUri);
     const updatedNewUri = this.updateUri(newUri);
+    const [oldProvider, oldProviderUri] = this._getProviderAndUri(oldUri);
+    const [newProvider, newProviderUri] = this._getProviderAndUri(newUri);
 
-    const existed = this.indexeddbHandler.exists(updatedNewUri.path);
+    const existed = newProvider.exists(newProviderUri);
 
-    const sourceExists = this.indexeddbHandler.exists(updatedOldUri.path);
-    const destinationParentExists = this.indexeddbHandler.exists(
-      path.dirname(updatedNewUri.path)
+    const sourceExists = oldProvider.exists(oldProviderUri);
+    const destinationParentExists = newProvider.exists(
+      newProviderUri.with({ path: path.dirname(newProviderUri.path) })
     );
-    const destinationExists = this.indexeddbHandler.exists(updatedNewUri.path);
+    const destinationExists = newProvider.exists(newProviderUri);
 
     if (!sourceExists) {
       throw vscode.FileSystemError.FileNotFound(updatedOldUri);
@@ -201,8 +199,12 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
       return;
     }
 
-    await this.indexeddbHandler.copy(updatedOldUri.path, updatedNewUri.path);
-    await this.indexeddbHandler.delete(updatedOldUri.path);
+    if (oldProvider === newProvider) {
+      await oldProvider.rename(oldProviderUri, newProviderUri);
+    } else {
+      await this._copy(updatedOldUri, updatedNewUri);
+      await this.delete(updatedOldUri);
+    }
 
     this._fireSoon(
       {
@@ -235,15 +237,20 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
     console.log("executing copy!", source, destination, options);
     const updatedSource = this.updateUri(source);
     const updatedDestination = this.updateUri(destination);
+    const [sourceProvider, sourceProviderUri] = this._getProviderAndUri(source);
+    const [destinationProvider, destinationProviderUri] =
+      this._getProviderAndUri(destination);
 
-    const existed = this.indexeddbHandler.exists(updatedDestination.path);
+    const existed = destinationProvider.exists(destinationProviderUri);
 
-    const sourceExists = this.indexeddbHandler.exists(updatedSource.path);
-    const destinationParentExists = this.indexeddbHandler.exists(
-      path.dirname(updatedDestination.path)
+    const sourceExists = sourceProvider.exists(sourceProviderUri);
+    const destinationParentExists = destinationProvider.exists(
+      destinationProviderUri.with({
+        path: path.dirname(destinationProviderUri.path),
+      })
     );
-    const destinationExists = this.indexeddbHandler.exists(
-      updatedDestination.path
+    const destinationExists = destinationProvider.exists(
+      destinationProviderUri
     );
 
     if (!sourceExists) {
@@ -266,10 +273,7 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
       );
     }
 
-    await this.indexeddbHandler.copy(
-      updatedSource.path,
-      updatedDestination.path
-    );
+    await this._copy(updatedSource, updatedDestination);
 
     if (!existed) {
       this._fireSoon({
@@ -281,6 +285,42 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
         type: vscode.FileChangeType.Changed,
         uri: updatedDestination,
       });
+    }
+  }
+
+  private async _copy(
+    source: vscode.Uri,
+    destination: vscode.Uri,
+    type?: vscode.FileType
+  ) {
+    const [sourceProvider, sourceProviderUri] = this._getProviderAndUri(source);
+    const [destinationProvider, destinationProviderUri] =
+      this._getProviderAndUri(destination);
+
+    if (sourceProvider === destinationProvider) {
+      return await sourceProvider.copy(
+        sourceProviderUri,
+        destinationProviderUri
+      );
+    }
+
+    const fileType =
+      type ?? (await sourceProvider.stat(sourceProviderUri)).type;
+
+    if (fileType === vscode.FileType.File) {
+      return await this.writeFile(destination, await this.readFile(source));
+    }
+
+    if (fileType !== vscode.FileType.Directory) {
+      throw new Error(`Unexpected file type "${fileType}"!`);
+    }
+
+    for (const [name, type] of await this.readDirectory(source)) {
+      await this._copy(
+        source.with({ path: path.join(source.path, name) }),
+        destination.with({ path: path.join(destination.path, name) }),
+        type
+      );
     }
   }
 
@@ -304,38 +344,77 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
 
   // helper functions
 
+  private async _getAllEntries(uri?: vscode.Uri) {
+    const entries = [];
+    for (const [mountPath, provider] of this._mounts.entries()) {
+      entries.push(
+        ...(
+          await provider.readDirectory(
+            uri ?? vscode.Uri.from({ scheme: "crosslabfs", path: "/" })
+          )
+        ).map(async ([name, type]) => {
+          const entryPath = path.join(mountPath, name);
+          return {
+            type,
+            path: entryPath,
+            content:
+              type === vscode.FileType.File
+                ? await provider.readFile(
+                    vscode.Uri.from({
+                      scheme: "crosslabfs",
+                      path: entryPath,
+                    })
+                  )
+                : undefined,
+          };
+        })
+      );
+    }
+    return Promise.all(entries);
+  }
+
   async getAllFiles() {
-    return this.indexeddbHandler.getAllFiles();
+    return (await this._getAllEntries()).filter(
+      (entry) => entry.type === vscode.FileType.File
+    );
   }
 
-  getAllFilePaths() {
-    return this.indexeddbHandler.getAllFilePaths();
+  async getAllFilePaths() {
+    return (await this.getAllFiles()).map((entry) => entry.path);
   }
 
-  getAllDirectoryPaths() {
-    return this.indexeddbHandler.getAllDirectoryPaths();
+  async getAllDirectoryPaths() {
+    return (await this._getAllEntries())
+      .filter((entry) => entry.type === vscode.FileType.Directory)
+      .map((entry) => entry.path);
   }
 
   addProjectChangedHandler(handler: (project: vscode.Uri) => void) {
     this._projectChangedHandlers.push(handler);
   }
 
-  async setProject(project: string | null) {
-    if (project !== this._currentProject) {
+  async setProject(projectUri: vscode.Uri | null) {
+    if (projectUri !== this._currentProjectUri) {
       for (const handler of this._projectChangedHandlers) {
         handler(
-          vscode.Uri.from({
-            scheme: "crosslabfs",
-            path: project ? `/projects/${project}` : "/workspace",
-          })
+          projectUri ??
+            vscode.Uri.from({
+              scheme: "crosslabfs",
+              path: "/workspace",
+            })
         );
       }
-      this._currentProject = project;
+      this._currentProjectUri = projectUri;
       const settingsDatabase = await openSettingsDatabase();
       await writeSetting(
         settingsDatabase,
         "crosslab.current-project",
-        project ? project : ""
+        projectUri ? projectUri.toString() : ""
+      );
+      await writeSetting(
+        settingsDatabase,
+        "crosslab.current-project-name",
+        projectUri ? path.basename(projectUri.path) : ""
       );
       vscode.commands.executeCommand("workbench.action.closeAllEditors");
     }
@@ -347,30 +426,49 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
   async initialize() {
     const settingsDatabase = await openSettingsDatabase();
     try {
-      this._currentProject = (await readSetting(
-        settingsDatabase,
-        "crosslab.current-project"
-      )) as string;
+      const savedUri = vscode.Uri.parse(
+        (await readSetting(
+          settingsDatabase,
+          "crosslab.current-project"
+        )) as string
+      );
+      if ((await this.stat(savedUri)).type !== vscode.FileType.Directory) {
+        throw new Error(`Saved project "${savedUri.path}" is not a directory!`);
+      }
+      this._currentProjectUri = savedUri;
     } catch (error) {
       await writeSetting(settingsDatabase, "crosslab.current-project", "");
-      this._currentProject = null;
+      await writeSetting(settingsDatabase, "crosslab.current-project-name", "");
+      this._currentProjectUri = null;
+      vscode.commands.executeCommand("workbench.action.closeAllEditors");
     }
-    await this.indexeddbHandler.initialize();
   }
 
-  async clear() {
-    await this.indexeddbHandler.clear();
+  private _getProviderAndUri(
+    uri: vscode.Uri
+  ): [CrossLabFileSystemSubProvider, vscode.Uri] {
+    const updatedUri = this.updateUri(uri);
+    for (const [path, provider] of this._mounts.entries()) {
+      if (updatedUri.path.startsWith(path + "/") || updatedUri.path === path) {
+        return [
+          provider,
+          updatedUri.with({
+            path: updatedUri.path.startsWith(path + "/")
+              ? updatedUri.path.replace(path, "")
+              : "/",
+          }),
+        ];
+      }
+    }
+    throw new Error(`No provider found for path "${uri.path}"!`);
   }
 
-  updateUri(uri: vscode.Uri, path?: string) {
+  updateUri(uri: vscode.Uri) {
     const updatedUri = uri.with({
       path:
         (uri.path.startsWith("/workspace/") || uri.path === "/workspace") &&
-        (this._currentProject || path)
-          ? uri.path.replace(
-              "/workspace",
-              `/projects/${path ? path : this._currentProject}`
-            )
+        this._currentProjectUri
+          ? uri.path.replace("/workspace", this._currentProjectUri.path)
           : uri.path,
     });
 

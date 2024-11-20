@@ -24,17 +24,17 @@ export class CrossLabTextSearchProvider implements vscode.TextSearchProvider {
     const files = (await this.fs.getAllFiles())
       .filter((file) =>
         file.path.startsWith(
-          this.fs.currentProject
-            ? `/projects/${this.fs.currentProject}/`
+          this.fs.currentProjectUri
+            ? `${this.fs.currentProjectUri.path}/`
             : `/workspace/`
         )
       )
       .map((file) => {
         return {
           ...file,
-          path: this.fs.currentProject
+          path: this.fs.currentProjectUri
             ? file.path.replace(
-                `/projects/${this.fs.currentProject}/`,
+                `${this.fs.currentProjectUri.path}/`,
                 "/workspace/"
               )
             : file.path,
@@ -43,7 +43,7 @@ export class CrossLabTextSearchProvider implements vscode.TextSearchProvider {
       .map((file) => {
         return {
           uri: vscode.Uri.from({ scheme: "crosslabfs", path: file.path }),
-          content: new TextDecoder().decode(file.file.data),
+          content: new TextDecoder().decode(file.content),
         };
       });
 

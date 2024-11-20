@@ -1,3 +1,10 @@
+import {
+  isTest,
+  TestingServiceConsumer,
+  testSchema,
+  TestWithId,
+} from "@crosslab-ide/crosslab-testing-service";
+import { DeviceHandler } from "@crosslab-ide/soa-client";
 import * as vscode from "vscode";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -10,91 +17,65 @@ export function activate(context: vscode.ExtensionContext) {
     "CrossLab Tests"
   );
 
-  const firstTestItem = testController.createTestItem(
-    "crosslab-test-1",
-    "First Test"
-  );
-  const secondTestItem = testController.createTestItem(
-    "crosslab-test-2",
-    "Second Test"
+  const testingServiceConsumer = new TestingServiceConsumer(
+    "testing-extension:testing"
   );
 
-  testController.items.add(firstTestItem);
-  testController.items.add(secondTestItem);
+  function parseTest(test: TestWithId): vscode.TestItem {
+    console.log("parsing test:", test);
+    const testItem = testController.createTestItem(test.id, test.name);
+    testController.items.add(testItem);
 
-  const runProfile = testController.createRunProfile(
+    for (const child of test.children ?? []) {
+      testItem.children.add(parseTest(child));
+    }
+
+    console.log("parsed test successfully:", test);
+    return testItem;
+  }
+
+  testingServiceConsumer.on("new-test", parseTest);
+
+  testController.createRunProfile(
     "Run",
     vscode.TestRunProfileKind.Run,
-    (request, token) => {
-      // TODO
+    async (request, token) => {
+      testingServiceConsumer.startTesting();
       const testRun = testController.createTestRun(request);
       const queue: vscode.TestItem[] = [];
 
-      // Loop through all included tests, or all known tests, and add them to our queue
       if (request.include) {
         request.include.forEach((test) => queue.push(test));
       } else {
         testController.items.forEach((test) => queue.push(test));
       }
 
-      // For every test that was queued, try to run it. Call run.passed() or run.failed().
-      // The `TestMessage` can contain extra information, like a failing location or
-      // a diff output. But here we'll just give it a textual message.
       while (queue.length > 0 && !token.isCancellationRequested) {
         const test = queue.pop()!;
 
-        const start = Date.now();
-
-        // Skip tests the user asked to exclude
         if (request.exclude?.includes(test)) {
           continue;
         }
 
-        testRun.passed(test, Date.now() - start);
-
-        test.children.forEach((test) => queue.push(test));
-      }
-
-      // Make sure to end the run after all tests have been executed:
-      testRun.end();
-    }
-  );
-
-  const debugRunProfile = testController.createRunProfile(
-    "Debug",
-    vscode.TestRunProfileKind.Debug,
-    (request, token) => {
-      // TODO
-      const testRun = testController.createTestRun(request);
-      const queue: vscode.TestItem[] = [];
-
-      // Loop through all included tests, or all known tests, and add them to our queue
-      if (request.include) {
-        request.include.forEach((test) => queue.push(test));
-      } else {
-        testController.items.forEach((test) => queue.push(test));
-      }
-
-      // For every test that was queued, try to run it. Call run.passed() or run.failed().
-      // The `TestMessage` can contain extra information, like a failing location or
-      // a diff output. But here we'll just give it a textual message.
-      while (queue.length > 0 && !token.isCancellationRequested) {
-        const test = queue.pop()!;
-
         const start = Date.now();
+        const result = await testingServiceConsumer.runTest(test.id);
+        const duration = Date.now() - start;
 
-        // Skip tests the user asked to exclude
-        if (request.exclude?.includes(test)) {
-          continue;
+        if (result.success) {
+          testRun.passed(test, duration);
+        } else {
+          testRun.failed(
+            test,
+            new vscode.TestMessage(result.message),
+            duration
+          );
         }
 
-        testRun.passed(test, Date.now() - start);
-
         test.children.forEach((test) => queue.push(test));
       }
 
-      // Make sure to end the run after all tests have been executed:
       testRun.end();
+      testingServiceConsumer.endTesting();
     }
   );
 
@@ -108,6 +89,52 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(disposable);
+
+  return {
+    addServices(deviceHandler: DeviceHandler) {
+      console.log("adding testing service!");
+      deviceHandler.addService(testingServiceConsumer);
+      deviceHandler.once("configuration", (configuration) => {
+        console.log("attempting to read tests from device configuration!");
+        console.log("configuration:", configuration);
+
+        console.log(
+          `checking if device configuration contains property "tests"`
+        );
+        if (!("tests" in configuration)) {
+          return;
+        }
+
+        console.log(
+          `checking if property "tests" of device configuration is an array`
+        );
+        if (!Array.isArray(configuration.tests)) {
+          console.error(
+            `Property "tests" of device configuration is not an array!`
+          );
+          return;
+        }
+
+        console.log(
+          `checking if property "tests" of device configuration only contains items of type Test`
+        );
+        if (configuration.tests.some((test) => !isTest(test))) {
+          console.error(
+            `Property "tests" of device configuration contains invalid items!`
+          );
+          return;
+        }
+
+        console.log("parsing tests");
+        for (const test of configuration.tests) {
+          const testWithId = testingServiceConsumer.addTest(test);
+          parseTest(testWithId);
+        }
+        console.log("successfully read tests from device configuration!");
+      });
+      console.log("successfully added testing service!");
+    },
+  };
 }
 
 export function deactivate() {}

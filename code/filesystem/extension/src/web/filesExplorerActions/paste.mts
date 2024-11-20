@@ -23,8 +23,8 @@ export function registerFilesExplorerPaste(
       (await getSelectedUris(fileSystemProvider)).at(-1) ??
       vscode.Uri.from({
         scheme: "crosslabfs",
-        path: fileSystemProvider.currentProject
-          ? `/projects/${fileSystemProvider.currentProject}`
+        path: fileSystemProvider.currentProjectUri
+          ? fileSystemProvider.currentProjectUri.path
           : "/workspace",
       });
 
@@ -85,12 +85,16 @@ export function registerFilesExplorerPaste(
         "revealInExplorer",
         vscode.Uri.joinPath(
           lastCopied.with({
-            path: lastCopied.path.startsWith(`/projects/`)
-              ? lastCopied.path.replace(
-                  `/projects/${fileSystemProvider.currentProject}/`,
-                  "/workspace/"
-                )
-              : lastCopied.path,
+            path:
+              fileSystemProvider.currentProjectUri?.path &&
+              lastCopied.path.startsWith(
+                fileSystemProvider.currentProjectUri.path
+              )
+                ? lastCopied.path.replace(
+                    fileSystemProvider.currentProjectUri.path,
+                    "/workspace/"
+                  )
+                : lastCopied.path,
           })
         )
       );

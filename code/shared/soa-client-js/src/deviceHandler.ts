@@ -95,33 +95,39 @@ export class DeviceHandler extends TypedEmitter<DeviceHandlerEvents> {
 
     this.ws.onmessage = (event) => {
       const message = JSON.parse(event.data as string);
+      console.log("soa-client: received message", message);
 
       if (isCommandMessage(message)) {
         if (isCreatePeerConnectionMessage(message)) {
-          this.handleCreatePeerConnectionMessage(message);
+          return this.handleCreatePeerConnectionMessage(message);
         } else if (isClosePeerConnectionMessage(message)) {
-          this.handleClosePeerConnectionMessage(message);
+          return this.handleClosePeerConnectionMessage(message);
         }
+      } else if (isSignalingMessage(message)) {
+        return this.handleSignalingMessage(message);
+      } else if (isConfigurationMessage(message)) {
+        return this.handleConfigurationMessage(message);
+      } else if (isExperimentStatusChangedMessage(message)) {
+        return this.handleExperimentStatusChangedMessage(message);
       }
-      if (isSignalingMessage(message)) {
-        this.handleSignalingMessage(message);
-      }
-      if (isConfigurationMessage(message)) {
-        this.handleConfigurationMessage(message);
-      }
-      if (isExperimentStatusChangedMessage(message)) {
-        this.handleExperimentStatusChangedMessage(message);
-      }
+
+      console.log("soa-client: received unknown message", message);
     };
   }
 
   addService(service: Service) {
     this.services.set(service.serviceId, service);
+    console.log(
+      "soa-client: added service",
+      service,
+      Array.from(this.services.values())
+    );
   }
 
   private handleCreatePeerConnectionMessage(
     message: CreatePeerConnectionMessage
   ) {
+    console.log("soa-client: handling create peerconnection message", message);
     if (this.connections.has(message.connectionUrl)) {
       throw Error(
         "Can not create a connection. Connection Id is already present"
@@ -166,6 +172,11 @@ export class DeviceHandler extends TypedEmitter<DeviceHandlerEvents> {
     }
 
     this.connections.set(message.connectionUrl, connection);
+    console.log(
+      "soa-client: attempting to set up connections",
+      this.services,
+      serviceConfigs
+    );
     for (const serviceConfig of serviceConfigs) {
       const service = this.services.get(serviceConfig.serviceId);
       if (service === undefined) {

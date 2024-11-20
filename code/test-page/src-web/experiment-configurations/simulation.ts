@@ -33,13 +33,223 @@ export default (deviceUrls: {
         },
       ],
       roles: [
-        { name: "code-editor" },
+        {
+          name: "code-editor",
+          configuration: {
+            tests: [
+              {
+                name: "Should drive in a circle",
+                functions: [
+                  // stop and set all sensors to 0
+                  {
+                    producerId: "simulation",
+                    functionName: "stop",
+                    args: [],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A0", 0], // set limit x left to 0
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A1", 0], // set limit x right to 0
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A2", 0], // set limit y top to 0
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A3", 0], // set limit y bottom to 0
+                  },
+                  // start and check that only motor x left is on
+                  {
+                    producerId: "simulation",
+                    functionName: "start",
+                    args: [],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A4"],
+                    expect: 1, // expect motor x left to be on
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A5"],
+                    expect: 0, // expect motor x right to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A6"],
+                    expect: 0, // expect motor y top to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A7"],
+                    expect: 0, // expect motor y bottom to be off
+                  },
+                  // activate limit x left and check that only motor y top is on
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A0", 1],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A4"],
+                    expect: 0, // expect motor x left to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A5"],
+                    expect: 0, // expect motor x right to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A6"],
+                    expect: 1, // expect motor y top to be on
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A7"],
+                    expect: 0, // expect motor y bottom to be off
+                  },
+                  // activate limit y top and check that only motor x right is on
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A2", 1],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A4"],
+                    expect: 0, // expect motor x left to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A5"],
+                    expect: 1, // expect motor x right to be on
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A6"],
+                    expect: 0, // expect motor y top to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A7"],
+                    expect: 0, // expect motor y bottom to be off
+                  },
+                  // activate limit x right and check that only motor y bottom is on
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A1", 1],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A4"],
+                    expect: 0, // expect motor x left to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A5"],
+                    expect: 0, // expect motor x right to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A6"],
+                    expect: 0, // expect motor y top to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A7"],
+                    expect: 1, // expect motor y bottom to be on
+                  },
+                  // deactivate limit x left
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A0", 0],
+                  },
+                  // activate limit y bottom and check that only motor x left is on
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A3", 1],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A4"],
+                    expect: 1, // expect motor x left to be on
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A5"],
+                    expect: 0, // expect motor x right to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A6"],
+                    expect: 0, // expect motor y top to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A7"],
+                    expect: 0, // expect motor y bottom to be off
+                  },
+                ],
+              },
+            ],
+          },
+        },
         { name: "compiler" },
         { name: "debugger" },
         { name: "simulation" },
         { name: "vpspu" },
       ],
       serviceConfigurations: [
+        {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/testing",
+          participants: [
+            {
+              role: "code-editor",
+              config: {
+                producerId: "simulation",
+              },
+              serviceId: "testing-extension:testing",
+            },
+            {
+              role: "simulation",
+              config: {},
+              serviceId: "testing",
+            },
+          ],
+        },
         {
           serviceType:
             "https://api.goldi-labs.de/serviceTypes/debugging-adapter",

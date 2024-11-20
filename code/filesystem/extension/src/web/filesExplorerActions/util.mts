@@ -76,8 +76,8 @@ export async function getSelectedUris(
   await vscode.env.clipboard.writeText(savedClipboard);
 
   return paths.split("\n").map((path) => {
-    const replacement = fileSystemProvider.currentProject
-      ? `/projects/${fileSystemProvider.currentProject}`
+    const replacement = fileSystemProvider.currentProjectUri
+      ? fileSystemProvider.currentProjectUri.path
       : "/workspace";
     const updatedPath = path === "." ? replacement : path;
     return fileSystemProvider.updateUri(

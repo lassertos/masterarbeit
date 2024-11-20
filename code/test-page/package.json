@@ -3,21 +3,30 @@
   "name": "@crosslab-ide/test-page",
   "version": "0.0.1",
   "description": "A page for testing the crosslab ide in different experiment configurations.",
-  "main": "dist/index.js",
+  "main": "dist/index.mjs",
   "scripts": {
-    "build:html": "copyfiles -f src/index.html dist",
-    "build:js": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm",
-    "build:tsc": "tsc",
+    "build:html": "copyfiles -f src-web/index.html dist/web",
+    "build:website": "esbuild src-web/index.ts --bundle --outfile=dist/web/index.js --format=esm",
+    "build:server": "tsc -p ./tsconfig.server.json",
     "build": "npm-run-all build:*"
   },
   "author": "Pierre Helbing",
   "license": "MIT",
   "devDependencies": {
-    "@cross-lab-project/api-client": "file:../crosslab/clients/api/js",
+    "@types/body-parser": "^1.19.5",
+    "@types/express": "^4.17.21",
+    "@types/uuid": "^10.0.0",
     "copyfiles": "^2.4.1",
     "esbuild": "^0.24.0",
     "lit": "^3.2.1",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@cross-lab-project/api-client": "^0.2.8",
+    "body-parser": "^1.20.3",
+    "express": "^4.21.1",
+    "uuid": "^11.0.3",
+    "zod": "^3.23.8"
   }
 }

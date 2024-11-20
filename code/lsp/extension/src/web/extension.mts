@@ -62,7 +62,10 @@ export async function deactivate(): Promise<void> {
 }
 
 async function stopClient(): Promise<void> {
-  if (client?.isRunning()) await client?.stop();
+  if (client?.isRunning()) {
+    await client.stop();
+    await client.dispose();
+  }
 }
 
 async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
@@ -105,7 +108,7 @@ async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
 
     if (!isDirectory) {
       console.log("sending didOpen notification from onDidCreate!");
-      await vscode.workspace.openTextDocument(uri);
+      // await vscode.workspace.openTextDocument(uri);
     } else {
       commandPort1.postMessage({
         type: "filesystem:create",
@@ -269,7 +272,7 @@ async function setupFiles(
       case vscode.FileType.Unknown:
         break;
       case vscode.FileType.File:
-        const document = await vscode.workspace.openTextDocument(entryUri);
+        // const document = await vscode.workspace.openTextDocument(entryUri);
         console.log("sending didSave notification from setupFiles!");
         await client?.sendNotification("textDocument/didSave", {
           textDocument: {
@@ -280,7 +283,9 @@ async function setupFiles(
               })
               .toString(true),
           },
-          text: document.getText(),
+          text: new TextDecoder().decode(
+            await vscode.workspace.fs.readFile(entryUri)
+          ),
         });
         break;
       case vscode.FileType.Directory:

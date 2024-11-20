@@ -26,6 +26,41 @@ export default async () => {
       instantiateUrl: configuration.simulationUrl,
       services: [
         {
+          serviceDirection: "producer",
+          serviceId: "testing",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/testing",
+          supportedConnectionTypes: ["websocket"],
+          functions: [
+            {
+              name: "start",
+              argumentSchemas: [],
+            },
+            {
+              name: "stop",
+              argumentSchemas: [],
+            },
+            {
+              name: "setPinValue",
+              argumentSchemas: [
+                {
+                  type: "string",
+                },
+                {
+                  type: "number",
+                },
+              ],
+            },
+            {
+              name: "getPinValue",
+              argumentSchemas: [
+                {
+                  type: "string",
+                },
+              ],
+            },
+          ],
+        },
+        {
           serviceDirection: "consumer",
           serviceId: "program",
           serviceType: "https://api.goldi-labs.de/serviceTypes/file",

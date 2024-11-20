@@ -1,13 +1,10 @@
 import { css, html, LitElement } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
-import {
-  provideVSCodeDesignSystem,
-  vsCodeButton,
-  vsCodeDropdown,
-  vsCodeOption,
-  vsCodeTextField,
-} from "@vscode/webview-ui-toolkit";
-import { Message } from "./messages";
+import { Message } from "./messages.mjs";
+import "@vscode-elements/elements/dist/vscode-button/index.js";
+import "@vscode-elements/elements/dist/vscode-single-select/index.js";
+import "@vscode-elements/elements/dist/vscode-option/index.js";
+import "@vscode-elements/elements/dist/vscode-textfield/index.js";
 
 // eslint-disable-next-line
 interface vscode {
@@ -16,29 +13,25 @@ interface vscode {
 
 declare const vscode: vscode;
 
-provideVSCodeDesignSystem().register(
-  vsCodeTextField(),
-  vsCodeButton(),
-  vsCodeDropdown(),
-  vsCodeOption()
-);
-
 @customElement("collaboration-view")
 export class CollaborationView extends LitElement {
   static styles = css`
-    vscode-text-field {
-      width: 100%;
+    :host {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
-    vscode-button {
+    vscode-single-select {
       width: 100%;
-      margin-top: 0.5rem;
-    }
-    vscode-dropdown {
-      width: 100%;
-      margin-bottom: 0.5rem;
     }
     vscode-option {
       width: 100%;
+    }
+    vscode-textfield {
+      width: 100%;
+    }
+    vscode-button {
+      margin-top: 0.25rem;
     }
   `;
 
@@ -60,23 +53,23 @@ export class CollaborationView extends LitElement {
   protected render(): unknown {
     return html`
       <label for="action-dropdown">Action</label>
-      <vscode-dropdown
+      <vscode-single-select
         id="action-dropdown"
         @change=${() => this.selectHandler()}
       >
         <vscode-option value="create">Create Session</vscode-option>
         <vscode-option value="join">Join Session</vscode-option>
-      </vscode-dropdown>
-      <vscode-text-field
+      </vscode-single-select>
+      <vscode-textfield
         id="server-address-text-field"
         placeholder="ws://localhost:1234"
-        >Server</vscode-text-field
+        >Server</vscode-textfield
       >
-      <vscode-text-field id="room-name-text-field" placeholder="my-roomname"
-        >Room Name</vscode-text-field
+      <vscode-textfield id="room-name-text-field" placeholder="my-roomname"
+        >Room Name</vscode-textfield
       >
-      <vscode-text-field id="password-text-field" type="password"
-        >Password</vscode-text-field
+      <vscode-textfield id="password-text-field" type="password"
+        >Password</vscode-textfield
       >
       ${this.renderAction()}
     `;

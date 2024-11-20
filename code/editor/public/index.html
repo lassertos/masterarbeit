@@ -86,6 +86,11 @@
           authority: "localhost:3022",
           path: "/extensions/testing",
         },
+        {
+          scheme: "http",
+          authority: "localhost:3022",
+          path: "/extensions/collaboration",
+        },
       ],
       configurationDefaults: {
         "crosslab.instanceUrl": queryParameters.get("instanceUrl"),
@@ -116,7 +121,7 @@
       const readRequest = db
         .transaction(["settings"], "readonly")
         .objectStore("settings")
-        .get("crosslab.current-project");
+        .get("crosslab.current-project-name");
 
       let project = null;
       try {

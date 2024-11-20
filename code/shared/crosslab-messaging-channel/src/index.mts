@@ -17,7 +17,10 @@ export class CrossLabMessagingChannel<
   constructor(channel: DataChannel, protocol: MP, role: R) {
     super(protocol, role);
     this._channel = channel;
-    this._channel.ready().then(() => this.emit("ready"));
+    this._channel.ready().then(() => {
+      this._status = "open";
+      this.emit("ready");
+    });
     this._channel.ondata = (data: unknown) => {
       console.log(`received data: ${data}`);
       if (typeof data === "string") {

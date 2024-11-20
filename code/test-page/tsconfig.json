@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "lib": ["DOM", "ESNext"],
     "noEmit": true,
-    "rootDir": "./src",
+    "rootDirs": ["src", "src-web"],
     "experimentalDecorators": true
   }
 }

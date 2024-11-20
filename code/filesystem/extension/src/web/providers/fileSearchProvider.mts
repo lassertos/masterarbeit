@@ -3,7 +3,6 @@ import {
   FileSearchOptions,
   FileSearchProvider,
   FileSearchQuery,
-  ProviderResult,
   Uri,
 } from "vscode";
 import Fuse from "fuse.js";
@@ -16,27 +15,23 @@ export class CrossLabFileSearchProvider implements FileSearchProvider {
     this.fs = fs;
   }
 
-  provideFileSearchResults(
+  async provideFileSearchResults(
     query: FileSearchQuery,
     options: FileSearchOptions,
     token: CancellationToken
-  ): ProviderResult<Uri[]> {
+  ): Promise<Uri[]> {
     const fuse = new Fuse(
-      this.fs
-        .getAllFilePaths()
+      (await this.fs.getAllFilePaths())
         .filter((path) =>
           path.startsWith(
-            this.fs.currentProject
-              ? `/projects/${this.fs.currentProject}/`
+            this.fs.currentProjectUri
+              ? `${this.fs.currentProjectUri.path}/`
               : `/workspace/`
           )
         )
         .map((path) =>
-          this.fs.currentProject
-            ? path.replace(
-                `/projects/${this.fs.currentProject}/`,
-                "/workspace/"
-              )
+          this.fs.currentProjectUri
+            ? path.replace(`${this.fs.currentProjectUri.path}/`, "/workspace/")
             : path
         ),
       {

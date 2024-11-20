@@ -125,7 +125,7 @@ export class CompilationService__Consumer<R extends ResultFormat[]>
     const producer = this._producers.get(producerId);
 
     if (!producer) {
-      throw new Error(`Could not find provider with id "${producerId}"`);
+      throw new Error(`Could not find producer with id "${producerId}"`);
     }
 
     const requestId = uuidv4();

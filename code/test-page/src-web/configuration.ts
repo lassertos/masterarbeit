@@ -1,4 +1,5 @@
 export const configuration = {
+  url: "{{URL}}",
   apiUrl: "{{API_URL}}",
   codeEditorUrl: "{{CODE_EDITOR_URL}}",
   compilerUrl: "{{COMPILER_URL}}",

@@ -6,8 +6,10 @@ import {
   ExperimentServiceTypes,
 } from "@cross-lab-project/api-client";
 import { configuration } from "./configuration.js";
+import codeEditor from "./helper/code-editor.js";
+import { getDeviceUrl } from "./helper/index.js";
 
-@customElement("experiment-selection")
+@customElement("test-page-experiment-selection")
 export class ExperimentSelection extends LitElement {
   static styles: CSSResultGroup = css`
     :host {
@@ -72,13 +74,47 @@ export class ExperimentSelection extends LitElement {
         ...template.configuration,
       });
 
-      console.log(experiment);
+      if (experiment.roles.find((role) => role.name === "code-editor")) {
+        const response = await fetch(configuration.url + "/invites", {
+          method: "post",
+          body: JSON.stringify({
+            experiment: experiment.url,
+            devices: [
+              {
+                device: await getDeviceUrl("code-editor"),
+                role: {
+                  basedOn: "code-editor",
+                },
+              },
+            ],
+          }),
+          headers: [["Content-Type", "application/json"]],
+        });
 
-      for (const instance of experiment.instantiatedDevices) {
-        const url = new URL(instance.codeUrl);
-        url.searchParams.set("instanceUrl", instance.url);
-        url.searchParams.set("deviceToken", instance.token);
-        open(url);
+        const invite = await response.text();
+
+        console.log(experiment, invite);
+      }
+
+      for (const instantiatedDevice of experiment.instantiatedDevices) {
+        instantiatedDevice.name = (
+          await apiClient.getDevice(instantiatedDevice.url)
+        ).name;
+      }
+
+      if (template.name !== "Minimal Collaboration Setup") {
+        this.dispatchEvent(
+          new CustomEvent("experiment", { detail: experiment })
+        );
+      } else {
+        console.log(
+          experiment.instantiatedDevices.map((instantiatedDevice) => {
+            const url = new URL(instantiatedDevice.codeUrl);
+            url.searchParams.set("instanceUrl", instantiatedDevice.url);
+            url.searchParams.set("deviceToken", instantiatedDevice.token);
+            return url.toString();
+          })
+        );
       }
     };
   }

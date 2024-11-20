@@ -1,12 +1,11 @@
 import * as vscode from "vscode";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
-import { VSCodeBinding } from "./y-vscode";
-import { Message } from "./messages";
+import { VSCodeBinding } from "./y-vscode.mjs";
+import { Message } from "./messages.mjs";
 
 export class CollaborationViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "collaboration.view";
-  private _view?: vscode.WebviewView;
   private _status: {
     doc?: Y.Doc;
     provider?: WebsocketProvider;
@@ -21,7 +20,6 @@ export class CollaborationViewProvider implements vscode.WebviewViewProvider {
     context: vscode.WebviewViewResolveContext,
     token: vscode.CancellationToken
   ): Thenable<void> | void {
-    this._view = webviewView;
     context.state;
 
     webviewView.webview.options = {
@@ -91,9 +89,6 @@ export class CollaborationViewProvider implements vscode.WebviewViewProvider {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "dist", "web", "main.js")
     );
-    const styleMainUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "media", "main.css")
-    );
 
     // Use a nonce to only allow a specific script to be run.
     const nonce = getNonce();
@@ -113,7 +108,6 @@ export class CollaborationViewProvider implements vscode.WebviewViewProvider {
 
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-          <link href="${styleMainUri}" rel="stylesheet">
           <script nonce="${nonce}">
             const vscode = acquireVsCodeApi();
           </script>

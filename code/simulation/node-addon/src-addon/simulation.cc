@@ -124,6 +124,10 @@ void run(avr_t *avr, bool *stop_thread, std::queue<pin_event> *pin_events)
 void Simulation::start(const Napi::CallbackInfo &info)
 {
 	printf("Starting the simulation! %d\n", this->status);
+	if (this->status == RUNNING)
+	{
+		return;
+	}
 	this->status = RUNNING;
 	this->stop_thread = false;
 	this->thread = std::thread(&run, this->avr, &this->stop_thread, &this->pin_events);
@@ -132,6 +136,10 @@ void Simulation::start(const Napi::CallbackInfo &info)
 void Simulation::stop(const Napi::CallbackInfo &info)
 {
 	printf("Stopping the simulation!\n");
+	if (this->status != RUNNING)
+	{
+		return;
+	}
 	this->status = STOPPED;
 	this->stop_thread = true;
 	this->thread.join();

@@ -21,11 +21,17 @@ export abstract class AbstractMessagingChannel<
 > extends TypedEmitter<MessagingChannelEvents<MP, R>> {
     protected _protocol: MP;
     protected _role: R;
+    protected _status: "created" | "open" | "closed";
 
     protected constructor(protocol: MP, role: R) {
         super();
         this._protocol = protocol;
         this._role = role;
+        this._status = "created";
+    }
+
+    get status() {
+        return this._status;
     }
 
     abstract send(message: OutgoingMessage<MP, R>): Promise<void> | void;

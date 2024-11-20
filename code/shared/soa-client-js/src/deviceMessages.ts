@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // define message schema
 
@@ -13,7 +13,7 @@ export function isMessage(input: unknown): input is Message {
 // define command message schema
 
 const commandMessageSchema = messageSchema.extend({
-  messageType: z.literal('command'),
+  messageType: z.literal("command"),
   command: z.string(),
 });
 export type CommandMessage = z.infer<typeof commandMessageSchema>;
@@ -33,7 +33,7 @@ export type ServiceConfiguration = z.infer<typeof serviceConfigurationSchema>;
 // define create peerconnection message schemas
 
 const createPeerConnectionMessageBaseSchema = commandMessageSchema.extend({
-  command: z.literal('createPeerconnection'),
+  command: z.literal("createPeerconnection"),
   connectionType: z.string(),
   connectionUrl: z.string(),
   services: z.array(serviceConfigurationSchema),
@@ -42,7 +42,7 @@ const createPeerConnectionMessageBaseSchema = commandMessageSchema.extend({
 
 const createWebSocketPeerConnectionMessageSchema =
   createPeerConnectionMessageBaseSchema.extend({
-    connectionType: z.literal('websocket'),
+    connectionType: z.literal("websocket"),
     connectionOptions: z.object({
       webSocketUrl: z.string(),
     }),
@@ -50,7 +50,7 @@ const createWebSocketPeerConnectionMessageSchema =
 
 const createWebRTCPeerConnectionMessageSchema =
   createPeerConnectionMessageBaseSchema.extend({
-    connectionType: z.literal('webrtc'),
+    connectionType: z.literal("webrtc"),
     connectionOptions: z.object({
       iceServers: z.optional(
         z.array(
@@ -58,15 +58,15 @@ const createWebRTCPeerConnectionMessageSchema =
             urls: z.union([z.string(), z.array(z.string())]),
             username: z.optional(z.string()),
             credential: z.optional(z.string()),
-          }),
-        ),
+          })
+        )
       ),
     }),
   });
 
 const createLocalPeerConnectionMessageSchema =
   createPeerConnectionMessageBaseSchema.extend({
-    connectionType: z.literal('local'),
+    connectionType: z.literal("local"),
   });
 
 const createPeerConnectionMessageSchema = z.union([
@@ -78,7 +78,7 @@ export type CreatePeerConnectionMessage = z.infer<
   typeof createPeerConnectionMessageSchema
 >;
 export function isCreatePeerConnectionMessage(
-  input: unknown,
+  input: unknown
 ): input is CreatePeerConnectionMessage {
   return createPeerConnectionMessageSchema.safeParse(input).success;
 }
@@ -86,13 +86,13 @@ export function isCreatePeerConnectionMessage(
 // define signaling message schema
 
 const signalingMessageSchema = messageSchema.extend({
-  messageType: z.literal('signaling'),
+  messageType: z.literal("signaling"),
   connectionUrl: z.string(),
   signalingType: z.union([
-    z.literal('options'),
-    z.literal('offer'),
-    z.literal('answer'),
-    z.literal('candidate'),
+    z.literal("options"),
+    z.literal("offer"),
+    z.literal("answer"),
+    z.literal("candidate"),
   ]),
   content: z.unknown(),
 });
@@ -104,12 +104,14 @@ export function isSignalingMessage(input: unknown): input is SignalingMessage {
 // define close peerconnection message schema
 
 const closePeerConnectionMessageSchema = commandMessageSchema.extend({
-  command: z.literal('closePeerconnection'),
+  command: z.literal("closePeerconnection"),
   connectionUrl: z.string(),
 });
-export type ClosePeerConnectionMessage = z.infer<typeof closePeerConnectionMessageSchema>;
+export type ClosePeerConnectionMessage = z.infer<
+  typeof closePeerConnectionMessageSchema
+>;
 export function isClosePeerConnectionMessage(
-  input: unknown,
+  input: unknown
 ): input is ClosePeerConnectionMessage {
   return closePeerConnectionMessageSchema.safeParse(input).success;
 }
@@ -117,15 +119,15 @@ export function isClosePeerConnectionMessage(
 // define connection state changed message schema
 
 const connectionStateChangedMessageSchema = messageSchema.extend({
-  messageType: z.literal('connection-state-changed'),
+  messageType: z.literal("connection-state-changed"),
   connectionUrl: z.string(),
   status: z.union([
-    z.literal('new'),
-    z.literal('connecting'),
-    z.literal('connected'),
-    z.literal('disconnected'),
-    z.literal('failed'),
-    z.literal('closed'),
+    z.literal("new"),
+    z.literal("connecting"),
+    z.literal("connected"),
+    z.literal("disconnected"),
+    z.literal("failed"),
+    z.literal("closed"),
   ]),
 });
 export type ConnectionStateChangedMessage = z.infer<
@@ -135,24 +137,26 @@ export type ConnectionStateChangedMessage = z.infer<
 // define configuration message schema
 
 const configurationMessageSchema = messageSchema.extend({
-  messageType: z.literal('configuration'),
+  messageType: z.literal("configuration"),
   configuration: z.record(z.string(), z.unknown()),
 });
 export type ConfigurationMessage = z.infer<typeof configurationMessageSchema>;
-export function isConfigurationMessage(input: unknown): input is ConfigurationMessage {
+export function isConfigurationMessage(
+  input: unknown
+): input is ConfigurationMessage {
   return configurationMessageSchema.safeParse(input).success;
 }
 
 // define experiment status changed message schema
 
 const experimentStatusChangedMessageSchema = messageSchema.extend({
-  messageType: z.literal('experiment-status-changed'),
+  messageType: z.literal("experiment-status-changed"),
   status: z.union([
-    z.literal('created'),
-    z.literal('booked'),
-    z.literal('setup'),
-    z.literal('running'),
-    z.literal('finished'),
+    z.literal("created"),
+    z.literal("booked"),
+    z.literal("setup"),
+    z.literal("running"),
+    z.literal("finished"),
   ]),
   message: z.optional(z.string()),
 });
@@ -160,7 +164,7 @@ export type ExperimentStatusChangedMessage = z.infer<
   typeof experimentStatusChangedMessageSchema
 >;
 export function isExperimentStatusChangedMessage(
-  input: unknown,
+  input: unknown
 ): input is ExperimentStatusChangedMessage {
   return experimentStatusChangedMessageSchema.safeParse(input).success;
 }
@@ -186,17 +190,17 @@ export type DeviceDescription = z.infer<typeof deviceDescriptionSchema>;
 
 const webSocketMessageSchema = z.union([
   z.object({
-    type: z.literal('string'),
+    type: z.literal("string"),
     channel: z.string(),
     content: z.string(),
   }),
   z.object({
-    type: z.union([z.literal('arrayBuffer'), z.literal('blob')]),
+    type: z.union([z.literal("arrayBuffer"), z.literal("blob")]),
     channel: z.string(),
     content: z.array(z.number()),
   }),
   z.object({
-    type: z.literal('arrayBufferView'),
+    type: z.literal("arrayBufferView"),
     channel: z.string(),
     content: z.object({
       buffer: z.array(z.number()),
