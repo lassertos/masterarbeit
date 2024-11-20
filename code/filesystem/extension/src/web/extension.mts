@@ -256,6 +256,9 @@ export async function activate(context: vscode.ExtensionContext) {
     addProjectRootFolder: (title: string, uri: vscode.Uri) => {
       projectViewDataProvider.addProjectRootFolder(title, uri);
     },
+    removeProjectRootFolder: (title: string) => {
+      projectViewDataProvider.removeProjectRootFolder(title);
+    },
     refreshProjectsView: () => {
       projectViewDataProvider.refresh();
     },

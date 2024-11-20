@@ -24,6 +24,10 @@ export abstract class CollaborationProvider extends TypedEmitter<CollaborationPr
 
   abstract startSynchronization(): Message;
 
+  abstract executeTransaction(transaction: () => void, origin: unknown): void;
+
+  abstract valueToCollaborationType(value: unknown): CollaborationType;
+
   abstract get<T extends CollaborationTypeName>(
     key: string,
     type: T

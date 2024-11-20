@@ -19,7 +19,6 @@ import {
   YjsCollaborationBoolean,
   YjsCollaborationNull,
   YjsCollaborationType,
-  valueToCollaborationType,
   yjsToCollaborationType,
 } from "./types.mjs";
 import * as Y from "yjs";
@@ -43,6 +42,7 @@ export class YjsCollaborationProvider extends CollaborationProvider {
 
   private _initialize(initialValue: Record<string, unknown>) {
     for (const [key, value] of Object.entries(initialValue)) {
+      console.log("collaboration: current entry", key, value);
       if (
         typeof value === "undefined" ||
         typeof value === "function" ||
@@ -60,11 +60,17 @@ export class YjsCollaborationProvider extends CollaborationProvider {
           .observeDeep((events, transaction) =>
             this._handleYjsEvents(key, events, transaction)
           );
-        array.push(...value.map((item) => valueToCollaborationType(item)));
+        array.push(...value.map((item) => this.valueToCollaborationType(item)));
+        console.log(
+          "collaboration: initialized as array",
+          key,
+          value,
+          array.toJSON()
+        );
         continue;
       }
 
-      if (typeof key === "object") {
+      if (typeof value === "object") {
         if (value === null) {
           this.get(key, "null");
           continue;
@@ -76,39 +82,65 @@ export class YjsCollaborationProvider extends CollaborationProvider {
             this._handleYjsEvents(key, events, transaction)
           );
         for (const [key, val] of Object.entries(value)) {
-          object.set(key, valueToCollaborationType(val));
+          console.log("collaboration: current entry", key, val);
+          object.set(key, this.valueToCollaborationType(val));
         }
+        console.log(
+          "collaboration: initialized as object",
+          key,
+          value,
+          object.toJSON()
+        );
+        continue;
       }
 
       switch (typeof value) {
         case "number": {
-          const number = new YjsCollaborationNumber();
+          const number = this.get(key, "number");
           number
             .toYjs()
             .observeDeep((events, transaction) =>
               this._handleYjsEvents(key, events, transaction)
             );
           number.set(value);
+          console.log(
+            "collaboration: initialized as number",
+            key,
+            value,
+            number.toJSON()
+          );
           continue;
         }
         case "string": {
-          const string = new YjsCollaborationString();
+          const string = this.get(key, "string");
           string
             .toYjs()
             .observeDeep((events, transaction) =>
               this._handleYjsEvents(key, events, transaction)
             );
           string.set(value);
+          console.log(
+            "collaboration: initialized as string",
+            key,
+            value,
+            string.toJSON()
+          );
           continue;
         }
         case "boolean": {
-          const boolean = new YjsCollaborationBoolean();
+          const boolean = this.get(key, "boolean");
           boolean
             .toYjs()
             .observeDeep((events, transaction) =>
               this._handleYjsEvents(key, events, transaction)
             );
           boolean.set(value);
+          console.log(
+            "collaboration: initialized as boolean",
+            key,
+            value,
+            boolean.toJSON()
+          );
           continue;
         }
       }
@@ -124,6 +156,61 @@ export class YjsCollaborationProvider extends CollaborationProvider {
         } satisfies ProtocolMessage<typeof yjsCollaborationProtocol, "yjs:sync:update">);
       }
     });
+  }
+
+  valueToCollaborationType(value: unknown): YjsCollaborationType {
+    if (
+      typeof value === "undefined" ||
+      typeof value === "function" ||
+      typeof value === "symbol" ||
+      typeof value === "bigint"
+    ) {
+      throw new Error(
+        `Cannot convert type "${typeof value}" to yjs collaboration type!`
+      );
+    }
+
+    if (Array.isArray(value)) {
+      const array = new YjsCollaborationArray();
+      array.push(...value.map((item) => this.valueToCollaborationType(item)));
+      return array;
+    }
+
+    if (typeof value === "object") {
+      if (value === null) {
+        return new YjsCollaborationNull();
+      }
+      const object = new YjsCollaborationObject();
+      for (const [key, val] of Object.entries(value)) {
+        console.log("collaboration: current entry", key, val);
+        object.set(key, this.valueToCollaborationType(val));
+      }
+      return object;
+    }
+
+    switch (typeof value) {
+      case "number": {
+        const number = new YjsCollaborationNumber();
+        number.set(value);
+        return number;
+      }
+      case "string": {
+        const string = new YjsCollaborationString();
+        string.set(value);
+        return string;
+      }
+      case "boolean": {
+        const boolean = new YjsCollaborationBoolean();
+        boolean.set(value);
+        return boolean;
+      }
+    }
+
+    throw new Error(`Could not convert "${value}" to yjs collaboration type!`);
+  }
+
+  executeTransaction(transaction: () => void, origin: unknown) {
+    this._document.transact(transaction, origin);
   }
 
   startSynchronization(): ProtocolMessage<

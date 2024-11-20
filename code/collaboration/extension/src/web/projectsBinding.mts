@@ -1,9 +1,10 @@
-import * as Y from "yjs";
 import * as vscode from "vscode";
 import path from "path";
 import {
-  valueFromYjs,
-  yjsFromValue,
+  CollaborationObject,
+  CollaborationServiceProsumer,
+  CollaborationString,
+  CollaborationUpdateEventType,
 } from "@crosslab-ide/crosslab-collaboration-service";
 import {
   File,
@@ -21,25 +22,23 @@ export class ProjectsBinding {
   private _fileSystemApi: {
     getCurrentProject: () => vscode.Uri;
     refreshProjectsView: () => void;
+    addProjectRootFolder: (title: string, uri: vscode.Uri) => void;
+    removeProjectRootFolder: (title: string) => void;
   } = {
     getCurrentProject: () => vscode.Uri.from({ scheme: "crosslabfs" }),
     refreshProjectsView: () => undefined,
+    addProjectRootFolder: (title: string, uri: vscode.Uri) => undefined,
+    removeProjectRootFolder: (title: string) => undefined,
   };
 
-  private _yjsChanges: (
+  private _remoteChanges: (
     | { index: number; insert: string }
     | { index: number; delete: number }
   )[] = [];
 
-  getValue: (
-    key?: string
-  ) => Y.Map<unknown> | Y.Array<unknown> | Y.Text | undefined = () => undefined;
-
-  constructor() {
-    // vscode.window.onDidChangeVisibleTextEditors((editors) => {
-    //   console.log("changed visible text editors:", editors);
-    // });
-
+  constructor(
+    private _collaborationServiceProsumer: CollaborationServiceProsumer
+  ) {
     // check for required extensions and their apis
     const fileSystemExtension = vscode.extensions.getExtension(
       "crosslab.@crosslab-ide/crosslab-filesystem-extension"
@@ -79,13 +78,13 @@ export class ProjectsBinding {
         "collaboration: text document changed",
         event,
         changes,
-        this._yjsChanges
+        this._remoteChanges
       );
 
       const remainingChanges: vscode.TextDocumentContentChangeEvent[] = [];
 
       for (const [index, change] of changes.entries()) {
-        const yjsChangeIndex = this._yjsChanges.findIndex(
+        const yjsChangeIndex = this._remoteChanges.findIndex(
           (yjsChange) =>
             change.index === yjsChange.index &&
             ("delete" in yjsChange
@@ -97,12 +96,12 @@ export class ProjectsBinding {
             "collaboration: found yjsChange for change",
             yjsChangeIndex,
             change,
-            this._yjsChanges[yjsChangeIndex]
+            this._remoteChanges[yjsChangeIndex]
           );
 
-          this._yjsChanges.splice(yjsChangeIndex, 1);
+          this._remoteChanges.splice(yjsChangeIndex, 1);
 
-          console.log("collaboration: updated yjsChanges", this._yjsChanges);
+          console.log("collaboration: updated yjsChanges", this._remoteChanges);
         } else {
           remainingChanges.push(event.contentChanges[index]);
         }
@@ -134,14 +133,8 @@ export class ProjectsBinding {
 
       console.log("collaboration: updated path", updatedPath);
 
-      // const textEditor = vscode.window.visibleTextEditors.find(
-      //   (visibleTextEditor) => visibleTextEditor.document === event.document
-      // );
-
-      // console.log("collaboration: text editor", textEditor);
-
       // TOOD: get value corresponding to correct shared project
-      const yText = updatedPath.startsWith("/projects/")
+      const collaborationString = updatedPath.startsWith("/projects/")
         ? updatedPath
             .replace("/projects/", "")
             .split("/")
@@ -152,11 +145,11 @@ export class ProjectsBinding {
                 accumulator,
                 currentValue
               );
-              if (!(accumulator instanceof Y.Map)) {
+              if (!(accumulator instanceof CollaborationObject)) {
                 throw new Error("collaboration: expected map!");
               }
-              return accumulator.get(currentValue) as Y.Map<unknown>;
-            }, this.getValue())
+              return accumulator.get(currentValue) as CollaborationObject;
+            }, this._getValue())
         : updatedPath
             .replace("/shared/", "")
             .split("/")
@@ -168,34 +161,46 @@ export class ProjectsBinding {
                 accumulator,
                 currentValue
               );
-              if (!(accumulator instanceof Y.Map)) {
-                throw new Error("collaboration: expected map!");
+              if (!(accumulator instanceof CollaborationObject)) {
+                throw new Error(
+                  "collaboration: expected collaboration object!"
+                );
               }
-              return accumulator.get(currentValue) as Y.Map<unknown>;
-            }, this.getValue(updatedPath.replace("/shared/", "").split("/").at(0)));
+              return accumulator.get(currentValue) as CollaborationObject;
+            }, this._getValue(updatedPath.replace("/shared/", "").split("/").at(0)));
 
-      console.log("collaboration: ytext", yText);
+      console.log("collaboration: collaboration string", collaborationString);
 
-      if (!(yText instanceof Y.Text)) {
-        throw new Error("collaboration: expected text!");
+      if (!(collaborationString instanceof CollaborationString)) {
+        throw new Error("collaboration: expected collaboration string!");
       }
-      // if (!textEditor || event.document.getText() === yText.toJSON()) {
-      //   return;
-      // }
-      if (event.document.getText() === yText.toJSON()) {
+
+      if (
+        event.document.getText() ===
+        (collaborationString as CollaborationString).toJSON()
+      ) {
         return;
       }
 
-      yText.doc?.transact(() => {
-        console.log("collaboration: before", yText.toJSON());
-        remainingChanges
-          .sort((change1, change2) => change2.rangeOffset - change1.rangeOffset)
-          .forEach((change) => {
-            yText.delete(change.rangeOffset, change.rangeLength);
-            yText.insert(change.rangeOffset, change.text);
-          });
-        console.log("collaboration: after", yText.toJSON());
-      }, this);
+      this._collaborationServiceProsumer.executeTransaction(
+        "projects",
+        () => {
+          console.log("collaboration: before", collaborationString.toJSON());
+          remainingChanges
+            .sort(
+              (change1, change2) => change2.rangeOffset - change1.rangeOffset
+            )
+            .forEach((change) => {
+              collaborationString.delete(
+                change.rangeOffset,
+                change.rangeLength
+              );
+              collaborationString.insert(change.rangeOffset, change.text);
+            });
+          console.log("collaboration: after", collaborationString.toJSON());
+        },
+        this
+      );
     }, this);
 
     // TODO: this should be done over the collaboration ui
@@ -205,6 +210,34 @@ export class ProjectsBinding {
         path: "/projects/collaboration-test",
       })
     );
+  }
+
+  private _getValue(key: string = this._collaborationServiceProsumer.id) {
+    const projectsCollaborationObject =
+      this._collaborationServiceProsumer.getCollaborationValue(
+        "projects",
+        "projects",
+        "object"
+      );
+
+    if (!(projectsCollaborationObject instanceof CollaborationObject)) {
+      throw new Error(`Expected projects to be a collaboration object!`);
+    }
+
+    console.log(
+      "collaboration: projects collaboration object",
+      projectsCollaborationObject
+    );
+
+    const collaborationObject = projectsCollaborationObject.get(key);
+
+    if (!(collaborationObject instanceof CollaborationObject)) {
+      throw new Error(
+        `Expected property "${key}" of projects to be a collaboration object!`
+      );
+    }
+
+    return collaborationObject;
   }
 
   shareProject(projectUri: vscode.Uri) {
@@ -241,37 +274,89 @@ export class ProjectsBinding {
   }
 
   async handleCollaborationEvent(
-    events: Y.YEvent<any>[],
-    transaction: Y.Transaction,
-    id: string,
+    events: CollaborationUpdateEventType[],
     localId: string
   ) {
     console.log("collaboration: handling events", events);
 
-    if (transaction.origin === this) {
-      return;
-    }
-
-    const value = this.getValue(id);
-
-    // check that value is correct type
-    if (!(value instanceof Y.Map)) {
-      throw new Error(`Expected value to be of type "Y.Map"!`);
-    }
-
     for (const event of events) {
-      this._handleEvent(event, value, id, localId);
+      if (event.origin === this) {
+        return;
+      }
+      this._handleEvent(event, localId);
     }
   }
 
   private async _handleEvent(
-    event: Y.YEvent<any>,
-    value: Y.Map<unknown>,
-    id: string,
+    event: CollaborationUpdateEventType,
     localId: string
   ) {
+    // TODO: needed?
+    console.log(
+      "collaboration: handling event",
+      `/${event.path.join("/")}`,
+      event.target instanceof CollaborationObject,
+      Array.from(
+        (event as CollaborationUpdateEventType<"object">).changes.entries()
+      )
+    );
+    if (`/${event.path.join("/")}` === `/projects`) {
+      if (event.target instanceof CollaborationObject) {
+        for (const [key, value] of (
+          event as CollaborationUpdateEventType<"object">
+        ).changes.entries()) {
+          const sharedProjectsUri = vscode.Uri.from({
+            scheme: "crosslabfs",
+            path: `/shared/${key}`,
+          });
+          if (value.action === "add") {
+            const directory = {
+              type: "directory",
+              content: event.target.get(key)?.toJSON(),
+            };
+            console.log(
+              "collaboration: directory",
+              directory,
+              isDirectoryWithoutName(directory)
+            );
+            if (!isDirectoryWithoutName(directory)) {
+              return;
+            }
+            await this._createDirectory(sharedProjectsUri, directory);
+            this._fileSystemApi.addProjectRootFolder(
+              `Shared projects: ${key}`,
+              sharedProjectsUri
+            );
+          } else if (value.action === "delete") {
+            await vscode.workspace.fs.delete(sharedProjectsUri, {
+              recursive: true,
+            });
+            this._fileSystemApi.removeProjectRootFolder(
+              `Shared projects: ${key}`
+            );
+          }
+        }
+      }
+      return;
+    }
+
+    // get changed id
+    const id = event.path.at(1);
+
+    if (!id) {
+      throw new Error(
+        `Path "${`/${event.path.join(
+          "/"
+        )}`}" is not formated as expected! (expected: "/projects/{id}/...")`
+      );
+    }
+
+    if (typeof id !== "string") {
+      throw new Error(`Expected id to be of type "string", got "${typeof id}"`);
+    }
+
     // check that path is valid
-    const eventPath = event.path;
+    const eventPath = event.path.slice(2);
     const filteredEventPath = eventPath.filter(
       (pathSegment) => typeof pathSegment !== "number"
     );
@@ -294,18 +379,6 @@ export class ProjectsBinding {
 
     console.log("collaboration: path", event.path, pathSegments);
 
-    const changes = event.changes;
-
-    console.log("collaboration: changes", changes);
-
-    const keys = changes.keys;
-
-    console.log("collaboration: keys", Array.from(keys.entries()));
-
-    const delta = changes.delta;
-
-    console.log("collaboration: delta", delta);
-
     // map event path to filesystem uri
     const uri = vscode.Uri.from({
       scheme: "crosslabfs",
@@ -321,10 +394,22 @@ export class ProjectsBinding {
         break;
       case vscode.FileType.File:
         // apply file changes
-        await this._handleFileEvents(value, uri, filteredEventPath, delta);
+        if (!(event.target instanceof CollaborationString)) {
+          throw new Error(`Event target is not a collaboration string!`);
+        }
+        await this._handleFileEvents(
+          event as CollaborationUpdateEventType<"string">,
+          uri
+        );
         break;
       case vscode.FileType.Directory:
-        await this._handleDirectoryEvents(value, uri, filteredEventPath, keys);
+        if (!(event.target instanceof CollaborationObject)) {
+          throw new Error(`Event target is not a collaboration object!`);
+        }
+        await this._handleDirectoryEvent(
+          event as CollaborationUpdateEventType<"object">,
+          uri
+        );
         break;
       case vscode.FileType.SymbolicLink:
         break;
@@ -332,23 +417,9 @@ export class ProjectsBinding {
   }
 
   private async _handleFileEvents(
-    value: Y.Map<unknown>,
-    uri: vscode.Uri,
-    pathSegments: string[],
-    delta: {
-      insert?: Array<any> | string;
-      delete?: number;
-      retain?: number;
-    }[]
+    event: CollaborationUpdateEventType<"string">,
+    uri: vscode.Uri
   ) {
-    const yText = pathSegments.reduce((accumulator, v) => {
-      return accumulator.get(v) as any;
-    }, value) as any;
-
-    if (!(yText instanceof Y.Text)) {
-      console.error("collaboration: path does not lead to ytext", pathSegments);
-    }
-
     // TODO: update uri correctly
     const textEditor = vscode.window.visibleTextEditors.find(
       (visibleTextEditor) =>
@@ -364,11 +435,8 @@ export class ProjectsBinding {
 
     console.log(
       "collaboration: collaboration-event file update",
-      value,
+      event,
       uri,
-      pathSegments,
-      delta,
-      yText,
       textEditor
     );
 
@@ -378,7 +446,7 @@ export class ProjectsBinding {
         let index = 0;
         await textEditor.edit((builder) => {
           const document = textEditor.document;
-          delta.forEach((op) => {
+          event.changes.forEach((op) => {
             if (op.retain !== undefined) {
               index += op.retain;
             } else if (op.insert !== undefined) {
@@ -386,13 +454,13 @@ export class ProjectsBinding {
               console.log(index, pos);
               const insert = op.insert as string;
               builder.insert(pos, insert);
-              this._yjsChanges.push({ index, insert });
+              this._remoteChanges.push({ index, insert });
             } else if (op.delete !== undefined) {
               const pos = document.positionAt(index);
               const endPos = document.positionAt(index + op.delete);
               const selection = new vscode.Selection(pos, endPos);
               builder.delete(selection);
-              this._yjsChanges.push({ index, delete: op.delete });
+              this._remoteChanges.push({ index, delete: op.delete });
               index += op.delete;
             } else {
               throw new Error(`collaboration: unexpected case!`);
@@ -403,88 +471,67 @@ export class ProjectsBinding {
         release();
       }
     } else {
-      vscode.workspace.fs.writeFile(
-        uri,
-        Buffer.from((yText as Y.Text).toJSON())
-      );
-    }
-  }
-
-  private async _handleDirectoryEvents(
-    value: Y.Map<unknown>,
-    uri: vscode.Uri,
-    pathSegments: string[],
-    keys: Map<
-      string,
-      {
-        action: "add" | "update" | "delete";
-        oldValue: any;
-      }
-    >
-  ) {
-    // apply directory changes
-    for (const [key, change] of keys) {
-      await this._handleDirectoryEvent(value, uri, pathSegments, key, change);
+      vscode.workspace.fs.writeFile(uri, Buffer.from(event.target.toJSON()));
     }
   }
 
   private async _handleDirectoryEvent(
-    value: Y.Map<unknown>,
-    uri: vscode.Uri,
-    pathSegments: string[],
-    key: string,
-    change: {
-      action: "add" | "update" | "delete";
-      oldValue: any;
-    }
+    event: CollaborationUpdateEventType<"object">,
+    uri: vscode.Uri
   ) {
-    const entryUri = uri.with({ path: path.join(uri.path, key) });
-    switch (change.action) {
-      case "add":
-        // get value for new entry
-        const newValue = valueFromYjs(
-          [...pathSegments, key].reduce((accumulator, v) => {
-            return accumulator.get(v) as Y.Map<unknown>;
-          }, value)
-        );
-        console.log("collaboration: new value", newValue);
+    // apply directory changes
+    for (const [key, change] of event.changes.entries()) {
+      const entryUri = uri.with({ path: path.join(uri.path, key) });
+      switch (change.action) {
+        case "add":
+          // get value for new entry
+          const newValue = event.target.get(key);
+          console.log("collaboration: new value", newValue);
 
-        // ensure that new entry is either a file or a directory
-        if (!isFileWithoutName(newValue) && !isDirectoryWithoutName(newValue)) {
-          console.error(
-            `New value is neither a file nor a directory!`,
-            newValue
-          );
-          return;
-        }
+          // ensure that new entry is either a file or a directory
+          if (
+            !isFileWithoutName(newValue) &&
+            !isDirectoryWithoutName(newValue)
+          ) {
+            console.error(
+              `New value is neither a file nor a directory!`,
+              newValue
+            );
+            return;
+          }
 
-        // add file/directory
-        // TODO: better way to check if refresh is needed
-        this._fileSystemApi.refreshProjectsView();
-        await this._createEntry(entryUri, newValue);
-        console.log("refreshing files explorer create entry");
+          // add file/directory
+          // TODO: better way to check if refresh is needed
+          this._fileSystemApi.refreshProjectsView();
+          await this._createEntry(entryUri, newValue);
+          console.log("refreshing files explorer create entry");
 
-        if (uri.path.startsWith(this._fileSystemApi.getCurrentProject().path)) {
-          await vscode.commands.executeCommand(
-            "workbench.files.action.refreshFilesExplorer"
-          );
-        }
-        break;
-      case "update":
-        // update entry with value - this should not happen
-        break;
-      case "delete":
-        // delete entry
-        await this._deleteEntry(entryUri);
-        // TODO: better way to check if refresh is needed
-        this._fileSystemApi.refreshProjectsView();
-        console.log("refreshing files explorer delete entry");
-        if (uri.path.startsWith(this._fileSystemApi.getCurrentProject().path)) {
-          await vscode.commands.executeCommand(
-            "workbench.files.action.refreshFilesExplorer"
-          );
-        }
-        break;
+          if (
+            uri.path.startsWith(this._fileSystemApi.getCurrentProject().path)
+          ) {
+            await vscode.commands.executeCommand(
+              "workbench.files.action.refreshFilesExplorer"
+            );
+          }
+          break;
+        case "update":
+          // update entry with value - this should not happen
+          break;
+        case "delete":
+          // delete entry
+          await this._deleteEntry(entryUri);
+          // TODO: better way to check if refresh is needed
+          this._fileSystemApi.refreshProjectsView();
+          console.log("refreshing files explorer delete entry");
+          if (
+            uri.path.startsWith(this._fileSystemApi.getCurrentProject().path)
+          ) {
+            await vscode.commands.executeCommand(
+              "workbench.files.action.refreshFilesExplorer"
+            );
+          }
+          break;
+      }
     }
   }
 
@@ -571,18 +618,18 @@ export class ProjectsBinding {
     console.log("filesystem created-event:", uri);
 
     const pathSegments = uri.path.replace("/projects/", "").split("/");
-    let value: unknown = this.getValue();
+    let value: unknown = this._getValue();
     for (const pathSegment of pathSegments.slice(0, -1)) {
-      if (value instanceof Y.Map) {
+      if (value instanceof CollaborationObject) {
         value = value.get(pathSegment);
-        if (!(value instanceof Y.Map)) {
-          console.error("collaboration: entry is not a map!");
+        if (!(value instanceof CollaborationObject)) {
+          console.error("collaboration: entry is not a collaboration object!");
           return;
         }
         value = value.get("content");
       } else {
         console.error(
-          "collaboration: expected map during filesystem created-event!",
+          "collaboration: expected collaboration object during filesystem created-event!",
           value,
           pathSegments,
           pathSegment
@@ -591,17 +638,24 @@ export class ProjectsBinding {
     }
 
     const lastPathSegment = pathSegments.at(-1);
-    if (value instanceof Y.Map && lastPathSegment) {
+    if (value instanceof CollaborationObject && lastPathSegment) {
       const entry = await this._readEntry(uri);
-      value.doc?.transact(() => {
-        value.set(
-          lastPathSegment,
-          yjsFromValue({ type: entry.type, content: entry.content })
-        );
-      }, this);
+      this._collaborationServiceProsumer.executeTransaction(
+        "projects",
+        () => {
+          value.set(
+            lastPathSegment,
+            this._collaborationServiceProsumer.valueToCollaborationType(
+              "projects",
+              { type: entry.type, content: entry.content }
+            )
+          );
+        },
+        this
+      );
     } else {
       console.error(
-        "collaboration: expected map and last path fragment during filesystem created-event!",
+        "collaboration: expected collaboration object and last path fragment during filesystem created-event!",
         value,
         pathSegments,
         lastPathSegment
@@ -617,18 +671,18 @@ export class ProjectsBinding {
     console.log("filesystem deleted-event:", uri);
 
     const pathSegments = uri.path.replace("/projects/", "").split("/");
-    let value: unknown = this.getValue();
+    let value: unknown = this._getValue();
     for (const pathSegment of pathSegments.slice(0, -1)) {
-      if (value instanceof Y.Map) {
+      if (value instanceof CollaborationObject) {
         value = value.get(pathSegment);
-        if (!(value instanceof Y.Map)) {
-          console.error("collaboration: entry is not a map!");
+        if (!(value instanceof CollaborationObject)) {
+          console.error("collaboration: entry is not a collaboration object!");
           return;
         }
         value = value.get("content");
       } else {
         console.error(
-          "collaboration: expected map during filesystem created-event!",
+          "collaboration: expected collaboration object during filesystem created-event!",
           value,
           pathSegments,
           pathSegment
@@ -637,10 +691,14 @@ export class ProjectsBinding {
     }
 
     const lastPathSegment = pathSegments.at(-1);
-    if (value instanceof Y.Map && lastPathSegment) {
-      value.doc?.transact(() => {
-        value.delete(lastPathSegment);
-      }, this);
+    if (value instanceof CollaborationObject && lastPathSegment) {
+      this._collaborationServiceProsumer.executeTransaction(
+        "projects",
+        () => {
+          value.delete(lastPathSegment);
+        },
+        this
+      );
     } else {
       console.error(
         "collaboration: expected map and last path fragment during filesystem created-event!",

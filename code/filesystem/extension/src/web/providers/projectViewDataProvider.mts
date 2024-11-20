@@ -90,4 +90,9 @@ export class ProjectViewDataProvider
     this._projectRootFolders.set(title, uri);
     this.refresh();
   }
+
+  removeProjectRootFolder(title: string) {
+    this._projectRootFolders.delete(title);
+    this.refresh();
+  }
 }

@@ -11,7 +11,11 @@ import { z } from "zod";
 import { TypedEmitter } from "tiny-typed-emitter";
 import { collaborationProtocol } from "./protocol.mjs";
 import { Room } from "./room.mjs";
-import { CollaborationUpdateEventType } from "./collaborationTypes.mjs";
+import {
+  CollaborationType,
+  CollaborationTypeName,
+  CollaborationUpdateEventType,
+} from "./collaborationTypes.mjs";
 
 const serviceConfigurationSchema = z.object({
   serviceType: z.string(),
@@ -38,36 +42,72 @@ export class CollaborationServiceProsumer
     string,
     CrossLabMessagingChannel<typeof collaborationProtocol, "participant">
   > = new Map();
-  private _initialValues: Record<
+  private _initialValues: Map<
     string,
     | Record<string, unknown>
     | Promise<Record<string, unknown>>
     | (() => Promise<Record<string, unknown>> | Record<string, unknown>)
-  >;
+  > = new Map();
   private _rooms: Map<string, Room> = new Map();
   private _id: string;
   serviceType: string = "https://api.goldi-labs.de/serviceTypes/collaboration";
   serviceId: string;
   serviceDirection: ServiceDirection = "prosumer";
 
-  constructor(
-    serviceId: string,
-    initialValues: Record<
-      string,
-      | Record<string, unknown>
-      | Promise<Record<string, unknown>>
-      | (() => Promise<Record<string, unknown>> | Record<string, unknown>)
-    >
-  ) {
+  constructor(serviceId: string) {
     super();
     this.serviceId = serviceId;
-    this._initialValues = initialValues;
     this._id = uuidv4();
     console.log("collaboration: created prosumer with id", this.id);
   }
 
   get id() {
     return this._id;
+  }
+
+  executeTransaction(
+    roomName: string,
+    transaction: () => void,
+    origin: unknown
+  ) {
+    const room = this._rooms.get(roomName);
+    if (!room) {
+      throw new Error(`Room with name "${roomName}" could not be found!`);
+    }
+    room.executeTransaction(transaction, origin);
+  }
+
+  valueToCollaborationType(
+    roomName: string,
+    value: unknown
+  ): CollaborationType {
+    const room = this._rooms.get(roomName);
+    if (!room) {
+      throw new Error(`Room with name "${roomName}" could not be found!`);
+    }
+    return room.valueToCollaborationType(value);
+  }
+
+  setInitialValue(
+    room: string,
+    initialValue:
+      | Record<string, unknown>
+      | Promise<Record<string, unknown>>
+      | (() => Promise<Record<string, unknown>> | Record<string, unknown>)
+  ) {
+    this._initialValues.set(room, initialValue);
+  }
+
+  getCollaborationValue(
+    roomName: string,
+    key: string,
+    type: CollaborationTypeName
+  ) {
+    const room = this._rooms.get(roomName);
+    if (!room) {
+      throw new Error(`Room with name "${roomName}" could not be found!`);
+    }
+    return room.get(key, type);
   }
 
   getMeta() {
@@ -114,7 +154,7 @@ export class CollaborationServiceProsumer
 
       for (const roomName of serviceConfiguration.rooms) {
         if (!this._rooms.has(roomName)) {
-          const initialValue = this._initialValues[roomName];
+          const initialValue = this._initialValues.get(roomName);
           const room = new Room(
             roomName,
             "yjs",

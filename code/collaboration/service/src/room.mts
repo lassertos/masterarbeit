@@ -1,6 +1,7 @@
 import { YjsCollaborationProvider } from "./collaborationProviders/index.mjs";
 import {
   CollaborationProvider,
+  CollaborationType,
   CollaborationUpdateEventType,
 } from "./collaborationTypes.mjs";
 import { collaborationProtocol } from "./protocol.mjs";
@@ -23,8 +24,9 @@ export class Room extends TypedEmitter<RoomEvents> {
   constructor(
     name: string,
     _collaborationProvider: "yjs",
-    initialValue: Record<string, unknown>
+    initialValue: Record<string, unknown> = {}
   ) {
+    console.log("collaboration: creating room", initialValue);
     super();
     this._name = name;
     this._collaborationProvider = new YjsCollaborationProvider(initialValue);
@@ -36,6 +38,9 @@ export class Room extends TypedEmitter<RoomEvents> {
         });
       }
     });
+    this._collaborationProvider.on("update", (events) => {
+      this.emit("update", events);
+    });
   }
 
   addParticipant(
@@ -46,6 +51,14 @@ export class Room extends TypedEmitter<RoomEvents> {
     >
   ) {
     this._participants.set(participantId, messagingChannel);
+  }
+
+  valueToCollaborationType(value: unknown): CollaborationType {
+    return this._collaborationProvider.valueToCollaborationType(value);
+  }
+
+  executeTransaction(transaction: () => void, origin: unknown) {
+    this._collaborationProvider.executeTransaction(transaction, origin);
   }
 
   async startSynchronization(participantId: string) {
