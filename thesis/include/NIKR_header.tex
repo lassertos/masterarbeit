@@ -30,6 +30,19 @@
 \usepackage{enumitem}
 \usepackage[most]{tcolorbox}
 \usepackage{parskip}
+\usepackage{pgf-umlsd}
+
+% based on \newthread macro from pgf-umlsd.sty
+% add fourth argument (third mandatory) that defines the xshift of a thread.
+% that argument gets passed to \newinst, which has an optional
+% argument that defines the shift
+\newcommand{\newthreadShift}[4][gray!30]{
+\newinst[#4]{#2}{#3}
+\stepcounter{threadnum}
+\node[below of=inst\theinstnum,node distance=0.8cm] (thread\thethreadnum) {};
+\tikzstyle{threadcolor\thethreadnum}=[fill=#1]
+\tikzstyle{instcolor#2}=[fill=#1]
+}
 
 \newcommand{\quoted}[1]{\glqq#1\grqq}
 

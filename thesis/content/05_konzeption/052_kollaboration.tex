@@ -1,0 +1,36 @@
+\section{Kollaboration}\label{konzeption:kollaboration}
+
+Es gibt viele verschiedene Methoden zur Synchronisierung von Daten zwischen mehreren Teilnehmern. Beispiele derartiger Methoden sind \emph{\ac{OT}} \cite{sun_operational_1998}, \emph{Differential Synchronization} \cite{fraser_differential_2009} und \emph{\ac{CRDTs}} \cite{shapiro_conflict-free_2011}. Aufgrund der Tatsache, dass jede dieser Methoden ihre Vor- und Nachteile besitzt, sollte die entwickelte Lösung unabhängig von dem zugrunde liegenden Synchronisationsalgorithmus sein. Der Kollaborationsdienst ist als Consumer, Producer und Prosumer nutzbar. Bei Experimenten mit einem zentralen Synchronisationspunkt (z.B. bei der Verwendung von \ac{OT}) bietet dieser einen Producer an während die restlichen Geräte, die an der Kollaboration teilnehmen, einen Consumer nutzen. Dahingegen nutzen bei Experimenten ohne einen zentralen Synchronisationspunkt (z.B. bei der Verwendung von \ac{CRDTs}) alle Geräte, die an der Kollaboration teilnehmen, einen Prosumer. In der Experimentbeschreibung sollten bei den Konfigurationen der Verbindungen von Kollaborationsdiensten stets die Synchronisationsmethode sowie die sogenannten \emph{Räume} angegeben werden, die in der Verbindung genutzt werden sollen. Räume besitzen einen eindeutigen Namen und ein JSON-Objekt, das zwischen allen Teilnehmern innerhalb des Raums synchronisiert wird. Das synchronisierte JSON-Objekt kann z.B. Ordner oder Dateien abbilden, die von den Teilnehmern geteilt werden. Jeder Raum besitzt einen sogenannten \emph{Provider}. Dieser nutzt die in der Konfiguration der Verbindung angegebene Synchronisationsmethode um den Inhalt des Raums zu synchronisieren. Weiterhin bietet der Provider eine Schnittstelle um Statusinformationen auszutauschen. Diese Informationen sind teilnehmerspezifisch, d.h. sie können nur von dem jeweiligen Teilnehmer aktualisiert werden. Ein Beispiel für derartige Statusinformationen ist z.B. die aktuelle Position eines Teilnehmers innerhalb einer Datei.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{sequencediagram}
+        \newthread{consumer}{Consumer}
+        \newthreadShift{producer}{Producer}{4cm}
+
+        \begin{call}{consumer}{erstelle Räume}{consumer}{}
+        \end{call}
+
+        \prelevel\prelevel
+
+        \begin{call}{producer}{erstelle Räume}{producer}{}
+        \end{call}
+
+        \postlevel
+
+        \begin{call}{consumer}{sende ID}{producer}{}
+            \begin{call}{producer}{registriere Consumer}{producer}{return}
+            \end{call}
+        \end{call}
+
+        \postlevel
+
+        \begin{call}{consumer}{starte Synchronisation}{producer}{}
+        \end{call}
+    \end{sequencediagram}
+    \caption{Initialisierung Kollaboration}\label{abbildung:initialisierung-kollaboration}
+\end{figure}
+
+Die Kommunikation zwischen den Kollaborationsteilnehmern erfolgt über ein entsprechendes Nachrichtenprotokoll. In \autoref{abbildung:initialisierung-kollaboration} ist der Verbindungsaufbau zwischen einem Consumer und einem Producer dargestellt. Zunächst erstellen beide die in der Verbindungskonfiguration festgelegten Räume. Dabei verknüpft der Consumer den Raum direkt mit der Verbindung. Der Producer hingegen wartet auf die Initialisierungsnachricht des Consumer, welche dessen ID beinhaltet. Die ID kann dann genutzt werden um den Consumer dem entsprechenden Räumen zuzuweisen. Sobald der Producer das erfolgreiche Ende der Initialisierung an den Consumer meldet beginnt dieser mit der Synchronisation. Da die verschiedenen Synchronisationsmethoden ggf. unterschiedliche Nachrichtenformate besitzen wird eine allgemeine Nachricht definiert, die dann die spezifischen Informationen für die zugrundeliegende Methode beinhalten. Daraus folgt auch, dass es nicht möglich ist einen Consumer mit einem Producer zu verbinden, der eine andere Synchronisationsmethode verwendet. Weiterhin ist darauf zu achten, dass ggf. mehrere Provider für eine Synchronisationsmethode benötigt werden. Dies ist z.B. der Fall bei Methoden mit einem zentralen Synchronisationspunkt.
+
+Während die Behandlung von Aktualisierungen der Räume durch das Protokoll der zugrundeliegenden Synchronisationsmethode erfolgt, wird für die Behandlung von Statusaktualisierungen der Teilnehmer ein allgemeines Protokoll eingeführt. Dabei ist der Status eines Teilnehmers immer als ein JSON-Objekt darstellbar, wobei ein Wert von \texttt{null} angibt, dass der Teilnehmer nicht mehr erreichbar ist. Zu Beginn der Synchronisation schicken Consumer ihren aktuellen Status an den Producer. Dieser speichert den aktuellen Status und sendet ihn an die restlichen Consumer. Wenn sich der Status eines Consumer kann er entweder den kompletten Status an den Producer senden oder nur die vorgenommenen Änderungen. Der Producer aktualisiert seine gespeicherten Statusinformationen für den Consumer und leitet die Änderungen an die restlichen Consumer weiter. Diese aktualisieren ebenfalls ihre lokalen Statusinformationen und können dann auf die vorgenommenen Änderungen reagieren. Sollte ein Consumer nicht innerhalb eines vordefinierten Zeitraums seinen Status aktualisieren wird dieser auf \texttt{null} gesetzt und die Änderung an die restlichen Consumer weitergeleitet.

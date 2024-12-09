@@ -1,46 +1,10 @@
-\chapter{Implementierung} \label{implementierung}
+\chapter{Prototypische Implementierung} \label{implementierung}
 
-\section{CrossLab Kompatibilität}
-
-\begin{itemize}
-    \item Definition und Implementierung der Services
-    \item Anbindung an IDE
-\end{itemize}
-
-\section{Datenspeicherung}
-
-\begin{itemize}
-    \item FileSystemProvider
-    \item FileSearchProvider (Proposed API)
-    \item TextSearchProvider (Proposed API)
-    \item Speicherung in indexeddb an Domain gebunden $\to$
-\end{itemize}
-
-\section{Code Kompilierung}
-
-\begin{itemize}
-    \item Kompilierungsserver
-    \item Kompilierung auf Raspberry Pi
-\end{itemize}
-
-\section{Language Server}
-
-\begin{itemize}
-    \item Server wahrscheinlich benötigt
-    \item clangd WebAssembly? (\href{https://github.com/Guyutongxue/clangd-in-browser}{https://github.com/Guyutongxue/clangd-in-browser})
-    \item Handhabung kollaboratives Arbeiten an Code
-\end{itemize}
-
-\section{Debugging}
-
-\begin{itemize}
-    \item avr\_debug (\href{https://github.com/jdolinay/avr_debug}{https://github.com/jdolinay/avr\_debug})
-    \item Anbindung des Debuggers an das Frontend
-\end{itemize}
-
-\section{Kollaboratives Bearbeiten}
-
-\begin{itemize}
-    \item Yjs kann genutzt werden (\href{https://github.com/yjs/yjs}{https://github.com/yjs/yjs})
-    \item wahrscheinlich Anpassung des webrtc-connectors erforderlich \\ (\href{https://github.com/yjs/y-webrtc}{https://github.com/yjs/y-webrtc})
-\end{itemize}
+\input{content/06_implementierung/061_code_editor.tex}
+\input{content/06_implementierung/062_crosslab_kompatibilität.tex}
+\input{content/06_implementierung/063_datenspeicherung.tex}
+\input{content/06_implementierung/064_kompilierung.tex}
+\input{content/06_implementierung/065_debugging.tex}
+\input{content/06_implementierung/066_testen.tex}
+\input{content/06_implementierung/067_language_server.tex}
+\input{content/06_implementierung/068_simulation.tex}
