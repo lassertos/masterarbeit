@@ -2,22 +2,30 @@ import * as vscode from "vscode";
 import path from "path";
 import {
   Awareness,
-  CollaborationObject,
   CollaborationServiceProsumer,
   CollaborationString,
+  CollaborationType,
   CollaborationUpdateEventType,
 } from "@crosslab-ide/crosslab-collaboration-service";
+import { Mutex } from "async-mutex";
+import { z } from "zod";
 import {
   File,
   Directory,
   DirectoryWithoutName,
   FileWithoutName,
-  isDirectoryWithoutName,
-  isFileWithoutName,
-  isDirectory,
-} from "./types.mjs";
-import { Mutex } from "async-mutex";
-import { z } from "zod";
+} from "@crosslab-ide/filesystem-messaging-protocol";
+import { CrossLabFileSystemProvider } from "./providers/fileSystemProvider.mjs";
+import { ProjectViewDataProvider } from "./providers/projectViewDataProvider.mjs";
+import {
+  convertToCollaborationDirectory,
+  convertToCollaborationFile,
+  convertToDirectoryWithoutName,
+  convertToFileWithoutName,
+  isCollaborationDirectoryWithoutName,
+  isCollaborationFileWithoutName,
+} from "./collaborationTypes.mjs";
+import { hsvToHex } from "./hsl.mjs";
 
 const awarenessStateSchema = z.object({
   selection: z.object({
@@ -35,7 +43,8 @@ function isAwarenessState(input: unknown): input is AwarenessState {
 
 export class ProjectsBinding {
   private _mutex: Mutex = new Mutex();
-  private _sharedProjects: Set<vscode.Uri> = new Set();
+  private _fileSystemWatchers: Map<string, vscode.FileSystemWatcher> =
+    new Map();
   private _remoteChanges: (
     | { index: number; insert: string }
     | { index: number; delete: number }
@@ -45,13 +54,9 @@ export class ProjectsBinding {
     new Map();
 
   constructor(
-    private _collaborationServiceProsumer: CollaborationServiceProsumer,
-    private _fileSystemApi: {
-      getCurrentProject: () => vscode.Uri;
-      refreshProjectsView: () => void;
-      addProjectRootFolder: (title: string, uri: vscode.Uri) => void;
-      removeProjectRootFolder: (title: string) => void;
-    }
+    private _fileSystemProvider: CrossLabFileSystemProvider,
+    private _projectViewDataProvider: ProjectViewDataProvider,
+    private _collaborationServiceProsumer: CollaborationServiceProsumer
   ) {
     this._collaborationServiceProsumer.on(
       "new-participant",
@@ -69,13 +74,55 @@ export class ProjectsBinding {
 
     this._awareness.setLocalState({});
 
+    vscode.window.onDidChangeActiveTextEditor((textEditor) => {
+      console.log("collaboration: active text editor changed", textEditor);
+
+      if (!textEditor) {
+        this._awareness.setLocalStateField("selection", null);
+        return;
+      }
+
+      const selection = textEditor.selection;
+      let anchor = selection.isReversed ? selection.end : selection.start;
+      let head = selection.isReversed ? selection.start : selection.end;
+
+      const projectUri = this._fileSystemProvider.currentProjectUri;
+
+      if (!projectUri) {
+        return;
+      }
+
+      this._awareness.setLocalStateField("selection", {
+        path: projectUri.path.startsWith("/projects/")
+          ? textEditor.document.uri.path.replace(
+              "/workspace/",
+              `/${this._collaborationServiceProsumer.id}/${projectUri.path
+                .split("/")
+                .at(2)}/`
+            )
+          : textEditor.document.uri.path.replace(
+              "/workspace/",
+              `/${projectUri.path.split("/").at(2)}/${projectUri.path
+                .split("/")
+                .at(3)}/`
+            ),
+        anchor: { line: anchor.line, character: anchor.character },
+        head: { line: head.line, character: head.character },
+      });
+    }, this);
+
     vscode.window.onDidChangeTextEditorSelection((event) => {
       console.log("collaboration: text editor selection changed", event);
       const selection = event.textEditor.selection;
       let anchor = selection.isReversed ? selection.end : selection.start;
       let head = selection.isReversed ? selection.start : selection.end;
 
-      const projectUri = this._fileSystemApi.getCurrentProject();
+      const projectUri = this._fileSystemProvider.currentProjectUri;
+
+      if (!projectUri) {
+        return;
+      }
+
       this._awareness.setLocalStateField("selection", {
         path: projectUri.path.startsWith("/projects/")
           ? event.textEditor.document.uri.path.replace(
@@ -159,22 +206,22 @@ export class ProjectsBinding {
         return;
       }
 
+      const projectUri = this._fileSystemProvider.currentProjectUri;
+
+      if (!projectUri) {
+        return;
+      }
+
       console.log(
         "collaboration: text document changed (path updated)",
         event.document.uri.with({
           path: event.document.uri.path.startsWith("/workspace/")
-            ? event.document.uri.path.replace(
-                "/workspace",
-                this._fileSystemApi.getCurrentProject().path
-              )
+            ? event.document.uri.path.replace("/workspace", projectUri.path)
             : event.document.uri.path,
         })
       );
       const updatedPath = event.document.uri.path.startsWith("/workspace/")
-        ? event.document.uri.path.replace(
-            "/workspace",
-            this._fileSystemApi.getCurrentProject().path
-          )
+        ? event.document.uri.path.replace("/workspace", projectUri.path)
         : event.document.uri.path;
 
       console.log("collaboration: updated path", updatedPath);
@@ -191,11 +238,11 @@ export class ProjectsBinding {
                 accumulator,
                 currentValue
               );
-              if (!(accumulator instanceof CollaborationObject)) {
+              if (accumulator.type !== "object") {
                 throw new Error("collaboration: expected map!");
               }
-              return accumulator.get(currentValue) as CollaborationObject;
-            }, this._getValue())
+              return accumulator.get(currentValue) as CollaborationType;
+            }, this._getValue() as CollaborationType)
         : updatedPath
             .replace("/shared/", "")
             .split("/")
@@ -207,17 +254,17 @@ export class ProjectsBinding {
                 accumulator,
                 currentValue
               );
-              if (!(accumulator instanceof CollaborationObject)) {
+              if (accumulator.type !== "object") {
                 throw new Error(
                   "collaboration: expected collaboration object!"
                 );
               }
-              return accumulator.get(currentValue) as CollaborationObject;
-            }, this._getValue(updatedPath.replace("/shared/", "").split("/").at(0)));
+              return accumulator.get(currentValue) as CollaborationType;
+            }, this._getValue(updatedPath.replace("/shared/", "").split("/").at(0)) as CollaborationType);
 
       console.log("collaboration: collaboration string", collaborationString);
 
-      if (!(collaborationString instanceof CollaborationString)) {
+      if (collaborationString.type !== "string") {
         throw new Error("collaboration: expected collaboration string!");
       }
 
@@ -248,14 +295,6 @@ export class ProjectsBinding {
         this
       );
     }, this);
-
-    // TODO: this should be done over the collaboration ui
-    this.shareProject(
-      vscode.Uri.from({
-        scheme: "crosslabfs",
-        path: "/projects/collaboration-test",
-      })
-    );
   }
 
   private _getValue(key: string = this._collaborationServiceProsumer.id) {
@@ -266,7 +305,11 @@ export class ProjectsBinding {
         "object"
       );
 
-    if (!(collaborationObject instanceof CollaborationObject)) {
+    if (collaborationObject.type !== "object") {
+      console.error(
+        (collaborationObject as any).toJSON(),
+        (collaborationObject as any).constructor.name
+      );
       throw new Error(
         `Expected property "${key}" of projects to be a collaboration object!`
       );
@@ -302,7 +345,12 @@ export class ProjectsBinding {
             ? `/projects/${splitPath.slice(1).join("/")}`
             : `/shared/${splitPath.join("/")}`;
 
-          const projectUri = this._fileSystemApi.getCurrentProject();
+          const projectUri = this._fileSystemProvider.currentProjectUri;
+
+          if (!projectUri) {
+            return;
+          }
+
           // TODO: find better nameyy
           const adaptedPath = projectUri.path.startsWith("/projects/")
             ? textEditor.document.uri.path.replace(
@@ -321,21 +369,35 @@ export class ProjectsBinding {
             continue;
           }
 
-          const start = new vscode.Position(
+          const lineStart = Math.min(
             state.selection.anchor.line,
-            state.selection.anchor.character
+            textEditor.document.lineCount - 1
           );
-          const end = new vscode.Position(
+          const characterStart = Math.min(
+            state.selection.anchor.character,
+            textEditor.document.lineAt(lineStart).text.length
+          );
+          const start = new vscode.Position(lineStart, characterStart);
+
+          const lineEnd = Math.min(
             state.selection.head.line,
-            state.selection.head.character
+            textEditor.document.lineCount - 1
           );
-          // const start = textEditor.document.positionAt(state.selection.anchor);
-          // const end = textEditor.document.positionAt(state.selection.head);
+          const characterEnd = Math.min(
+            state.selection.head.character,
+            textEditor.document.lineAt(lineEnd).text.length
+          );
+          const end = new vscode.Position(lineEnd, characterEnd);
+
+          console.log(start, end);
 
           let decorations = this._decorations.get(id);
           if (!decorations) {
-            const color =
-              "#" + Math.floor(Math.random() * 16777215).toString(16);
+            const hue = Math.random() * 360;
+            const saturation = 1 - Math.random() * 0.5;
+            const value = 1 - Math.random() * 0.5;
+            const color = hsvToHex(hue, saturation, value);
+            console.log("color:", color);
             decorations = [
               vscode.window.createTextEditorDecorationType({
                 border: `${color} solid 2px`,
@@ -356,8 +418,8 @@ export class ProjectsBinding {
           ]);
           textEditor.setDecorations(decorations[1], [
             new vscode.Range(
-              textEditor.document.lineAt(start.line).range.end,
-              textEditor.document.lineAt(start.line).range.end
+              textEditor.document.lineAt(end.line).range.end,
+              textEditor.document.lineAt(end.line).range.end
             ),
           ]);
         }
@@ -366,12 +428,12 @@ export class ProjectsBinding {
   }
 
   shareProject(projectUri: vscode.Uri) {
-    this._sharedProjects.add(projectUri);
     if (!projectUri.path.startsWith("/projects/")) {
       throw new Error(
         `Cannot share "${projectUri.path}" since it is not a local project!`
       );
     }
+
     this._addFileSystemWatcher(projectUri);
   }
 
@@ -391,14 +453,13 @@ export class ProjectsBinding {
     fileSystemWatcher.onDidDelete((uri) =>
       this._handleFilesystemDeletedEvent(uri)
     );
+
+    this._fileSystemWatchers.set(uri.path, fileSystemWatcher);
   }
 
-  async getSharedProjects() {
-    const sharedProjects: Record<string, Directory> = {};
-    for (const uri of this._sharedProjects) {
-      sharedProjects[path.basename(uri.path)] = await this._readDirectory(uri);
-    }
-    return sharedProjects;
+  unshareProject(projectUri: vscode.Uri) {
+    this._fileSystemWatchers.get(projectUri.path)?.dispose();
+    this._fileSystemWatchers.delete(projectUri.path);
   }
 
   async handleCollaborationEvent(
@@ -423,7 +484,7 @@ export class ProjectsBinding {
     console.log(
       "collaboration: handling event",
       event.path,
-      event.target instanceof CollaborationObject,
+      event.target.type === "object",
       Array.from(
         (event as CollaborationUpdateEventType<"object">).changes.entries()
       )
@@ -433,7 +494,7 @@ export class ProjectsBinding {
     const id = event.path.at(0);
 
     if (event.path.length === 1) {
-      if (event.target instanceof CollaborationObject) {
+      if (event.target.type === "object") {
         for (const [key, value] of (
           event as CollaborationUpdateEventType<"object">
         ).changes.entries()) {
@@ -446,19 +507,29 @@ export class ProjectsBinding {
             console.log(
               "collaboration: directory",
               directory,
-              isDirectoryWithoutName(directory) || isDirectory(directory)
+              isCollaborationDirectoryWithoutName(directory)
             );
-            if (!isDirectoryWithoutName(directory) && !isDirectory(directory)) {
+            if (!isCollaborationDirectoryWithoutName(directory)) {
               return;
             }
-            await this._createDirectory(sharedProjectUri, directory);
+            await this._createDirectory(
+              sharedProjectUri,
+              convertToDirectoryWithoutName(directory)
+            );
+            this._projectViewDataProvider.addRemoteProject(sharedProjectUri);
+            this._projectViewDataProvider.refresh();
           } else if (value.action === "delete") {
             await vscode.workspace.fs.delete(sharedProjectUri, {
               recursive: true,
             });
-            // this._fileSystemApi.removeProjectRootFolder(
-            //   `Shared projects: ${key}`
-            // );
+            if (
+              this._fileSystemProvider.currentProjectUri?.path ===
+              sharedProjectUri.path
+            ) {
+              this._fileSystemProvider.setProject(null);
+            }
+            this._projectViewDataProvider.removeRemoteProject(sharedProjectUri);
+            this._projectViewDataProvider.refresh();
           }
         }
       }
@@ -516,7 +587,7 @@ export class ProjectsBinding {
         break;
       case vscode.FileType.File:
         // apply file changes
-        if (!(event.target instanceof CollaborationString)) {
+        if (event.target.type !== "string") {
           throw new Error(`Event target is not a collaboration string!`);
         }
         await this._handleFileEvents(
@@ -525,7 +596,7 @@ export class ProjectsBinding {
         );
         break;
       case vscode.FileType.Directory:
-        if (!(event.target instanceof CollaborationObject)) {
+        if (event.target.type !== "object") {
           throw new Error(`Event target is not a collaboration object!`);
         }
         await this._handleDirectoryEvent(
@@ -543,15 +614,18 @@ export class ProjectsBinding {
     uri: vscode.Uri
   ) {
     // TODO: update uri correctly
+    const projectUri = this._fileSystemProvider.currentProjectUri;
+
+    if (!projectUri) {
+      return;
+    }
+
     const textEditor = vscode.window.visibleTextEditors.find(
       (visibleTextEditor) =>
         visibleTextEditor.document.uri.scheme === uri.scheme &&
         visibleTextEditor.document.uri.path ===
-          (uri.path.startsWith(this._fileSystemApi.getCurrentProject().path)
-            ? uri.path.replace(
-                this._fileSystemApi.getCurrentProject().path,
-                "/workspace"
-              )
+          (uri.path.startsWith(projectUri.path)
+            ? uri.path.replace(projectUri.path, "/workspace")
             : uri.path)
     );
 
@@ -606,15 +680,15 @@ export class ProjectsBinding {
     for (const [key, change] of event.changes.entries()) {
       const entryUri = uri.with({ path: path.join(uri.path, key) });
       switch (change.action) {
-        case "add":
+        case "add": {
           // get value for new entry
           const newValue = event.target.get(key)?.toJSON();
           console.log("collaboration: new value", newValue);
 
           // ensure that new entry is either a file or a directory
           if (
-            !isFileWithoutName(newValue) &&
-            !isDirectoryWithoutName(newValue)
+            !isCollaborationFileWithoutName(newValue) &&
+            !isCollaborationDirectoryWithoutName(newValue)
           ) {
             console.error(
               `New value is neither a file nor a directory!`,
@@ -625,35 +699,51 @@ export class ProjectsBinding {
 
           // add file/directory
           // TODO: better way to check if refresh is needed
-          this._fileSystemApi.refreshProjectsView();
-          await this._createEntry(entryUri, newValue);
+          this._projectViewDataProvider.refresh();
+          await this._createEntry(
+            entryUri,
+            newValue.type === "file"
+              ? convertToFileWithoutName(newValue)
+              : convertToDirectoryWithoutName(newValue)
+          );
           console.log("refreshing files explorer create entry");
 
-          if (
-            uri.path.startsWith(this._fileSystemApi.getCurrentProject().path)
-          ) {
+          const projectUri = this._fileSystemProvider.currentProjectUri;
+
+          if (!projectUri) {
+            return;
+          }
+
+          if (uri.path.startsWith(projectUri.path)) {
             await vscode.commands.executeCommand(
               "workbench.files.action.refreshFilesExplorer"
             );
           }
           break;
+        }
         case "update":
           // update entry with value - this should not happen
           break;
-        case "delete":
+        case "delete": {
           // delete entry
           await this._deleteEntry(entryUri);
           // TODO: better way to check if refresh is needed
-          this._fileSystemApi.refreshProjectsView();
+          this._projectViewDataProvider.refresh();
           console.log("refreshing files explorer delete entry");
-          if (
-            uri.path.startsWith(this._fileSystemApi.getCurrentProject().path)
-          ) {
+
+          const projectUri = this._fileSystemProvider.currentProjectUri;
+
+          if (!projectUri) {
+            return;
+          }
+
+          if (uri.path.startsWith(projectUri.path)) {
             await vscode.commands.executeCommand(
               "workbench.files.action.refreshFilesExplorer"
             );
           }
           break;
+        }
       }
     }
   }
@@ -727,9 +817,7 @@ export class ProjectsBinding {
 
   private async _readFile(uri: vscode.Uri): Promise<File> {
     const name = path.basename(uri.path);
-    const content = new TextDecoder().decode(
-      await vscode.workspace.fs.readFile(uri)
-    );
+    const content = await vscode.workspace.fs.readFile(uri);
     return {
       type: "file",
       name,
@@ -745,11 +833,13 @@ export class ProjectsBinding {
           .replace("/projects/", `${this._collaborationServiceProsumer.id}/`)
           .split("/")
       : uri.path.replace("/shared/", "").split("/");
-    let value: unknown = this._getValue(pathSegments[0]);
+    let value = this._getValue(pathSegments[0]) as
+      | CollaborationType
+      | undefined;
     for (const pathSegment of pathSegments.slice(1, -1)) {
-      if (value instanceof CollaborationObject) {
+      if (value?.type === "object") {
         value = value.get(pathSegment);
-        if (!(value instanceof CollaborationObject)) {
+        if (value?.type !== "object") {
           console.error("collaboration: entry is not a collaboration object!");
           return;
         }
@@ -765,8 +855,13 @@ export class ProjectsBinding {
     }
 
     const lastPathSegment = pathSegments.at(-1);
-    if (value instanceof CollaborationObject && lastPathSegment) {
+    if (value?.type === "object" && lastPathSegment) {
       const entry = await this._readEntry(uri);
+      const collaborationEntry =
+        entry.type === "file"
+          ? convertToCollaborationFile(entry)
+          : convertToCollaborationDirectory(entry);
+      console.log(collaborationEntry);
       this._collaborationServiceProsumer.executeTransaction(
         "projects",
         () => {
@@ -774,7 +869,7 @@ export class ProjectsBinding {
             lastPathSegment,
             this._collaborationServiceProsumer.valueToCollaborationType(
               "projects",
-              { type: entry.type, content: entry.content }
+              collaborationEntry
             )
           );
         },
@@ -802,11 +897,13 @@ export class ProjectsBinding {
           .replace("/projects/", `${this._collaborationServiceProsumer.id}/`)
           .split("/")
       : uri.path.replace("/shared/", "").split("/");
-    let value: unknown = this._getValue(pathSegments[0]);
+    let value = this._getValue(pathSegments[0]) as
+      | CollaborationType
+      | undefined;
     for (const pathSegment of pathSegments.slice(1, -1)) {
-      if (value instanceof CollaborationObject) {
+      if (value?.type === "object") {
         value = value.get(pathSegment);
-        if (!(value instanceof CollaborationObject)) {
+        if (value?.type !== "object") {
           console.error("collaboration: entry is not a collaboration object!");
           return;
         }
@@ -822,7 +919,7 @@ export class ProjectsBinding {
     }
 
     const lastPathSegment = pathSegments.at(-1);
-    if (value instanceof CollaborationObject && lastPathSegment) {
+    if (value?.type === "object" && lastPathSegment) {
       this._collaborationServiceProsumer.executeTransaction(
         "projects",
         () => {

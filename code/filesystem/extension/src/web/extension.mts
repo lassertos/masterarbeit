@@ -16,6 +16,12 @@ import { registerFilesExplorerCut } from "./filesExplorerActions/cut.mjs";
 import { IndexedDBFileSystemProvider } from "./providers/subproviders/indexeddb.mjs";
 import { MemoryFileSystemProvider } from "./providers/subproviders/memory.mjs";
 import { CrossLabFileSystemSubProvider } from "./providers/subproviders/index.mjs";
+import { CollaborationServiceProsumer } from "@crosslab-ide/crosslab-collaboration-service";
+import { ProjectsBinding } from "./projectsBinding.mjs";
+import { isProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
+import { fileSystemProtocol } from "@crosslab-ide/filesystem-messaging-protocol";
+import path from "path";
+import { convertToCollaborationDirectory } from "./collaborationTypes.mjs";
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log(
@@ -95,13 +101,13 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
     vscode.commands.registerCommand(
       "projects.view.openProject",
-      async (projectName) => {
-        await fileSystemProvider.setProject(projectName);
+      async (projectUri: vscode.Uri) => {
+        await fileSystemProvider.setProject(projectUri);
       }
     ),
     vscode.commands.registerCommand(
       "projects.view.renameProject",
-      async (projectName) => {
+      async (projectUri: vscode.Uri) => {
         const name = await vscode.window.showInputBox({
           prompt: "Please enter a new name for your project!",
           title: "Project Rename",
@@ -111,10 +117,7 @@ export async function activate(context: vscode.ExtensionContext) {
           return;
         }
 
-        const oldProjectUri = vscode.Uri.from({
-          scheme: "crosslabfs",
-          path: `/projects/${projectName}`,
-        });
+        const oldProjectUri = projectUri;
         const newProjectUri = vscode.Uri.from({
           scheme: "crosslabfs",
           path: `/projects/${name}`,
@@ -122,7 +125,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
         await vscode.workspace.fs.rename(oldProjectUri, newProjectUri);
 
-        if (fileSystemProvider.currentProjectUri === projectName) {
+        if (fileSystemProvider.currentProjectUri?.path === projectUri.path) {
           await fileSystemProvider.setProject(newProjectUri);
         }
         projectViewDataProvider.refresh();
@@ -130,15 +133,9 @@ export async function activate(context: vscode.ExtensionContext) {
     ),
     vscode.commands.registerCommand(
       "projects.view.deleteProject",
-      async (projectName) => {
-        await vscode.workspace.fs.delete(
-          vscode.Uri.from({
-            scheme: "crosslabfs",
-            path: `/projects/${projectName}`,
-          }),
-          { recursive: true }
-        );
-        if (fileSystemProvider.currentProjectUri === projectName) {
+      async (projectUri: vscode.Uri) => {
+        await vscode.workspace.fs.delete(projectUri, { recursive: true });
+        if (fileSystemProvider.currentProjectUri?.path === projectUri.path) {
           await fileSystemProvider.setProject(null);
         }
         projectViewDataProvider.refresh();
@@ -223,6 +220,122 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.workspace.onDidCloseTextDocument((event) => {
     console.log("filesystem-extension: closed text document", event.uri.path);
   });
+
+  // add collaborative capabilities
+  const collaborationExtension = vscode.extensions.all.find(
+    (extension) =>
+      extension.id === "crosslab.@crosslab-ide/crosslab-collaboration-extension"
+  );
+  if (collaborationExtension) {
+    const collaborationApi = collaborationExtension.isActive
+      ? collaborationExtension.exports
+      : await collaborationExtension.activate();
+    const collaborationServiceProsumer =
+      collaborationApi.getProsumer() as CollaborationServiceProsumer;
+    const sharedFileSystemProvider = new MemoryFileSystemProvider();
+
+    collaborationServiceProsumer.createRoom("projects", "yjs");
+    fileSystemProvider.addMount("/shared", sharedFileSystemProvider);
+
+    const projectsBinding = new ProjectsBinding(
+      fileSystemProvider,
+      projectViewDataProvider,
+      collaborationServiceProsumer
+    );
+
+    collaborationServiceProsumer.on("update", (room, events) => {
+      if (room === "projects") {
+        projectsBinding.handleCollaborationEvent(
+          events,
+          collaborationServiceProsumer.id
+        );
+      }
+    });
+
+    collaborationServiceProsumer.on(
+      "new-participant",
+      async (participantId) => {
+        collaborationServiceProsumer.getCollaborationValue(
+          "projects",
+          participantId,
+          "object"
+        );
+        const sharedProjectsUri = vscode.Uri.from({
+          scheme: "crosslabfs",
+          path: `/shared/${participantId}`,
+        });
+        await fileSystemProvider.createDirectory(sharedProjectsUri);
+        projectViewDataProvider.addProjectRootFolder(
+          `Shared projects: ${participantId}`,
+          sharedProjectsUri
+        );
+      }
+    );
+
+    vscode.commands.executeCommand(
+      "setContext",
+      "crosslab.collaborationEnabled",
+      true
+    );
+
+    vscode.commands.registerCommand(
+      "projects.view.shareProject",
+      async (projectUri: vscode.Uri) => {
+        const collaborationObject =
+          collaborationServiceProsumer.getCollaborationValue(
+            "projects",
+            collaborationServiceProsumer.id,
+            "object"
+          );
+        const readDirectoryResponse =
+          await fileSystemRequestHandler.handleRequest({
+            type: "readDirectory:request",
+            content: {
+              requestId: "local",
+              path: projectUri.path,
+            },
+          });
+        if (
+          !isProtocolMessage(
+            fileSystemProtocol,
+            "readDirectory:response",
+            readDirectoryResponse
+          )
+        ) {
+          throw new Error(`Received invalid response!`);
+        }
+        if (!readDirectoryResponse.content.success) {
+          throw new Error(`Could not read project "${projectUri}"!`);
+        }
+        collaborationObject.set(
+          path.basename(projectUri.path),
+          collaborationServiceProsumer.valueToCollaborationType(
+            "projects",
+            convertToCollaborationDirectory(
+              readDirectoryResponse.content.directory
+            )
+          )
+        );
+        projectViewDataProvider.shareProject(projectUri);
+        projectsBinding.shareProject(projectUri);
+      }
+    );
+
+    vscode.commands.registerCommand(
+      "projects.view.unshareProject",
+      (projectUri: vscode.Uri) => {
+        const collaborationObject =
+          collaborationServiceProsumer.getCollaborationValue(
+            "projects",
+            collaborationServiceProsumer.id,
+            "object"
+          );
+        collaborationObject.delete(path.basename(projectUri.path));
+        projectViewDataProvider.unshareProject(projectUri);
+        projectsBinding.unshareProject(projectUri);
+      }
+    );
+  }
 
   return {
     addServices: (deviceHandler: DeviceHandler) => {

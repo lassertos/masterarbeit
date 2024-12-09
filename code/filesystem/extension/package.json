@@ -41,9 +41,17 @@
         "icon": "$(trash)"
       },
       {
-        "command": "filesExplorer.copy",
-        "title": "Delete Project",
-        "icon": "$(trash)"
+        "command": "projects.view.shareProject",
+        "title": "Share Project",
+        "icon": "$(organization)"
+      },
+      {
+        "command": "projects.view.unshareProject",
+        "title": "Share Project",
+        "icon": "$(x)"
+      },
+      {
+        "command": "filesExplorer.copy"
       }
     ],
     "menus": {
@@ -57,18 +65,28 @@
       "view/item/context": [
         {
           "command": "projects.view.openProject",
-          "when": "view == projects.view && viewItem == project",
+          "when": "view == projects.view && viewItem != project-folder",
           "group": "inline@1"
         },
         {
           "command": "projects.view.renameProject",
-          "when": "view == projects.view && viewItem == project",
+          "when": "view == projects.view && (viewItem == local-project || viewItem == shared-project)",
           "group": "inline@2"
         },
         {
           "command": "projects.view.deleteProject",
-          "when": "view == projects.view && viewItem == project",
+          "when": "view == projects.view && (viewItem == local-project || viewItem == shared-project)",
           "group": "inline@3"
+        },
+        {
+          "command": "projects.view.shareProject",
+          "when": "view == projects.view && viewItem == local-project && crosslab.collaborationEnabled",
+          "group": "inline@4"
+        },
+        {
+          "command": "projects.view.unshareProject",
+          "when": "view == projects.view && viewItem == shared-project && crosslab.collaborationEnabled",
+          "group": "inline@4"
         }
       ]
     },
@@ -124,15 +142,18 @@
   },
   "dependencies": {
     "@crosslab-ide/abstract-messaging-channel": "file:../../shared/abstract-messaging-channel",
+    "@crosslab-ide/crosslab-collaboration-service": "file:../../collaboration/service",
     "@crosslab-ide/crosslab-filesystem-service": "file:../service",
     "@crosslab-ide/editor-settings": "file:../../shared/editor-settings",
     "@crosslab-ide/filesystem-messaging-protocol": "file:../libraries/filesystem-messaging-protocol",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@types/uuid": "^10.0.0",
+    "async-mutex": "^0.5.0",
     "diff": "^7.0.0",
     "esbuild-plugin-polyfill-node": "^0.3.0",
     "fuse.js": "^7.0.0",
     "uuid": "^10.0.0",
-    "vscode-uri": "^3.0.8"
+    "vscode-uri": "^3.0.8",
+    "zod": "^3.23.8"
   }
 }

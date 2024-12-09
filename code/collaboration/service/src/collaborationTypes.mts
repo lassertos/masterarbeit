@@ -341,6 +341,8 @@ interface CollaborationObjectEvents {
 }
 
 export abstract class CollaborationObject extends TypedEmitter<CollaborationObjectEvents> {
+  readonly type = "object";
+
   abstract set(key: string, value: CollaborationType): void;
   abstract get(key: string): CollaborationType | undefined;
   abstract delete(key: string): void;
@@ -357,6 +359,8 @@ interface CollaborationArrayEvents {
 }
 
 export abstract class CollaborationArray extends TypedEmitter<CollaborationArrayEvents> {
+  readonly type = "array";
+
   abstract push(item: CollaborationType): void;
   abstract get(index: number): CollaborationType | undefined;
   abstract delete(index: number, length?: number): void;
@@ -373,6 +377,8 @@ interface CollaborationNumberEvents {
 }
 
 export abstract class CollaborationNumber extends TypedEmitter<CollaborationNumberEvents> {
+  readonly type = "number";
+
   abstract set(value: number): void;
   abstract toJSON(): number;
 }
@@ -391,6 +397,8 @@ interface CollaborationStringEvents {
 }
 
 export abstract class CollaborationString extends TypedEmitter<CollaborationStringEvents> {
+  readonly type = "string";
+
   abstract set(value: string): void;
   abstract insert(index: number, value: string): void;
   abstract delete(index: number, count: number): void;
@@ -407,11 +415,15 @@ interface CollaborationBooleanEvents {
 }
 
 export abstract class CollaborationBoolean extends TypedEmitter<CollaborationBooleanEvents> {
+  readonly type = "boolean";
+
   abstract set(value: boolean): void;
   abstract toJSON(): boolean;
 }
 
 export abstract class CollaborationNull {
+  readonly type = "null";
+
   abstract toJSON(): null;
 }
 

@@ -8,6 +8,9 @@ export const FileWithoutNameSchema = z.object({
   content: z.instanceof(Uint8Array),
 });
 export type FileWithoutName = z.infer<typeof FileWithoutNameSchema>;
+export function isFileWithoutName(input: unknown): input is FileWithoutName {
+  return FileWithoutNameSchema.safeParse(input).success;
+}
 
 // declare schemas and types for files with a name
 
@@ -15,6 +18,9 @@ export const FileSchema = FileWithoutNameSchema.extend({
   name: z.string(),
 });
 export type File = z.infer<typeof FileSchema>;
+export function isFile(input: unknown): input is File {
+  return FileSchema.safeParse(input).success;
+}
 
 // declare schemas and types for directories without a name
 
@@ -32,6 +38,11 @@ export const DirectoryWithoutNameSchema: z.Schema<DirectoryWithoutName> =
       z.record(z.union([DirectoryWithoutNameSchema, FileWithoutNameSchema]))
     ),
   });
+export function isDirectoryWithoutName(
+  input: unknown
+): input is DirectoryWithoutName {
+  return DirectoryWithoutNameSchema.safeParse(input).success;
+}
 
 // declare schemas and types for directories with a name
 
@@ -43,6 +54,9 @@ export const DirectorySchema = z.object({
   ),
 });
 export type Directory = z.infer<typeof DirectorySchema>;
+export function isDirectory(input: unknown): input is Directory {
+  return DirectorySchema.safeParse(input).success;
+}
 
 type FileSystemProtocolMessageType =
   | "createDirectory:request"

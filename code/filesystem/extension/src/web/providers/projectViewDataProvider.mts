@@ -8,6 +8,28 @@ export class ProjectViewDataProvider
   private _onDidChangeTreeData: vscode.EventEmitter<
     vscode.Uri | undefined | null | void
   > = new vscode.EventEmitter<vscode.Uri | undefined | null | void>();
+  private _sharedProjects: Set<string> = new Set();
+  private _remoteProjects: Set<string> = new Set();
+
+  shareProject(projectUri: vscode.Uri) {
+    this._sharedProjects.add(projectUri.path);
+    this.refresh();
+  }
+
+  unshareProject(projectUri: vscode.Uri) {
+    this._sharedProjects.delete(projectUri.path);
+    this.refresh();
+  }
+
+  addRemoteProject(projectUri: vscode.Uri) {
+    this._remoteProjects.add(projectUri.path);
+    this.refresh();
+  }
+
+  removeRemoteProject(projectUri: vscode.Uri) {
+    this._remoteProjects.delete(projectUri.path);
+    this.refresh();
+  }
 
   onDidChangeTreeData?:
     | vscode.Event<vscode.Uri | void | vscode.Uri[] | null | undefined>
@@ -30,13 +52,18 @@ export class ProjectViewDataProvider
       return {
         label: title,
         collapsibleState: vscode.TreeItemCollapsibleState.Expanded,
+        contextValue: "project-folder",
       };
     }
 
     return {
       label: path.basename(element.path),
       iconPath: new vscode.ThemeIcon("file-directory"),
-      contextValue: "project",
+      contextValue: this._sharedProjects.has(element.path)
+        ? "shared-project"
+        : this._remoteProjects.has(element.path)
+        ? "remote-project"
+        : "local-project",
     };
   }
 
@@ -55,7 +82,14 @@ export class ProjectViewDataProvider
       return [];
     }
 
-    console.log("project view data provider:", projectRootFolder);
+    console.log(
+      "project view data provider:",
+      projectRootFolder,
+      await vscode.workspace.fs.readDirectory(
+        vscode.Uri.from({ scheme: "crosslabfs", path: "/shared" })
+      ),
+      await vscode.workspace.fs.readDirectory(projectRootFolder)
+    );
 
     const result = (await vscode.workspace.fs.readDirectory(projectRootFolder))
       .filter((entry) => entry[1] === vscode.FileType.Directory)
