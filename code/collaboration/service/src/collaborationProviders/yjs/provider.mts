@@ -3,6 +3,7 @@ import {
   Message,
   isIncomingMessage,
   IncomingMessage,
+  isProtocolMessage,
 } from "@crosslab-ide/abstract-messaging-channel";
 import {
   CollaborationTypeName,
@@ -22,19 +23,17 @@ import {
   yjsToCollaborationType,
 } from "./types.mjs";
 import * as Y from "yjs";
-import * as awarenessProtocol from "y-protocols/awareness.js";
+// import * as awarenessProtocol from "y-protocols/awareness.js";
 import * as syncProtocol from "y-protocols/sync.js";
 import * as encoding from "lib0/encoding.js";
 import * as decoding from "lib0/decoding.js";
 
 export class YjsCollaborationProvider extends CollaborationProvider {
-  private _document: Y.Doc;
-  private _awareness: awarenessProtocol.Awareness;
+  private _document: Y.Doc = new Y.Doc();
+  private _knownProperties: Set<string> = new Set();
 
-  constructor(initialValue: Record<string, unknown>) {
-    super();
-    this._document = new Y.Doc();
-    this._awareness = new awarenessProtocol.Awareness(this._document);
+  constructor(id: string, initialValue: Record<string, unknown>) {
+    super(id);
 
     // TODO: add observers
     this._initialize(initialValue);
@@ -42,6 +41,7 @@ export class YjsCollaborationProvider extends CollaborationProvider {
 
   private _initialize(initialValue: Record<string, unknown>) {
     for (const [key, value] of Object.entries(initialValue)) {
+      this._knownProperties.add(key);
       console.log("collaboration: current entry", key, value);
       if (
         typeof value === "undefined" ||
@@ -55,11 +55,6 @@ export class YjsCollaborationProvider extends CollaborationProvider {
 
       if (Array.isArray(value)) {
         const array = this.get(key, "array");
-        array
-          .toYjs()
-          .observeDeep((events, transaction) =>
-            this._handleYjsEvents(key, events, transaction)
-          );
         array.push(...value.map((item) => this.valueToCollaborationType(item)));
         console.log(
           "collaboration: initialized as array",
@@ -76,11 +71,6 @@ export class YjsCollaborationProvider extends CollaborationProvider {
           continue;
         }
         const object = this.get(key, "object");
-        object
-          .toYjs()
-          .observeDeep((events, transaction) =>
-            this._handleYjsEvents(key, events, transaction)
-          );
         for (const [key, val] of Object.entries(value)) {
           console.log("collaboration: current entry", key, val);
           object.set(key, this.valueToCollaborationType(val));
@@ -97,11 +87,6 @@ export class YjsCollaborationProvider extends CollaborationProvider {
       switch (typeof value) {
         case "number": {
           const number = this.get(key, "number");
-          number
-            .toYjs()
-            .observeDeep((events, transaction) =>
-              this._handleYjsEvents(key, events, transaction)
-            );
           number.set(value);
           console.log(
             "collaboration: initialized as number",
@@ -113,11 +98,6 @@ export class YjsCollaborationProvider extends CollaborationProvider {
         }
         case "string": {
           const string = this.get(key, "string");
-          string
-            .toYjs()
-            .observeDeep((events, transaction) =>
-              this._handleYjsEvents(key, events, transaction)
-            );
           string.set(value);
           console.log(
             "collaboration: initialized as string",
@@ -129,11 +109,6 @@ export class YjsCollaborationProvider extends CollaborationProvider {
         }
         case "boolean": {
           const boolean = this.get(key, "boolean");
-          boolean
-            .toYjs()
-            .observeDeep((events, transaction) =>
-              this._handleYjsEvents(key, events, transaction)
-            );
           boolean.set(value);
           console.log(
             "collaboration: initialized as boolean",
@@ -155,6 +130,14 @@ export class YjsCollaborationProvider extends CollaborationProvider {
           },
         } satisfies ProtocolMessage<typeof yjsCollaborationProtocol, "yjs:sync:update">);
       }
+    });
+
+    this._awarenessProvider.on("change", (changes, origin) => {
+      this.emit("awareness-change", changes, origin);
+    });
+
+    this._awarenessProvider.on("update", (changes, origin) => {
+      this.emit("awareness-update", changes, origin);
     });
   }
 
@@ -226,44 +209,98 @@ export class YjsCollaborationProvider extends CollaborationProvider {
   }
 
   handleCollaborationMessage(
-    message: ProtocolMessage<
-      typeof collaborationProtocol,
-      "collaboration:message"
-    >["content"]
+    message:
+      | ProtocolMessage<
+          typeof collaborationProtocol,
+          "collaboration:message"
+        >["content"]
+      | (ProtocolMessage<
+          typeof collaborationProtocol,
+          "collaboration:awareness:update"
+        > & { participantId: string })
   ): Promise<Message | void> | Message | void {
-    if (!isIncomingMessage(yjsCollaborationProtocol, "participant", message)) {
+    if (
+      isProtocolMessage(
+        collaborationProtocol,
+        "collaboration:awareness:update",
+        message
+      )
+    ) {
+      return this._handleAwarenessUpdateMessage(message);
+    }
+
+    if (!isIncomingMessage(yjsCollaborationProtocol, "prosumer", message)) {
       throw new Error("Received invalid yjs collaboration message!");
     }
-    return this._handleMessage(message);
+
+    return this._handleYjsMessage(message);
   }
 
   get<T extends CollaborationTypeName>(
     key: string,
     type: T
   ): YjsCollaborationType<T> {
+    console.log("collaboration: getting", type, key);
     switch (type) {
       case "object": {
         const yMap = this._document.getMap(key);
+        if (!this._knownProperties.has(key)) {
+          console.log("collaboration: adding observer for", key);
+          this._knownProperties.add(key);
+          yMap.observeDeep((events, transaction) =>
+            this._handleYjsEvents(key, events, transaction)
+          );
+        }
         return new YjsCollaborationObject(yMap) as YjsCollaborationType<T>;
       }
       case "array": {
         const yArray = this._document.getArray(key);
+        if (!this._knownProperties.has(key)) {
+          this._knownProperties.add(key);
+          yArray.observeDeep((events, transaction) =>
+            this._handleYjsEvents(key, events, transaction)
+          );
+        }
         return new YjsCollaborationArray(yArray) as YjsCollaborationType<T>;
       }
       case "number": {
         const yText = this._document.getText(key);
+        if (!this._knownProperties.has(key)) {
+          this._knownProperties.add(key);
+          yText.observeDeep((events, transaction) =>
+            this._handleYjsEvents(key, events, transaction)
+          );
+        }
         return new YjsCollaborationNumber(yText) as YjsCollaborationType<T>;
       }
       case "string": {
         const yText = this._document.getText(key);
+        if (!this._knownProperties.has(key)) {
+          this._knownProperties.add(key);
+          yText.observeDeep((events, transaction) =>
+            this._handleYjsEvents(key, events, transaction)
+          );
+        }
         return new YjsCollaborationString(yText) as YjsCollaborationType<T>;
       }
       case "boolean": {
         const yText = this._document.getText(key);
+        if (!this._knownProperties.has(key)) {
+          this._knownProperties.add(key);
+          yText.observeDeep((events, transaction) =>
+            this._handleYjsEvents(key, events, transaction)
+          );
+        }
         return new YjsCollaborationBoolean(yText) as YjsCollaborationType<T>;
       }
       case "null": {
         const yText = this._document.getText(key);
+        if (!this._knownProperties.has(key)) {
+          this._knownProperties.add(key);
+          yText.observeDeep((events, transaction) =>
+            this._handleYjsEvents(key, events, transaction)
+          );
+        }
         return new YjsCollaborationNull(yText) as YjsCollaborationType<T>;
       }
     }
@@ -271,8 +308,28 @@ export class YjsCollaborationProvider extends CollaborationProvider {
     throw new Error(`Cannot get value of type "${type}"!`);
   }
 
-  private _handleMessage(
-    message: IncomingMessage<typeof yjsCollaborationProtocol, "participant">
+  _handleAwarenessUpdateMessage(
+    awarenessUpdateMessage: ProtocolMessage<
+      typeof collaborationProtocol,
+      "collaboration:awareness:update"
+    > & { participantId: string }
+  ) {
+    console.log(
+      "collaboration: handling awareness update message",
+      awarenessUpdateMessage
+    );
+
+    // TODO: maybe change origin to id of participant it was received from
+    this._awarenessProvider.applyUpdate(
+      awarenessUpdateMessage.content,
+      awarenessUpdateMessage.participantId
+    );
+
+    console.log("collaboration: successfully handled awareness update message");
+  }
+
+  private _handleYjsMessage(
+    message: IncomingMessage<typeof yjsCollaborationProtocol, "prosumer">
   ) {
     switch (message.type) {
       case "yjs:sync:step1":
@@ -283,10 +340,6 @@ export class YjsCollaborationProvider extends CollaborationProvider {
         return this._handleSyncDoneMessage(message.content);
       case "yjs:sync:update":
         return this._handleSyncUpdateMessage(message.content);
-      case "yjs:awareness:query":
-        return this._handleAwarenessQueryMessage(message.content);
-      case "yjs:awareness:update":
-        return this._handleAwarenessUpdateMessage(message.content);
     }
   }
 
@@ -366,59 +419,22 @@ export class YjsCollaborationProvider extends CollaborationProvider {
     >["content"]
   ) {
     console.log(
-      "collaboration: handling sync updated message",
+      "collaboration: handling sync update message",
       syncUpdateMessage
     );
 
     // TODO: check if "this" is correct here!
     Y.applyUpdate(this._document, syncUpdateMessage.message, this);
 
+    for (const property of this._knownProperties) {
+      console.log(
+        "collaboration:",
+        property,
+        this.get(property, "object").toJSON()
+      );
+    }
+
     console.log("collaboration: successfully handled sync update message");
-  }
-
-  private _handleAwarenessQueryMessage(
-    awarenessQueryMessage: ProtocolMessage<
-      typeof yjsCollaborationProtocol,
-      "yjs:awareness:query"
-    >["content"]
-  ): ProtocolMessage<typeof yjsCollaborationProtocol, "yjs:awareness:update"> {
-    console.log(
-      "collaboration: handling awareness query message",
-      awarenessQueryMessage
-    );
-
-    console.log("collaboration: successfully handled awareness query message");
-
-    return {
-      type: "yjs:awareness:update",
-      content: {
-        message: awarenessProtocol.encodeAwarenessUpdate(
-          this._awareness,
-          Array.from(this._awareness.getStates().keys())
-        ),
-      },
-    };
-  }
-
-  private _handleAwarenessUpdateMessage(
-    awarenessUpdateMessage: ProtocolMessage<
-      typeof yjsCollaborationProtocol,
-      "yjs:awareness:update"
-    >["content"]
-  ) {
-    console.log(
-      "collaboration: handling awareness update message",
-      awarenessUpdateMessage
-    );
-
-    // TODO: check if "this" is correct here!
-    awarenessProtocol.applyAwarenessUpdate(
-      this._awareness,
-      awarenessUpdateMessage.message,
-      this
-    );
-
-    console.log("collaboration: successfully handled awareness update message");
   }
 
   private _handleYjsEvents(
@@ -426,6 +442,7 @@ export class YjsCollaborationProvider extends CollaborationProvider {
     events: Y.YEvent<any>[],
     transaction: Y.Transaction
   ) {
+    console.log("collaboration:", property, events, transaction);
     const updatedEvents: CollaborationUpdateEventType[] = [];
     for (const event of events) {
       if (event instanceof Y.YMapEvent) {

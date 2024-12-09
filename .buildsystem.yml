@@ -374,6 +374,7 @@ gdb-server:
         - crosslab-compilation-service:publish
         - crosslab-debugging-adapter-service:publish
         - crosslab-debugging-target-service:publish
+        - messaging-service:publish
     build-docker:
       helper-functions:
         before:
@@ -421,6 +422,7 @@ simavr-server:
         - simavr-node-addon:publish
         - file-service-js:publish
         - crosslab-testing-service:publish
+        - messaging-service:publish
     build-docker:
       helper-functions:
         before:

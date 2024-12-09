@@ -7,8 +7,6 @@ export const yjsCollaborationProtocol = {
     "yjs:sync:step2",
     "yjs:sync:done",
     "yjs:sync:update",
-    "yjs:awareness:query",
-    "yjs:awareness:update",
   ],
   messages: {
     "yjs:sync:step1": z.object({
@@ -21,38 +19,25 @@ export const yjsCollaborationProtocol = {
     "yjs:sync:update": z.object({
       message: z.instanceof(Uint8Array),
     }),
-    "yjs:awareness:update": z.object({
-      message: z.instanceof(Uint8Array),
-    }),
-    "yjs:awareness:query": z.undefined(),
   },
-  roles: ["participant"],
+  roles: ["prosumer"],
   roleMessages: {
-    participant: {
+    prosumer: {
       incoming: [
         "yjs:sync:step1",
         "yjs:sync:step2",
         "yjs:sync:done",
         "yjs:sync:update",
-        "yjs:awareness:query",
-        "yjs:awareness:update",
       ],
       outgoing: [
         "yjs:sync:step1",
         "yjs:sync:step2",
         "yjs:sync:done",
         "yjs:sync:update",
-        "yjs:awareness:query",
-        "yjs:awareness:update",
       ],
     },
   },
 } as const satisfies MessagingProtocol<
-  | "yjs:sync:step1"
-  | "yjs:sync:step2"
-  | "yjs:sync:done"
-  | "yjs:sync:update"
-  | "yjs:awareness:query"
-  | "yjs:awareness:update",
-  "participant"
+  "yjs:sync:step1" | "yjs:sync:step2" | "yjs:sync:done" | "yjs:sync:update",
+  "prosumer"
 >;

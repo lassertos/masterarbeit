@@ -1,12 +1,12 @@
 import { YjsCollaborationProvider } from "./collaborationProviders/index.mjs";
 import {
+  Awareness,
   CollaborationProvider,
   CollaborationType,
   CollaborationUpdateEventType,
 } from "./collaborationTypes.mjs";
 import { collaborationProtocol } from "./protocol.mjs";
 import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
-import { ProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
 import { TypedEmitter } from "tiny-typed-emitter";
 
 interface RoomEvents {
@@ -14,14 +14,16 @@ interface RoomEvents {
 }
 
 export class Room extends TypedEmitter<RoomEvents> {
+  // TODO: change depending on service direction
   private _participants: Map<
     string,
-    CrossLabMessagingChannel<typeof collaborationProtocol, "participant">
+    CrossLabMessagingChannel<typeof collaborationProtocol, "prosumer">
   > = new Map();
   private _name: string;
   private _collaborationProvider: CollaborationProvider;
 
   constructor(
+    id: string,
     name: string,
     _collaborationProvider: "yjs",
     initialValue: Record<string, unknown> = {}
@@ -29,7 +31,10 @@ export class Room extends TypedEmitter<RoomEvents> {
     console.log("collaboration: creating room", initialValue);
     super();
     this._name = name;
-    this._collaborationProvider = new YjsCollaborationProvider(initialValue);
+    this._collaborationProvider = new YjsCollaborationProvider(
+      id,
+      initialValue
+    );
     this._collaborationProvider.on("update-message", (update) => {
       for (const participant of this._participants.values()) {
         participant.send({
@@ -41,13 +46,29 @@ export class Room extends TypedEmitter<RoomEvents> {
     this._collaborationProvider.on("update", (events) => {
       this.emit("update", events);
     });
+    this._collaborationProvider.on(
+      "awareness-update-message",
+      (message, origin) => {
+        for (const [id, participant] of this._participants.entries()) {
+          if (id === origin) {
+            continue;
+          }
+          participant.send(message);
+        }
+      }
+    );
   }
 
+  get awareness(): Awareness {
+    return this._collaborationProvider.awareness;
+  }
+
+  // TODO: change depending on service direction
   addParticipant(
     participantId: string,
     messagingChannel: CrossLabMessagingChannel<
       typeof collaborationProtocol,
-      "participant"
+      "prosumer"
     >
   ) {
     this._participants.set(participantId, messagingChannel);
@@ -72,6 +93,13 @@ export class Room extends TypedEmitter<RoomEvents> {
         return;
       }
 
+      if (message.type === "collaboration:awareness:update") {
+        return await this._collaborationProvider.handleCollaborationMessage({
+          ...message,
+          participantId,
+        });
+      }
+
       if (message.type !== "collaboration:message") {
         throw new Error(
           `Expected message of type "collaboration:message", got "${message.type}"`
@@ -82,7 +110,10 @@ export class Room extends TypedEmitter<RoomEvents> {
         return;
       }
 
-      const response = await this.handleCollaborationMessage(message.content);
+      const response =
+        await this._collaborationProvider.handleCollaborationMessage(
+          message.content
+        );
 
       if (response) {
         await participant.send({
@@ -110,16 +141,8 @@ export class Room extends TypedEmitter<RoomEvents> {
     this._participants.delete(participantId);
   }
 
-  handleCollaborationMessage(
-    message: ProtocolMessage<
-      typeof collaborationProtocol,
-      "collaboration:message"
-    >["content"]
-  ) {
-    return this._collaborationProvider.handleCollaborationMessage(message);
-  }
-
   get: CollaborationProvider["get"] = (key, type) => {
+    console.log("collaboration: getting room value", key, type);
     return this._collaborationProvider.get(key, type);
   };
 }

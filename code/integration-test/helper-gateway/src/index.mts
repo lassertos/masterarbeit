@@ -23,6 +23,10 @@ app.ws("*", function (ws, req) {
   const proxyWs = new WebSocket(
     "ws://" + DOCKER_DOMAIN + req.url.replace("/.websocket", "")
   );
+  const interval = setInterval(() => {
+    ws.ping();
+    proxyWs.ping();
+  }, 5000);
 
   ws.on("message", (message) => {
     if (proxyWs.readyState === WebSocket.OPEN) {
@@ -34,7 +38,11 @@ app.ws("*", function (ws, req) {
     }
   });
   ws.on("close", () => {
+    clearInterval(interval);
     proxyWs.close();
+  });
+  ws.on("ping", () => {
+    ws.pong();
   });
 
   proxyWs.on("open", () => {
@@ -49,7 +57,11 @@ app.ws("*", function (ws, req) {
     });
   });
   proxyWs.on("close", () => {
+    clearInterval(interval);
     ws.close();
+  });
+  proxyWs.on("ping", () => {
+    proxyWs.pong();
   });
 });
 

@@ -40,7 +40,7 @@ export class CollaborationServiceProsumer
 {
   private _prosumers: Map<
     string,
-    CrossLabMessagingChannel<typeof collaborationProtocol, "participant">
+    CrossLabMessagingChannel<typeof collaborationProtocol, "prosumer">
   > = new Map();
   private _initialValues: Map<
     string,
@@ -64,6 +64,16 @@ export class CollaborationServiceProsumer
   get id() {
     return this._id;
   }
+
+  getAwareness(roomName: string) {
+    const room = this._rooms.get(roomName);
+    if (!room) {
+      throw new Error(`Room with name "${roomName}" could not be found!`);
+    }
+    return room.awareness;
+  }
+
+  setGlobalAwarenessField(field: string) {}
 
   executeTransaction(
     roomName: string,
@@ -98,11 +108,34 @@ export class CollaborationServiceProsumer
     this._initialValues.set(room, initialValue);
   }
 
-  getCollaborationValue(
+  createRoom(
+    roomName: string,
+    collaborationProvider: "yjs",
+    initialValue?: Record<string, unknown>
+  ) {
+    const room = new Room(
+      this._id,
+      roomName,
+      collaborationProvider,
+      initialValue
+    );
+    room.on("update", (events) => {
+      this.emit("update", roomName, events);
+    });
+    this._rooms.set(roomName, room);
+  }
+
+  getCollaborationValue<T extends CollaborationTypeName>(
     roomName: string,
     key: string,
-    type: CollaborationTypeName
+    type: T
   ) {
+    console.log(
+      "collaboration: getting collaboration value",
+      roomName,
+      key,
+      type
+    );
     const room = this._rooms.get(roomName);
     if (!room) {
       throw new Error(`Room with name "${roomName}" could not be found!`);
@@ -129,7 +162,7 @@ export class CollaborationServiceProsumer
     const messagingChannel = new CrossLabMessagingChannel(
       channel,
       collaborationProtocol,
-      "participant"
+      "prosumer"
     );
 
     if (!checkServiceConfiguration(serviceConfiguration)) {
@@ -156,6 +189,7 @@ export class CollaborationServiceProsumer
         if (!this._rooms.has(roomName)) {
           const initialValue = this._initialValues.get(roomName);
           const room = new Room(
+            this._id,
             roomName,
             "yjs",
             typeof initialValue === "function"
@@ -203,7 +237,7 @@ export class CollaborationServiceProsumer
   private _receiveInitializationRequest(
     messagingChannel: CrossLabMessagingChannel<
       typeof collaborationProtocol,
-      "participant"
+      "prosumer"
     >
   ): Promise<[string, Promise<void>]> {
     return new Promise<[string, Promise<void>]>((resolve, reject) => {
@@ -227,7 +261,7 @@ export class CollaborationServiceProsumer
   private async _receiveInitializationResponse(
     messagingChannel: CrossLabMessagingChannel<
       typeof collaborationProtocol,
-      "participant"
+      "prosumer"
     >
   ) {
     return new Promise<void>((resolve, reject) => {

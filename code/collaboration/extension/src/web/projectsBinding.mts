@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import path from "path";
 import {
+  Awareness,
   CollaborationObject,
   CollaborationServiceProsumer,
   CollaborationString,
@@ -13,50 +14,91 @@ import {
   FileWithoutName,
   isDirectoryWithoutName,
   isFileWithoutName,
+  isDirectory,
 } from "./types.mjs";
 import { Mutex } from "async-mutex";
+import { z } from "zod";
+
+const awarenessStateSchema = z.object({
+  selection: z.object({
+    path: z.string(),
+    anchor: z.object({ line: z.number(), character: z.number() }),
+    head: z.object({ line: z.number(), character: z.number() }),
+  }),
+});
+
+type AwarenessState = z.infer<typeof awarenessStateSchema>;
+
+function isAwarenessState(input: unknown): input is AwarenessState {
+  return awarenessStateSchema.safeParse(input).success;
+}
 
 export class ProjectsBinding {
   private _mutex: Mutex = new Mutex();
   private _sharedProjects: Set<vscode.Uri> = new Set();
-  private _fileSystemApi: {
-    getCurrentProject: () => vscode.Uri;
-    refreshProjectsView: () => void;
-    addProjectRootFolder: (title: string, uri: vscode.Uri) => void;
-    removeProjectRootFolder: (title: string) => void;
-  } = {
-    getCurrentProject: () => vscode.Uri.from({ scheme: "crosslabfs" }),
-    refreshProjectsView: () => undefined,
-    addProjectRootFolder: (title: string, uri: vscode.Uri) => undefined,
-    removeProjectRootFolder: (title: string) => undefined,
-  };
-
   private _remoteChanges: (
     | { index: number; insert: string }
     | { index: number; delete: number }
   )[] = [];
+  private _awareness: Awareness;
+  private _decorations: Map<string, vscode.TextEditorDecorationType[]> =
+    new Map();
 
   constructor(
-    private _collaborationServiceProsumer: CollaborationServiceProsumer
+    private _collaborationServiceProsumer: CollaborationServiceProsumer,
+    private _fileSystemApi: {
+      getCurrentProject: () => vscode.Uri;
+      refreshProjectsView: () => void;
+      addProjectRootFolder: (title: string, uri: vscode.Uri) => void;
+      removeProjectRootFolder: (title: string) => void;
+    }
   ) {
-    // check for required extensions and their apis
-    const fileSystemExtension = vscode.extensions.getExtension(
-      "crosslab.@crosslab-ide/crosslab-filesystem-extension"
+    this._collaborationServiceProsumer.on(
+      "new-participant",
+      (participantId) => {
+        const uri = vscode.Uri.from({
+          scheme: "crosslabfs",
+          path: `/shared/${participantId}`,
+        });
+        this._addFileSystemWatcher(uri);
+      }
     );
 
-    if (!fileSystemExtension) {
-      throw new Error(
-        "This extension requires the extension 'crosslab.@crosslab-ide/crosslab-filesystem-extension'!"
-      );
-    }
+    this._awareness =
+      this._collaborationServiceProsumer.getAwareness("projects");
 
-    if (fileSystemExtension.isActive) {
-      this._fileSystemApi = fileSystemExtension.exports;
-    } else {
-      fileSystemExtension.activate().then((exports) => {
-        this._fileSystemApi = exports;
+    this._awareness.setLocalState({});
+
+    vscode.window.onDidChangeTextEditorSelection((event) => {
+      console.log("collaboration: text editor selection changed", event);
+      const selection = event.textEditor.selection;
+      let anchor = selection.isReversed ? selection.end : selection.start;
+      let head = selection.isReversed ? selection.start : selection.end;
+
+      const projectUri = this._fileSystemApi.getCurrentProject();
+      this._awareness.setLocalStateField("selection", {
+        path: projectUri.path.startsWith("/projects/")
+          ? event.textEditor.document.uri.path.replace(
+              "/workspace/",
+              `/${this._collaborationServiceProsumer.id}/${projectUri.path
+                .split("/")
+                .at(2)}/`
+            )
+          : event.textEditor.document.uri.path.replace(
+              "/workspace/",
+              `/${projectUri.path.split("/").at(2)}/${projectUri.path
+                .split("/")
+                .at(3)}/`
+            ),
+        anchor: { line: anchor.line, character: anchor.character },
+        head: { line: head.line, character: head.character },
       });
-    }
+    }, this);
+
+    this._awareness.on("change", () => {
+      console.log("collaboration: rerendering decorations!");
+      this._rerenderDecorations();
+    });
 
     vscode.workspace.onDidChangeTextDocument(async (event) => {
       const changes = event.contentChanges.map((contentChange) => {
@@ -71,9 +113,10 @@ export class ProjectsBinding {
 
         return {
           index,
-          insert: contentChange.text,
+          insert: contentChange.text.replace(/\r\n/g, "\n"),
         };
       });
+
       console.log(
         "collaboration: text document changed",
         event,
@@ -84,24 +127,27 @@ export class ProjectsBinding {
       const remainingChanges: vscode.TextDocumentContentChangeEvent[] = [];
 
       for (const [index, change] of changes.entries()) {
-        const yjsChangeIndex = this._remoteChanges.findIndex(
-          (yjsChange) =>
-            change.index === yjsChange.index &&
-            ("delete" in yjsChange
-              ? change.delete === yjsChange.delete
-              : change.insert === yjsChange.insert)
+        const remoteChangeIndex = this._remoteChanges.findIndex(
+          (remoteChange) =>
+            change.index === remoteChange.index &&
+            ("delete" in remoteChange
+              ? change.delete === remoteChange.delete
+              : change.insert === remoteChange.insert)
         );
-        if (yjsChangeIndex >= 0) {
+        if (remoteChangeIndex >= 0) {
           console.log(
-            "collaboration: found yjsChange for change",
-            yjsChangeIndex,
+            "collaboration: found remoteChange for change",
+            remoteChangeIndex,
             change,
-            this._remoteChanges[yjsChangeIndex]
+            this._remoteChanges[remoteChangeIndex]
           );
 
-          this._remoteChanges.splice(yjsChangeIndex, 1);
+          this._remoteChanges.splice(remoteChangeIndex, 1);
 
-          console.log("collaboration: updated yjsChanges", this._remoteChanges);
+          console.log(
+            "collaboration: updated remoteChanges",
+            this._remoteChanges
+          );
         } else {
           remainingChanges.push(event.contentChanges[index]);
         }
@@ -213,23 +259,12 @@ export class ProjectsBinding {
   }
 
   private _getValue(key: string = this._collaborationServiceProsumer.id) {
-    const projectsCollaborationObject =
+    const collaborationObject =
       this._collaborationServiceProsumer.getCollaborationValue(
         "projects",
-        "projects",
+        key,
         "object"
       );
-
-    if (!(projectsCollaborationObject instanceof CollaborationObject)) {
-      throw new Error(`Expected projects to be a collaboration object!`);
-    }
-
-    console.log(
-      "collaboration: projects collaboration object",
-      projectsCollaborationObject
-    );
-
-    const collaborationObject = projectsCollaborationObject.get(key);
 
     if (!(collaborationObject instanceof CollaborationObject)) {
       throw new Error(
@@ -237,7 +272,97 @@ export class ProjectsBinding {
       );
     }
 
+    console.log("collaboration: collaboration object", collaborationObject);
+
     return collaborationObject;
+  }
+
+  private _rerenderDecorations() {
+    const states = this._awareness.getStates();
+    console.log("collaboration: rerendering", Array.from(states.entries()));
+
+    for (const decorations of this._decorations.values()) {
+      vscode.window.visibleTextEditors.forEach((textEditor) => {
+        textEditor.setDecorations(decorations[0], []);
+        textEditor.setDecorations(decorations[1], []);
+      });
+    }
+
+    states.forEach((state, id) => {
+      if (
+        id !== this._collaborationServiceProsumer.id &&
+        isAwarenessState(state)
+      ) {
+        for (const textEditor of vscode.window.visibleTextEditors) {
+          const splitPath = state.selection.path.split("/").slice(1);
+          const isLocalPath =
+            splitPath[0] === this._collaborationServiceProsumer.id;
+          // TODO: find better name
+          const translatedPath = isLocalPath
+            ? `/projects/${splitPath.slice(1).join("/")}`
+            : `/shared/${splitPath.join("/")}`;
+
+          const projectUri = this._fileSystemApi.getCurrentProject();
+          // TODO: find better nameyy
+          const adaptedPath = projectUri.path.startsWith("/projects/")
+            ? textEditor.document.uri.path.replace(
+                "/workspace/",
+                `/projects/${projectUri.path.split("/").at(2)}/`
+              )
+            : textEditor.document.uri.path.replace(
+                "/workspace/",
+                `/shared/${projectUri.path.split("/").at(2)}/${projectUri.path
+                  .split("/")
+                  .at(3)}/`
+              );
+
+          console.log(adaptedPath, translatedPath);
+          if (adaptedPath !== translatedPath) {
+            continue;
+          }
+
+          const start = new vscode.Position(
+            state.selection.anchor.line,
+            state.selection.anchor.character
+          );
+          const end = new vscode.Position(
+            state.selection.head.line,
+            state.selection.head.character
+          );
+          // const start = textEditor.document.positionAt(state.selection.anchor);
+          // const end = textEditor.document.positionAt(state.selection.head);
+
+          let decorations = this._decorations.get(id);
+          if (!decorations) {
+            const color =
+              "#" + Math.floor(Math.random() * 16777215).toString(16);
+            decorations = [
+              vscode.window.createTextEditorDecorationType({
+                border: `${color} solid 2px`,
+              }),
+              vscode.window.createTextEditorDecorationType({
+                after: {
+                  contentText: `- ${id}`,
+                  color,
+                  margin: "0.5rem",
+                },
+              }),
+            ];
+            this._decorations.set(id, decorations);
+          }
+
+          textEditor.setDecorations(decorations[0], [
+            new vscode.Range(start, end),
+          ]);
+          textEditor.setDecorations(decorations[1], [
+            new vscode.Range(
+              textEditor.document.lineAt(start.line).range.end,
+              textEditor.document.lineAt(start.line).range.end
+            ),
+          ]);
+        }
+      }
+    });
   }
 
   shareProject(projectUri: vscode.Uri) {
@@ -247,9 +372,12 @@ export class ProjectsBinding {
         `Cannot share "${projectUri.path}" since it is not a local project!`
       );
     }
+    this._addFileSystemWatcher(projectUri);
+  }
 
+  private _addFileSystemWatcher(uri: vscode.Uri) {
     const fileSystemWatcher = vscode.workspace.createFileSystemWatcher(
-      new vscode.RelativePattern(projectUri, "**/*")
+      new vscode.RelativePattern(uri, "**/*")
     );
 
     fileSystemWatcher.onDidChange((uri) =>
@@ -294,60 +422,54 @@ export class ProjectsBinding {
     // TODO: needed?
     console.log(
       "collaboration: handling event",
-      `/${event.path.join("/")}`,
+      event.path,
       event.target instanceof CollaborationObject,
       Array.from(
         (event as CollaborationUpdateEventType<"object">).changes.entries()
       )
     );
-    if (`/${event.path.join("/")}` === `/projects`) {
+
+    // get changed id
+    const id = event.path.at(0);
+
+    if (event.path.length === 1) {
       if (event.target instanceof CollaborationObject) {
         for (const [key, value] of (
           event as CollaborationUpdateEventType<"object">
         ).changes.entries()) {
-          const sharedProjectsUri = vscode.Uri.from({
+          const sharedProjectUri = vscode.Uri.from({
             scheme: "crosslabfs",
-            path: `/shared/${key}`,
+            path: `/shared/${id}/${key}`,
           });
           if (value.action === "add") {
-            const directory = {
-              type: "directory",
-              content: event.target.get(key)?.toJSON(),
-            };
+            const directory = event.target.get(key)?.toJSON();
             console.log(
               "collaboration: directory",
               directory,
-              isDirectoryWithoutName(directory)
+              isDirectoryWithoutName(directory) || isDirectory(directory)
             );
-            if (!isDirectoryWithoutName(directory)) {
+            if (!isDirectoryWithoutName(directory) && !isDirectory(directory)) {
               return;
             }
-            await this._createDirectory(sharedProjectsUri, directory);
-            this._fileSystemApi.addProjectRootFolder(
-              `Shared projects: ${key}`,
-              sharedProjectsUri
-            );
+            await this._createDirectory(sharedProjectUri, directory);
           } else if (value.action === "delete") {
-            await vscode.workspace.fs.delete(sharedProjectsUri, {
+            await vscode.workspace.fs.delete(sharedProjectUri, {
               recursive: true,
             });
-            this._fileSystemApi.removeProjectRootFolder(
-              `Shared projects: ${key}`
-            );
+            // this._fileSystemApi.removeProjectRootFolder(
+            //   `Shared projects: ${key}`
+            // );
           }
         }
       }
       return;
     }
 
-    // get changed id
-    const id = event.path.at(1);
-
     if (!id) {
       throw new Error(
         `Path "${`/${event.path.join(
           "/"
-        )}`}" is not formated as expected! (expected: "/projects/{id}/...")`
+        )}`}" is not formatted as expected! (expected: "/{id}/...")`
       );
     }
 
@@ -356,7 +478,7 @@ export class ProjectsBinding {
     }
 
     // check that path is valid
-    const eventPath = event.path.slice(2);
+    const eventPath = event.path.slice(1);
     const filteredEventPath = eventPath.filter(
       (pathSegment) => typeof pathSegment !== "number"
     );
@@ -467,6 +589,7 @@ export class ProjectsBinding {
             }
           });
         });
+        this._rerenderDecorations();
       } finally {
         release();
       }
@@ -485,7 +608,7 @@ export class ProjectsBinding {
       switch (change.action) {
         case "add":
           // get value for new entry
-          const newValue = event.target.get(key);
+          const newValue = event.target.get(key)?.toJSON();
           console.log("collaboration: new value", newValue);
 
           // ensure that new entry is either a file or a directory
@@ -617,9 +740,13 @@ export class ProjectsBinding {
   private async _handleFilesystemCreatedEvent(uri: vscode.Uri) {
     console.log("filesystem created-event:", uri);
 
-    const pathSegments = uri.path.replace("/projects/", "").split("/");
-    let value: unknown = this._getValue();
-    for (const pathSegment of pathSegments.slice(0, -1)) {
+    const pathSegments = uri.path.startsWith("/projects/")
+      ? uri.path
+          .replace("/projects/", `${this._collaborationServiceProsumer.id}/`)
+          .split("/")
+      : uri.path.replace("/shared/", "").split("/");
+    let value: unknown = this._getValue(pathSegments[0]);
+    for (const pathSegment of pathSegments.slice(1, -1)) {
       if (value instanceof CollaborationObject) {
         value = value.get(pathSegment);
         if (!(value instanceof CollaborationObject)) {
@@ -670,9 +797,13 @@ export class ProjectsBinding {
   private async _handleFilesystemDeletedEvent(uri: vscode.Uri) {
     console.log("filesystem deleted-event:", uri);
 
-    const pathSegments = uri.path.replace("/projects/", "").split("/");
-    let value: unknown = this._getValue();
-    for (const pathSegment of pathSegments.slice(0, -1)) {
+    const pathSegments = uri.path.startsWith("/projects/")
+      ? uri.path
+          .replace("/projects/", `${this._collaborationServiceProsumer.id}/`)
+          .split("/")
+      : uri.path.replace("/shared/", "").split("/");
+    let value: unknown = this._getValue(pathSegments[0]);
+    for (const pathSegment of pathSegments.slice(1, -1)) {
       if (value instanceof CollaborationObject) {
         value = value.get(pathSegment);
         if (!(value instanceof CollaborationObject)) {

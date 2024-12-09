@@ -9,6 +9,10 @@ export class ArduinoCliCompilationServer {
     });
 
     wss.on("connection", (ws) => {
+      const interval = setInterval(() => ws.ping(), 5000);
+      ws.on("close", () => {
+        clearInterval(interval);
+      });
       new ArduinoCliLanguageServerInstance(ws);
     });
 

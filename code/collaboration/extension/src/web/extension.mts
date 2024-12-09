@@ -1,15 +1,7 @@
 import * as vscode from "vscode";
 import { CollaborationViewProvider } from "./collaborationViewProvider.mjs";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
-import {
-  CollaborationArray,
-  CollaborationBoolean,
-  CollaborationNumber,
-  CollaborationObject,
-  CollaborationServiceProsumer,
-  CollaborationString,
-  CollaborationUpdateEventType,
-} from "@crosslab-ide/crosslab-collaboration-service";
+import { CollaborationServiceProsumer } from "@crosslab-ide/crosslab-collaboration-service";
 import { ProjectsBinding } from "./projectsBinding.mjs";
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -38,17 +30,37 @@ export async function activate(context: vscode.ExtensionContext) {
     "collaboration"
   );
 
-  const projectsBinding = new ProjectsBinding(collaborationServiceProsumer);
+  collaborationServiceProsumer.createRoom("projects", "yjs");
 
-  collaborationServiceProsumer.setInitialValue("projects", async () => {
-    const initialValue: Record<string, unknown> = {
-      projects: {
-        [collaborationServiceProsumer.id]:
-          await projectsBinding.getSharedProjects(),
-      },
-    };
-    return initialValue;
-  });
+  const projectsBinding = new ProjectsBinding(
+    collaborationServiceProsumer,
+    fileSystemApi
+  );
+
+  const sharedProjects = await projectsBinding.getSharedProjects();
+
+  for (const [key, value] of Object.entries(sharedProjects)) {
+    collaborationServiceProsumer
+      .getCollaborationValue(
+        "projects",
+        collaborationServiceProsumer.id,
+        "object"
+      )
+      .set(
+        key,
+        collaborationServiceProsumer.valueToCollaborationType("projects", value)
+      );
+  }
+
+  // collaborationServiceProsumer.setInitialValue("projects", async () => {
+  //   const initialValue: Record<string, unknown> = {
+  //     projects: {
+  //       [collaborationServiceProsumer.id]:
+  //         await projectsBinding.getSharedProjects(),
+  //     },
+  //   };
+  //   return initialValue;
+  // });
 
   collaborationServiceProsumer.on("update", (room, events) => {
     console.log("collaboration: update events", room, events);
@@ -63,17 +75,23 @@ export async function activate(context: vscode.ExtensionContext) {
     );
   });
 
-  // collaborationServiceProsumer.on("new-participant", async (participantId) => {
-  //   const sharedProjectsUri = vscode.Uri.from({
-  //     scheme: "crosslabfs",
-  //     path: `/shared/${participantId}`,
-  //   });
-  //   await vscode.workspace.fs.createDirectory(sharedProjectsUri);
-  //   fileSystemApi.addProjectRootFolder(
-  //     `Shared projects: ${participantId}`,
-  //     sharedProjectsUri
-  //   );
-  // });
+  collaborationServiceProsumer.on("new-participant", async (participantId) => {
+    console.log("collaboration: new participant", participantId);
+    collaborationServiceProsumer.getCollaborationValue(
+      "projects",
+      participantId,
+      "object"
+    );
+    const sharedProjectsUri = vscode.Uri.from({
+      scheme: "crosslabfs",
+      path: `/shared/${participantId}`,
+    });
+    await vscode.workspace.fs.createDirectory(sharedProjectsUri);
+    fileSystemApi.addProjectRootFolder(
+      `Shared projects: ${participantId}`,
+      sharedProjectsUri
+    );
+  });
 
   const collaborationViewProvider = new CollaborationViewProvider(
     context.extensionUri
@@ -91,6 +109,17 @@ export async function activate(context: vscode.ExtensionContext) {
       console.log("Adding collaboration services!");
       deviceHandler.addService(collaborationServiceProsumer);
       console.log("Successfully added collaboration services!");
+    },
+    createRoom(
+      name: string,
+      collaborationProvider: "yjs",
+      initialValue: Record<string, unknown>
+    ) {
+      collaborationServiceProsumer.createRoom(
+        name,
+        collaborationProvider,
+        initialValue
+      );
     },
   };
 }
