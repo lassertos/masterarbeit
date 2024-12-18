@@ -73,7 +73,9 @@ export class CollaborationServiceProsumer
     return room.awareness;
   }
 
-  setGlobalAwarenessField(field: string) {}
+  hasRoom(roomName: string) {
+    return this._rooms.has(roomName);
+  }
 
   executeTransaction(
     roomName: string,

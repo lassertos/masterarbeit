@@ -21,35 +21,8 @@ void setup()
 
 void loop()
 {
-    if (digitalRead(LimitXLeft) != HIGH)
-    {
-        digitalWrite(MotorXLeft, HIGH);
-        while (digitalRead(LimitXLeft) != HIGH)
-            ;
-        digitalWrite(MotorXLeft, LOW);
-    }
-
-    if (digitalRead(LimitYTop) != HIGH)
-    {
-        digitalWrite(MotorYTop, HIGH);
-        while (digitalRead(LimitYTop) != HIGH)
-            ;
-        digitalWrite(MotorYTop, LOW);
-    }
-
-    if (digitalRead(LimitXRight) != HIGH)
-    {
-        digitalWrite(MotorXRight, HIGH);
-        while (digitalRead(LimitXRight) != HIGH)
-            ;
-        digitalWrite(MotorXRight, LOW);
-    }
-
-    if (digitalRead(LimitYBottom) != HIGH)
-    {
-        digitalWrite(MotorYBottom, HIGH);
-        while (digitalRead(LimitYBottom) != HIGH)
-            ;
-        digitalWrite(MotorYBottom, LOW);
-    }
+    driveLeft(LimitXLeft, MotorXLeft);
+    driveTop(LimitYTop, MotorYTop);
+    driveRight(LimitXRight, MotorXRight);
+    driveBottom(LimitYBottom, MotorYBottom);
 }

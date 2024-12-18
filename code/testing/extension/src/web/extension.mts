@@ -1,21 +1,70 @@
+import { CollaborationServiceProsumer } from "@crosslab-ide/crosslab-collaboration-service";
 import {
   isTest,
   TestingServiceConsumer,
-  testSchema,
   TestWithId,
 } from "@crosslab-ide/crosslab-testing-service";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
 import * as vscode from "vscode";
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   console.log(
     'Congratulations, your extension "crosslab-testing-extension" is now active in the web extension host!'
   );
+
+  // check for collaboration extension
+  const collaborationExtension = vscode.extensions.all.find(
+    (extension) =>
+      extension.id === "crosslab.@crosslab-ide/crosslab-collaboration-extension"
+  );
+  const collaborationApi = collaborationExtension?.isActive
+    ? collaborationExtension?.exports
+    : await collaborationExtension?.activate();
+  const collaborationServiceProsumer = collaborationApi?.getProsumer() as
+    | CollaborationServiceProsumer
+    | undefined;
+  if (!collaborationServiceProsumer?.hasRoom("status")) {
+    collaborationServiceProsumer?.createRoom("status", "yjs");
+  }
+  const awareness = collaborationServiceProsumer?.getAwareness("status");
+  awareness?.setLocalState({
+    ...awareness.getLocalState(),
+    isTesting: false,
+  });
 
   const testController = vscode.tests.createTestController(
     "crosslab-tests",
     "CrossLab Tests"
   );
+
+  function canRunTests() {
+    const states = awareness?.getStates();
+    let canRunTests = true;
+    for (const [_id, state] of states ?? []) {
+      canRunTests &&= !state.isDebugging;
+      canRunTests &&= !state.isCompiling;
+      canRunTests &&= !state.isTesting;
+    }
+    return canRunTests;
+  }
+
+  awareness?.on("change", async (_changes, origin) => {
+    console.log(
+      "status-update (testing):",
+      _changes,
+      origin,
+      Array.from(awareness.getStates().entries())
+    );
+    if (origin === "local") {
+      return;
+    }
+
+    await vscode.commands.executeCommand(
+      "setContext",
+      "crosslab.isTesting",
+      !canRunTests()
+    );
+  });
 
   const testingServiceConsumer = new TestingServiceConsumer(
     "testing-extension:testing"
@@ -40,8 +89,32 @@ export function activate(context: vscode.ExtensionContext) {
     "Run",
     vscode.TestRunProfileKind.Run,
     async (request, token) => {
-      testingServiceConsumer.startTesting();
+      if (!canRunTests()) {
+        const testRun = testController.createTestRun(request);
+        testRun.appendOutput(
+          "Cannot start test-run while compiling, debugging or testing!"
+        );
+        testRun.end();
+        return;
+      }
+      awareness?.setLocalStateField("isTesting", true);
+      await vscode.commands.executeCommand(
+        "setContext",
+        "crosslab.isTesting",
+        true
+      );
+      await testingServiceConsumer.startTesting();
       const testRun = testController.createTestRun(request);
+      testRun.token.onCancellationRequested(async () => {
+        testRun.end();
+        await testingServiceConsumer.endTesting();
+        await vscode.commands.executeCommand(
+          "setContext",
+          "crosslab.isTesting",
+          false
+        );
+        awareness?.setLocalStateField("isTesting", false);
+      });
       const queue: vscode.TestItem[] = [];
 
       if (request.include) {
@@ -75,20 +148,15 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       testRun.end();
-      testingServiceConsumer.endTesting();
-    }
-  );
-
-  const disposable = vscode.commands.registerCommand(
-    "crosslab-testing-extension.helloWorld",
-    () => {
-      vscode.window.showInformationMessage(
-        "Hello World from crosslab-testing-extension in a web extension host!"
+      await testingServiceConsumer.endTesting();
+      await vscode.commands.executeCommand(
+        "setContext",
+        "crosslab.isTesting",
+        false
       );
+      awareness?.setLocalStateField("isTesting", false);
     }
   );
-
-  context.subscriptions.push(disposable);
 
   return {
     addServices(deviceHandler: DeviceHandler) {

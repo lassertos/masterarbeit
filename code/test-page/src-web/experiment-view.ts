@@ -21,8 +21,9 @@ export class ExperimentView extends LitElement {
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 100%;
-      height: 100%;
+      background-color: white;
+      width: 100vw;
+      height: 100vh;
     }
     #container {
       display: flex;

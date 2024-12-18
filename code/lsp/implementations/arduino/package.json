@@ -4,6 +4,8 @@
   "description": "An arduino-cli language server.",
   "main": "dist/index.mjs",
   "dependencies": {
+    "@crosslab-ide/crosslab-lsp-service": "file:../../service",
+    "@crosslab-ide/soa-client": "file:../../../shared/soa-client-js",
     "express": "^4.21.1",
     "queue": "^7.0.0",
     "tiny-typed-emitter": "^2.1.0",

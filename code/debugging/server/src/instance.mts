@@ -1,15 +1,19 @@
 import { CompilationService__Consumer } from "@crosslab-ide/crosslab-compilation-service";
-import { DebuggingAdapterServiceProducer } from "@crosslab-ide/crosslab-debugging-adapter-service";
+import {
+  DebuggingAdapterServiceProducer,
+  isDebugAdapterProtocolType,
+} from "@crosslab-ide/crosslab-debugging-adapter-service";
 import { DebuggingTargetServiceConsumer } from "@crosslab-ide/crosslab-debugging-target-service";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
-import { resultFormats } from "./types.mjs";
+import { resultFormats, Session } from "./types.mjs";
 import { Directory } from "@crosslab-ide/crosslab-debugging-adapter-service";
 import fs from "fs/promises";
 import path from "path";
-import { ChildProcessWithoutNullStreams, spawn } from "child_process";
+import { spawn } from "child_process";
 import net from "net";
 import { MessagingServiceProsumer } from "@crosslab-ide/messaging-service";
 import { randomUUID } from "crypto";
+import { DebugAdapterProtocolHandler } from "./debugAdapterProtocolHandler.mjs";
 
 export class GdbDebuggingInstance {
   private _deviceHandler: DeviceHandler;
@@ -21,21 +25,9 @@ export class GdbDebuggingInstance {
   private _messagingService: MessagingServiceProsumer;
   private _instanceUrl: string;
   private _deviceToken: string;
-  private _sessions: Map<
-    string,
-    {
-      paths: {
-        tmpDir: string;
-        srcDir: string;
-        projectDir: string;
-        elfDir: string;
-        elfFile: string;
-      };
-      gdbProcess: ChildProcessWithoutNullStreams;
-      buffer: string;
-    }
-  > = new Map();
-  private _messageBuffers: Map<string, string[]> = new Map();
+  private _sessions: Map<string, Session> = new Map();
+  // private _messageBuffers: Map<string, DebugAdapterProtocol.ProtocolMessage[]> =
+  //   new Map();
 
   constructor(instanceUrl: string, deviceToken: string) {
     this._instanceUrl = instanceUrl;
@@ -62,21 +54,24 @@ export class GdbDebuggingInstance {
       "dap-message",
       async (sessionId, message) => {
         const session = this._sessions.get(sessionId);
-        const messageBuffer = this._messageBuffers.get(sessionId);
+        // const messageBuffer = this._messageBuffers.get(sessionId);
 
         if (!session) {
           console.error(`Could not find session with id "${sessionId}"`);
-          if (messageBuffer) {
-            messageBuffer?.push(JSON.stringify(message));
-          } else {
-            console.error(
-              `Could not find message buffer with id "${sessionId}"`
-            );
-          }
+          // if (messageBuffer) {
+          //   messageBuffer?.push(message);
+          // } else {
+          //   console.error(
+          //     `Could not find message buffer with id "${sessionId}"`
+          //   );
+          // }
           return;
         }
 
-        await this._receiveMessage(sessionId, JSON.stringify(message));
+        session.debugAdapterProtocolHandler.handleIncomingMessage(
+          sessionId,
+          message
+        );
       }
     );
 
@@ -88,10 +83,10 @@ export class GdbDebuggingInstance {
 
     this._debuggingAdapterServiceProducer.on(
       "new-session",
-      async (requestId, sessionInfo) => {
+      async (consumerId, requestId, sessionInfo) => {
         const sessionId = randomUUID();
 
-        this._messageBuffers.set(sessionId, []);
+        // this._messageBuffers.set(sessionId, []);
         const compilationResult =
           await this._compilationServiceConsumer.compile(
             await producerId,
@@ -111,6 +106,8 @@ export class GdbDebuggingInstance {
           );
         }
 
+        const compiledProgram = compilationResult.result.content;
+
         // create temporary directory for the debug session
         const tmpDirPath = await fs.mkdtemp("/tmp/debug-session-");
         const srcDirPath = path.join(tmpDirPath, "sources");
@@ -127,12 +124,21 @@ export class GdbDebuggingInstance {
           elfDirPath,
           compilationResult.result.name
         );
-        await fs.writeFile(elfFilePath, compilationResult.result.content);
+        await fs.writeFile(elfFilePath, compiledProgram);
 
         const server = net.createServer((socket) => {
+          socket.on("error", (error) => {
+            console.error(error);
+          });
           this._messagingService.on("message", (message) => {
-            if (message.content instanceof Uint8Array) {
-              socket.write(message.content);
+            if (
+              message.content instanceof Uint8Array &&
+              (socket.readyState === "open" ||
+                socket.readyState === "writeOnly")
+            ) {
+              socket.write(message.content, (error) => {
+                console.error(error);
+              });
             }
           });
           socket.on("data", async (data) => {
@@ -148,35 +154,60 @@ export class GdbDebuggingInstance {
           server.listen(unixSocketPath, resolve)
         );
 
-        // start gdb session with new src directory and dap interface
-        const gdbProcess = spawn(
-          "avr-gdb",
-          ["--interpreter=dap", elfFilePath],
-          {
-            cwd: srcDirPath,
-          }
+        const gdbProcess = this._startGdb(sessionId, srcDirPath, elfFilePath);
+
+        const configuration = {
+          sessionId,
+          target: unixSocketPath,
+          program: elfFilePath,
+        };
+
+        const debugAdapterProtocolHandler = new DebugAdapterProtocolHandler(
+          sessionId,
+          consumerId
         );
-        gdbProcess.on("exit", (code) => {
-          console.log(`gdb process exited with code ${code}`);
-          this._debuggingTargetServiceConsumer.endDebugging();
-          if (code !== 0) {
-            // TODO: handle crashed server
+
+        debugAdapterProtocolHandler.on("incoming-message", async (message) => {
+          const session = this._sessions.get(sessionId);
+
+          if (!session) {
+            console.error(`Could not find session with id "${sessionId}"!`);
+            return;
           }
-        });
-        gdbProcess.stdout.setEncoding("utf-8");
-        gdbProcess.stderr.setEncoding("utf-8");
 
-        gdbProcess.stdout.on("data", (data) => {
-          console.log(`stdout: ${data}`);
-          this._addToBuffer(sessionId, data);
+          const updatedMessage = JSON.parse(
+            JSON.stringify(message)
+              .replaceAll("crosslabfs:/workspace", session.paths.projectDir)
+              .replaceAll("crosslab-remote:", "")
+          );
+
+          const stringifiedMessage = JSON.stringify(updatedMessage);
+          const encodedMessage = new TextEncoder().encode(stringifiedMessage);
+
+          await new Promise<void>((resolve) => {
+            if (
+              !session.gdbProcess.stdin.write(
+                `Content-Length: ${encodedMessage.length}\r\n\r\n${stringifiedMessage}`
+              )
+            ) {
+              session.gdbProcess.stdin.once("drain", resolve);
+            } else {
+              process.nextTick(resolve);
+            }
+          });
         });
 
-        gdbProcess.stderr.on("data", (data) => {
-          console.log(`stderr: ${data}`);
-        });
-
-        await this._debuggingTargetServiceConsumer.startDebugging(
-          compilationResult.result.content
+        debugAdapterProtocolHandler.on(
+          "outgoing-message",
+          async (sessionId, consumerId, message) => {
+            await this._debuggingAdapterServiceProducer.send(consumerId, {
+              type: "message:dap",
+              content: {
+                sessionId,
+                message,
+              },
+            });
+          }
         );
 
         this._sessions.set(sessionId, {
@@ -189,26 +220,88 @@ export class GdbDebuggingInstance {
           },
           gdbProcess,
           buffer: "",
+          configuration,
+          debugAdapterProtocolHandler,
         });
 
-        for (const message of this._messageBuffers.get(sessionId) ?? []) {
-          await this._receiveMessage(sessionId, message);
-        }
+        debugAdapterProtocolHandler.on("restart", async (message) => {
+          const session = this._sessions.get(sessionId);
+          if (!session) {
+            console.error(`Could not find session with id "${sessionId}"!`);
+            return;
+          }
+          session.buffer = "";
+          session.gdbProcess = this._startGdb(
+            sessionId,
+            srcDirPath,
+            elfFilePath
+          );
+          await this._debuggingTargetServiceConsumer.endDebugging();
+          await this._debuggingTargetServiceConsumer.startDebugging(
+            compiledProgram
+          );
+          await this._debuggingAdapterServiceProducer.send(consumerId, {
+            type: "message:dap",
+            content: {
+              sessionId,
+              message,
+            },
+          });
+        });
 
-        this._messageBuffers.delete(sessionId);
+        await this._debuggingTargetServiceConsumer.startDebugging(
+          compiledProgram
+        );
 
-        await this._debuggingAdapterServiceProducer.send({
+        // for (const message of this._messageBuffers.get(sessionId) ?? []) {
+        //   debugAdapterProtocolHandler.handleIncomingMessage(sessionId, message);
+        // }
+
+        // this._messageBuffers.delete(sessionId);
+
+        await this._debuggingAdapterServiceProducer.send(consumerId, {
           type: "session:start:response",
           content: {
             requestId,
             success: true,
             message: "GDB debugging session started successfully!",
             sessionId,
-            configuration: {
-              sessionId,
-              target: unixSocketPath,
-              program: elfFilePath,
+            configuration,
+          },
+        });
+      }
+    );
+
+    this._debuggingAdapterServiceProducer.on(
+      "join-session",
+      async (consumerId, requestId, sessionId) => {
+        const session = this._sessions.get(sessionId);
+
+        if (!session) {
+          return await this._debuggingAdapterServiceProducer.send(consumerId, {
+            type: "session:join:response",
+            content: {
+              requestId,
+              success: false,
+              message: `Could not find session with id "${sessionId}"!`,
             },
+          });
+        }
+
+        const subSessionId = randomUUID();
+        session.debugAdapterProtocolHandler.addSubSession(
+          subSessionId,
+          consumerId
+        );
+
+        this._sessions.set(subSessionId, session);
+
+        return await this._debuggingAdapterServiceProducer.send(consumerId, {
+          type: "session:join:response",
+          content: {
+            requestId,
+            success: true,
+            sessionId: subSessionId,
           },
         });
       }
@@ -235,6 +328,38 @@ export class GdbDebuggingInstance {
     });
   }
 
+  private _startGdb(
+    sessionId: string,
+    srcDirPath: string,
+    elfFilePath: string
+  ) {
+    // start gdb session with new src directory and dap interface
+    const gdbProcess = spawn("avr-gdb", ["--interpreter=dap", elfFilePath], {
+      cwd: srcDirPath,
+    });
+
+    gdbProcess.on("exit", (code) => {
+      console.log(`gdb process exited with code ${code}`);
+      this._debuggingTargetServiceConsumer.endDebugging();
+      if (code !== 0) {
+        // TODO: handle crashed server
+      }
+    });
+    gdbProcess.stdout.setEncoding("utf-8");
+    gdbProcess.stderr.setEncoding("utf-8");
+
+    gdbProcess.stdout.on("data", async (data) => {
+      console.log(`stdout: ${data}`);
+      this._addToBuffer(sessionId, data);
+    });
+
+    gdbProcess.stderr.on("data", (data) => {
+      console.log(`stderr: ${data}`);
+    });
+
+    return gdbProcess;
+  }
+
   private async _recreateDirectory(directory: Directory, currentPath: string) {
     const directoryPath = path.join(currentPath, directory.name);
     await fs.mkdir(directoryPath);
@@ -258,7 +383,7 @@ export class GdbDebuggingInstance {
     const session = this._sessions.get(sessionId);
 
     if (!session) {
-      console.error(`Could not find session with id "${sessionId}"`);
+      console.error(`Could not find session with id "${sessionId}"!`);
       return;
     }
 
@@ -270,7 +395,7 @@ export class GdbDebuggingInstance {
     const session = this._sessions.get(sessionId);
 
     if (!session) {
-      console.error(`Could not find session with id "${sessionId}"`);
+      console.error(`Could not find session with id "${sessionId}"!`);
       return;
     }
 
@@ -295,48 +420,18 @@ export class GdbDebuggingInstance {
           .replaceAll(session.paths.projectDir, "crosslabfs:/workspace")
       );
 
-      this._debuggingAdapterServiceProducer.send({
-        type: "message:dap",
-        content: { sessionId, message },
-      });
+      if (!isDebugAdapterProtocolType("ProtocolMessage", message)) {
+        throw new Error(
+          `Outgoing message is not a valid debug adapter protocol message!`
+        );
+      }
+
+      session.debugAdapterProtocolHandler.handleOutgoingMessage(message);
     } catch (error) {
       console.error(error);
     }
 
     session.buffer = new TextDecoder().decode(byteArray.slice(contentLength));
     this._checkBuffer(sessionId);
-  }
-
-  private async _receiveMessage(sessionId: string, message: string) {
-    const session = this._sessions.get(sessionId);
-
-    if (!session) {
-      console.error(`Could not find session with id "${sessionId}"`);
-      return;
-    }
-
-    const updatedMessage = message.replaceAll(
-      "crosslabfs:/workspace",
-      session.paths.projectDir
-    );
-
-    console.log(
-      `receiving message for session "${sessionId}":`,
-      updatedMessage
-    );
-
-    const encodedMessage = new TextEncoder().encode(updatedMessage);
-
-    return new Promise<void>((resolve) => {
-      if (
-        !session.gdbProcess.stdin.write(
-          `Content-Length: ${encodedMessage.length}\r\n\r\n${updatedMessage}`
-        )
-      ) {
-        session.gdbProcess.stdin.once("drain", resolve);
-      } else {
-        process.nextTick(resolve);
-      }
-    });
   }
 }

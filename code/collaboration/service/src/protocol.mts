@@ -17,13 +17,16 @@ export const collaborationProtocol = {
     "collaboration:initialization:response": z.undefined(),
     // "collaboration:awareness:request": z.undefined(),
     // "collaboration:awareness:response": z.unknown(),
-    "collaboration:awareness:update": z.record(
-      z.object({
-        clock: z.number(),
-        lastUpdated: z.number(),
-        state: z.union([z.record(z.unknown()), z.null()]),
-      })
-    ),
+    "collaboration:awareness:update": z.object({
+      room: z.string(),
+      states: z.record(
+        z.object({
+          clock: z.number(),
+          lastUpdated: z.number(),
+          state: z.union([z.record(z.unknown()), z.null()]),
+        })
+      ),
+    }),
     "collaboration:message": z.object({
       room: z.string(),
       type: z.string(),

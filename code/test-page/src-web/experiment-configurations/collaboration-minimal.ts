@@ -21,7 +21,7 @@ export default (deviceUrls: {
         {
           serviceType: "https://api.goldi-labs.de/serviceTypes/collaboration",
           configuration: {
-            rooms: ["projects"],
+            rooms: ["projects", "status"],
           },
           participants: [
             {

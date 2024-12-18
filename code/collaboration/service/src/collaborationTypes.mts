@@ -258,50 +258,112 @@ interface CollaborationProviderEvents {
     changes: { added: string[]; updated: string[]; removed: string[] },
     origin: any
   ) => void;
-  "awareness-update-message": (
-    message: ProtocolMessage<
-      typeof collaborationProtocol,
-      "collaboration:awareness:update"
-    >,
-    origin: unknown
-  ) => void;
 }
 
 export abstract class CollaborationProvider extends TypedEmitter<CollaborationProviderEvents> {
   protected _awarenessProvider: AwarenessProvider;
+  protected _knownProperties: Set<string> = new Set();
 
-  constructor(id: string) {
+  constructor(
+    awarenessProvider: AwarenessProvider,
+    initialValue: Record<string, unknown>
+  ) {
     super();
 
-    this._awarenessProvider = new AwarenessProvider(id);
-    this._awarenessProvider.on("update", (_changes, origin) => {
-      this.emit(
-        "awareness-update-message",
-        {
-          type: "collaboration:awareness:update",
-          content: this._awarenessProvider.encodeStates(),
-        },
-        origin
-      );
-    });
+    this._awarenessProvider = awarenessProvider;
+    this._initialize(initialValue);
   }
 
-  get awareness(): Awareness {
-    return {
-      getLocalState: this._awarenessProvider.getLocalState.bind(
-        this._awarenessProvider
-      ),
-      getStates: this._awarenessProvider.getStates.bind(
-        this._awarenessProvider
-      ),
-      setLocalState: this._awarenessProvider.setLocalState.bind(
-        this._awarenessProvider
-      ),
-      setLocalStateField: this._awarenessProvider.setLocalStateField.bind(
-        this._awarenessProvider
-      ),
-      on: this._awarenessProvider.on.bind(this._awarenessProvider),
-    };
+  private _initialize(initialValue: Record<string, unknown>) {
+    for (const [key, value] of Object.entries(initialValue)) {
+      this._knownProperties.add(key);
+      console.log("collaboration: current entry", key, value);
+      if (
+        typeof value === "undefined" ||
+        typeof value === "function" ||
+        typeof value === "symbol"
+      ) {
+        throw new Error(
+          `Cannot initialize property "${key}" with type "${typeof value}"!`
+        );
+      }
+
+      if (Array.isArray(value)) {
+        const array = this.get(key, "array");
+        const items = value.map((item) => this.valueToCollaborationType(item));
+        array.push(...items);
+        console.log(
+          "collaboration: initialized as array",
+          key,
+          value,
+          array.toJSON()
+        );
+        continue;
+      }
+
+      if (typeof value === "object") {
+        if (value === null) {
+          this.get(key, "null");
+          continue;
+        }
+        const object = this.get(key, "object");
+        for (const [key, val] of Object.entries(value)) {
+          console.log("collaboration: current entry", key, val);
+          object.set(key, this.valueToCollaborationType(val));
+        }
+        console.log(
+          "collaboration: initialized as object",
+          key,
+          value,
+          object.toJSON()
+        );
+        continue;
+      }
+
+      switch (typeof value) {
+        case "number": {
+          const number = this.get(key, "number");
+          number.set(value);
+          console.log(
+            "collaboration: initialized as number",
+            key,
+            value,
+            number.toJSON()
+          );
+          continue;
+        }
+        case "string": {
+          const string = this.get(key, "string");
+          string.set(value);
+          console.log(
+            "collaboration: initialized as string",
+            key,
+            value,
+            string.toJSON()
+          );
+          continue;
+        }
+        case "boolean": {
+          const boolean = this.get(key, "boolean");
+          boolean.set(value);
+          console.log(
+            "collaboration: initialized as boolean",
+            key,
+            value,
+            boolean.toJSON()
+          );
+          continue;
+        }
+      }
+    }
+
+    this._awarenessProvider.on("change", (changes, origin) => {
+      this.emit("awareness-change", changes, origin);
+    });
+
+    this._awarenessProvider.on("update", (changes, origin) => {
+      this.emit("awareness-update", changes, origin);
+    });
   }
 
   abstract handleCollaborationMessage(
@@ -361,7 +423,7 @@ interface CollaborationArrayEvents {
 export abstract class CollaborationArray extends TypedEmitter<CollaborationArrayEvents> {
   readonly type = "array";
 
-  abstract push(item: CollaborationType): void;
+  abstract push(...items: CollaborationType[]): void;
   abstract get(index: number): CollaborationType | undefined;
   abstract delete(index: number, length?: number): void;
   abstract toJSON(): Array<unknown>;

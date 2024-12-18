@@ -26,6 +26,12 @@ export default async () => {
       codeUrl: configuration.codeEditorUrl,
       services: [
         {
+          serviceDirection: "consumer",
+          serviceId: "lsp-extension:lsp",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/lsp",
+          supportedConnectionTypes: ["websocket", "local"],
+        },
+        {
           serviceDirection: "prosumer",
           serviceId: "collaboration",
           serviceType: "https://api.goldi-labs.de/serviceTypes/collaboration",

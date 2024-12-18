@@ -129,8 +129,8 @@ services:
       - service-network
   language-server:
     image: arduino-language-server:latest
-    ports:
-      - 3025:3025
+    environment:
+      - WEBSOCKET_ENDPOINT=http://gateway:80/devices/websocket
     networks:
       - service-network
     restart: on-failure

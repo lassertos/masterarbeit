@@ -148,6 +148,20 @@ export class ProjectsBinding {
     });
 
     vscode.workspace.onDidChangeTextDocument(async (event) => {
+      if (
+        !this._fileSystemProvider.currentProjectUri ||
+        !(
+          this._fileSystemWatchers.has(
+            this._fileSystemProvider.currentProjectUri.path
+          ) ||
+          this._fileSystemWatchers.has(
+            path.dirname(this._fileSystemProvider.currentProjectUri.path)
+          )
+        )
+      ) {
+        return;
+      }
+
       const changes = event.contentChanges.map((contentChange) => {
         const index = contentChange.rangeOffset;
 
@@ -160,7 +174,7 @@ export class ProjectsBinding {
 
         return {
           index,
-          insert: contentChange.text.replace(/\r\n/g, "\n"),
+          insert: contentChange.text,
         };
       });
 

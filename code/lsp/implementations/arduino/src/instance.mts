@@ -1,169 +1,401 @@
-import {
-  ChildProcessWithoutNullStreams,
-  exec,
-  execSync,
-  spawn,
-} from "child_process";
-import { WebSocket } from "ws";
+import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import fs from "fs";
-import path from "path";
-import { TypedEmitter } from "tiny-typed-emitter";
 import Queue from "queue";
+import { DeviceHandler } from "@crosslab-ide/soa-client";
+import { LanguageServerProducer } from "@crosslab-ide/crosslab-lsp-service";
+import { configuration } from "./configuration.mjs";
+import path from "path";
 
-type LSPEvents = {
-  "rebuild:begin": () => void;
-  "rebuild:end": () => void;
-};
-
-type DataMessage = {
-  type: "data";
-  data: string;
+type InstanceData = {
+  buffer: string;
+  arduinoLanguageServerProcess?: ChildProcessWithoutNullStreams;
+  srcPath?: string;
+  rootPath?: string;
+  tmpDirPath?: string;
+  buildPath?: string;
+  buildSketchRootPath?: string;
+  fullBuildPath?: string;
+  logPath: string;
+  queue: Queue;
+  openedDocuments: Set<string>;
 };
 
 export class ArduinoCliLanguageServerInstance {
-  private _webSocket: WebSocket;
-  private _buffer: string = "";
-  private _arduinoLanguageServerProcess?: ChildProcessWithoutNullStreams;
-  private _srcPath?: string;
-  private _rootPath?: string;
-  private _tmpDirPath?: string;
-  private _buildPath?: string;
-  private _buildSketchRootPath?: string;
-  private _fullBuildPath?: string;
-  private _tmpPath: string;
-  private _emitter = new TypedEmitter<LSPEvents>();
-  private _promises: Record<keyof LSPEvents, (() => void)[]> = {
-    "rebuild:begin": [],
-    "rebuild:end": [],
-  };
-  private _queue: Queue = new Queue({
-    concurrency: 1,
-    autostart: true,
-  });
+  private _deviceHandler: DeviceHandler;
+  private _languageServerProducer: LanguageServerProducer;
+  private _instanceUrl: string;
+  private _deviceToken: string;
+  private _consumers: Map<string, InstanceData> = new Map();
 
-  constructor(webSocket: WebSocket) {
-    this._webSocket = webSocket;
-    this._tmpPath = fs.mkdtempSync("/tmp/arduino");
-    for (const event of this._emitter.eventNames()) {
-      this._emitter.on(event, () => {
-        for (const resolve of this._promises[event]) {
-          resolve();
-        }
-        this._promises[event] = [];
+  constructor(instanceUrl: string, deviceToken: string) {
+    this._instanceUrl = instanceUrl;
+    this._deviceToken = deviceToken;
+
+    this._deviceHandler = new DeviceHandler();
+
+    this._languageServerProducer = new LanguageServerProducer("lsp");
+
+    this._languageServerProducer.on("new-consumer", async (consumerId) => {
+      this._consumers.set(consumerId, {
+        buffer: "",
+        logPath: fs.mkdtempSync("/tmp/arduino"),
+        queue: new Queue({
+          concurrency: 1,
+          autostart: true,
+        }),
+        openedDocuments: new Set(),
       });
-    }
-    this._startLanguageServer();
+    });
+
+    this._languageServerProducer.on("message", async (consumerId, message) => {
+      const consumerInstanceData = this._consumers.get(consumerId);
+
+      if (!consumerInstanceData) {
+        console.error(
+          `Could not find instance data for consumer with id "${consumerId}"!`
+        );
+        return;
+      }
+
+      if (message.type === "lsp:initialization:request") {
+        if (
+          consumerInstanceData.arduinoLanguageServerProcess &&
+          typeof consumerInstanceData.arduinoLanguageServerProcess.exitCode !==
+            "number"
+        ) {
+          consumerInstanceData.arduinoLanguageServerProcess.once("exit", () => {
+            consumerInstanceData.tmpDirPath = undefined;
+            consumerInstanceData.srcPath = undefined;
+            consumerInstanceData.rootPath = undefined;
+            consumerInstanceData.buildPath = undefined;
+            consumerInstanceData.fullBuildPath = undefined;
+            consumerInstanceData.buildSketchRootPath = undefined;
+            this._startLanguageServer(consumerId);
+          });
+          return;
+        }
+        this._startLanguageServer(consumerId);
+      } else if (message.type === "lsp:message") {
+        const parsedMessage = JSON.parse(message.content);
+        if (parsedMessage.method === "initialize") {
+          consumerInstanceData.rootPath = parsedMessage.params.rootUri.replace(
+            "file://",
+            ""
+          ) as string;
+          const sketchPath = path.join(
+            consumerInstanceData.rootPath,
+            `${path.basename(consumerInstanceData.rootPath)}.ino`
+          );
+          if (!fs.existsSync(consumerInstanceData.rootPath)) {
+            fs.mkdirSync(consumerInstanceData.rootPath, { recursive: true });
+          }
+          if (!fs.existsSync(sketchPath)) {
+            fs.writeFileSync(sketchPath, "");
+          }
+        }
+        return consumerInstanceData.queue.push(async () => {
+          await this._receiveMessage(consumerId, message.content, false);
+        });
+      } else if (message.type === "lsp:filesystem:write-file:request") {
+        if (
+          !message.content.path.startsWith(consumerInstanceData.srcPath + "/")
+        ) {
+          return await this._languageServerProducer.send(consumerId, {
+            type: "lsp:filesystem:write-file:response",
+            content: {
+              requestId: message.content.requestId,
+              success: false,
+            },
+          });
+        }
+        fs.writeFileSync(message.content.path, message.content.content);
+        await this._receiveMessage(
+          consumerId,
+          JSON.stringify({
+            jsonrpc: "2.0",
+            method: "textDocument/didOpen",
+            params: {
+              textDocument: {
+                uri: `file://${message.content.path}`,
+                languageId: "cpp",
+                version: 1,
+                text: message.content.content,
+              },
+            },
+          }),
+          true
+        );
+        await this._receiveMessage(
+          consumerId,
+          JSON.stringify({
+            jsonrpc: "2.0",
+            method: "textDocument/didSave",
+            params: {
+              textDocument: {
+                uri: `file://${message.content.path}`,
+              },
+              text: message.content.content,
+            },
+          }),
+          true
+        );
+        await this._languageServerProducer.send(consumerId, {
+          type: "lsp:filesystem:write-file:response",
+          content: {
+            requestId: message.content.requestId,
+            success: true,
+          },
+        });
+      } else if (message.type === "lsp:filesystem:create-directory:request") {
+        if (
+          !message.content.path.startsWith(consumerInstanceData.srcPath + "/")
+        ) {
+          return await this._languageServerProducer.send(consumerId, {
+            type: "lsp:filesystem:create-directory:response",
+            content: {
+              requestId: message.content.requestId,
+              success: false,
+            },
+          });
+        }
+        if (!fs.existsSync(message.content.path)) {
+          fs.mkdirSync(message.content.path);
+        }
+        await this._languageServerProducer.send(consumerId, {
+          type: "lsp:filesystem:create-directory:response",
+          content: {
+            requestId: message.content.requestId,
+            success: true,
+          },
+        });
+      } else if (message.type === "lsp:filesystem:delete:request") {
+        if (
+          !message.content.path.startsWith(consumerInstanceData.srcPath + "/")
+        ) {
+          return await this._languageServerProducer.send(consumerId, {
+            type: "lsp:filesystem:delete:response",
+            content: {
+              requestId: message.content.requestId,
+              success: false,
+            },
+          });
+        }
+        fs.rmSync(message.content.path, { force: true, recursive: true });
+        await this._receiveMessage(
+          consumerId,
+          JSON.stringify({
+            jsonrpc: "2.0",
+            method: "textDocument/didClose",
+            params: {
+              textDocument: {
+                uri: `file://${message.content.path}`,
+              },
+            },
+          }),
+          true
+        );
+        await this._languageServerProducer.send(consumerId, {
+          type: "lsp:filesystem:delete:response",
+          content: {
+            requestId: message.content.requestId,
+            success: true,
+          },
+        });
+      } else if (message.type === "lsp:filesystem:read:request") {
+        if (!fs.existsSync(message.content.path)) {
+          return await this._languageServerProducer.send(consumerId, {
+            type: "lsp:filesystem:read:response",
+            content: {
+              requestId: message.content.requestId,
+              success: false,
+            },
+          });
+        }
+        const stat = fs.statSync(message.content.path);
+        if (!stat.isFile()) {
+          return await this._languageServerProducer.send(consumerId, {
+            type: "lsp:filesystem:read:response",
+            content: {
+              requestId: message.content.requestId,
+              success: false,
+            },
+          });
+        }
+        const content = fs.readFileSync(message.content.path, {
+          encoding: "utf-8",
+        });
+        await this._receiveMessage(
+          consumerId,
+          JSON.stringify({
+            jsonrpc: "2.0",
+            method: "textDocument/didOpen",
+            params: {
+              textDocument: {
+                uri: `file://${message.content.path}`,
+                languageId: "cpp",
+                version: 1,
+                text: content,
+              },
+            },
+          }),
+          true
+        );
+        await this._languageServerProducer.send(consumerId, {
+          type: "lsp:filesystem:read:response",
+          content: {
+            requestId: message.content.requestId,
+            success: true,
+            content,
+          },
+        });
+      }
+    });
+
+    this._deviceHandler.addService(this._languageServerProducer);
   }
 
-  private _startLanguageServer() {
-    this._arduinoLanguageServerProcess = spawn("arduino-language-server", [
-      "-clangd",
-      "/usr/local/bin/clangd",
-      "-cli",
-      "/usr/local/bin/arduino-cli",
-      "-cli-config",
-      "/root/.arduino15/arduino-cli.yaml",
-      "-fqbn",
-      "arduino:avr:mega",
-      "-log",
-      "-logpath",
-      `${this._tmpPath}`,
-    ]);
-    this._arduinoLanguageServerProcess.on("exit", (code) => {
+  public async connect() {
+    const response = await fetch(
+      configuration.WEBSOCKET_ENDPOINT.replace(
+        "/websocket",
+        `/${this._instanceUrl.split("/").at(-1)}/websocket`
+      ),
+      {
+        method: "POST",
+        headers: [["authorization", `Bearer ${this._deviceToken}`]],
+      }
+    );
+    const token = await response.json();
+    await this._deviceHandler.connect({
+      endpoint: configuration.WEBSOCKET_ENDPOINT,
+      id: this._instanceUrl,
+      token: token,
+    });
+  }
+
+  private _startLanguageServer(consumerId: string) {
+    const consumerInstanceData = this._consumers.get(consumerId);
+
+    if (!consumerInstanceData) {
+      console.error(
+        `Could not find instance data for consumer with id "${consumerId}"!`
+      );
+      return;
+    }
+
+    consumerInstanceData.openedDocuments.clear();
+    consumerInstanceData.arduinoLanguageServerProcess = spawn(
+      "arduino-language-server",
+      [
+        "-clangd",
+        "/usr/local/bin/clangd",
+        "-cli",
+        "/usr/local/bin/arduino-cli",
+        "-cli-config",
+        "/root/.arduino15/arduino-cli.yaml",
+        "-fqbn",
+        "arduino:avr:mega",
+        "-log",
+        "-logpath",
+        `${consumerInstanceData.logPath}`,
+      ]
+    );
+    consumerInstanceData.arduinoLanguageServerProcess.on("exit", (code) => {
       console.log(`arduino language server process exited with code ${code}`);
       if (code !== 0) {
         // TODO: handle crashed server
       }
     });
-    this._arduinoLanguageServerProcess.stdout.setEncoding("utf-8");
-    this._arduinoLanguageServerProcess.stderr.setEncoding("utf-8");
+    consumerInstanceData.arduinoLanguageServerProcess.stdout.setEncoding(
+      "utf-8"
+    );
+    consumerInstanceData.arduinoLanguageServerProcess.stderr.setEncoding(
+      "utf-8"
+    );
 
-    this._arduinoLanguageServerProcess.stdout.on("data", (data) => {
-      console.log(`data: ${data}`);
-      this._addToBuffer(data);
-    });
-
-    this._arduinoLanguageServerProcess.stderr.on("data", (data) => {
-      console.error(`stderr: ${data}`);
-      const hadTmpDir = !!this._tmpDirPath;
-      this._tmpDirPath ??= data
-        .match(/Language server temp directory: ([0-9a-zA-Z/-]*)/)
-        ?.at(1);
-      this._buildPath ??= data
-        .match(/Language server build path: ([0-9a-zA-Z/-]*)/)
-        ?.at(1);
-      this._buildSketchRootPath ??= data
-        .match(/Language server build sketch root: ([0-9a-zA-Z/-]*)/)
-        ?.at(1);
-      this._fullBuildPath ??= data
-        .match(/Language server FULL build path: ([0-9a-zA-Z/-]*)/)
-        ?.at(1);
-
-      if (this._tmpDirPath && !hadTmpDir) {
-        this._srcPath = `${this._tmpDirPath}/src`;
-        fs.mkdirSync(this._srcPath);
-        this._webSocket.send(
-          JSON.stringify({ type: "path", data: this._srcPath })
-        );
+    consumerInstanceData.arduinoLanguageServerProcess.stdout.on(
+      "data",
+      (data) => {
+        console.log(`data: ${data}`);
+        this._addToBuffer(consumerId, data);
       }
-    });
+    );
 
-    this._arduinoLanguageServerProcess.on("close", (code) => {
+    consumerInstanceData.arduinoLanguageServerProcess.stderr.on(
+      "data",
+      async (data) => {
+        console.error(`stderr: ${data}`);
+        const hadTmpDir = !!consumerInstanceData.tmpDirPath;
+        consumerInstanceData.tmpDirPath ??= data
+          .match(/Language server temp directory: ([0-9a-zA-Z/-]*)/)
+          ?.at(1);
+        consumerInstanceData.buildPath ??= data
+          .match(/Language server build path: ([0-9a-zA-Z/-]*)/)
+          ?.at(1);
+        consumerInstanceData.buildSketchRootPath ??= data
+          .match(/Language server build sketch root: ([0-9a-zA-Z/-]*)/)
+          ?.at(1);
+        consumerInstanceData.fullBuildPath ??= data
+          .match(/Language server FULL build path: ([0-9a-zA-Z/-]*)/)
+          ?.at(1);
+
+        if (consumerInstanceData.tmpDirPath && !hadTmpDir) {
+          consumerInstanceData.srcPath = `${consumerInstanceData.tmpDirPath}/src`;
+          fs.mkdirSync(consumerInstanceData.srcPath);
+          await this._languageServerProducer.send(consumerId, {
+            type: "lsp:initialization:response",
+            content: {
+              sourcesPath: consumerInstanceData.srcPath,
+              configuration: {
+                documentSelector: [{ language: "cpp" }, { language: "c" }],
+              },
+            },
+          });
+        }
+      }
+    );
+
+    consumerInstanceData.arduinoLanguageServerProcess.on("close", (code) => {
       console.log(`arduino language server process closed with code ${code}`);
     });
-
-    this._webSocket.on("message", async (data) => {
-      console.log(`incoming: ${data.toString()}`);
-      const message = JSON.parse(data.toString());
-      if (message.type === "data") {
-        const parsedMessage = JSON.parse(message.data);
-        if (parsedMessage.method === "initialize") {
-          this._rootPath = parsedMessage.params.rootUri.replace(
-            "file://",
-            ""
-          ) as string;
-          const sketchPath = path.join(
-            this._rootPath,
-            `${path.basename(this._rootPath)}.ino`
-          );
-          if (!fs.existsSync(sketchPath)) {
-            fs.writeFileSync(sketchPath, "");
-          }
-        }
-        return this._queue.push(async () => {
-          await this._receiveMessage(message);
-        });
-      }
-      if (message.type === "filesystem:create") {
-        if (!message.data.path.startsWith(this._srcPath + "/")) return;
-        if (message.data.type === "directory") {
-          fs.mkdirSync(message.data.path);
-        } else if (message.data.type === "file") {
-          fs.writeFileSync(message.data.path, message.data.content);
-        }
-      }
-      if (message.type === "filesystem:delete") {
-        if (!message.data.path.startsWith(this._srcPath + "/")) return;
-        fs.rmSync(message.data.path, { force: true });
-      }
-    });
   }
 
-  private _addToBuffer(data: string) {
-    this._buffer = this._buffer ? this._buffer + data : data;
-    this._checkBuffer();
+  private _addToBuffer(consumerId: string, data: string) {
+    const consumerInstanceData = this._consumers.get(consumerId);
+
+    if (!consumerInstanceData) {
+      console.error(
+        `Could not find instance data for consumer with id "${consumerId}"!`
+      );
+      return;
+    }
+
+    consumerInstanceData.buffer = consumerInstanceData.buffer
+      ? consumerInstanceData.buffer + data
+      : data;
+    this._checkBuffer(consumerId);
   }
 
-  private _checkBuffer() {
-    if (!this._buffer) return;
-    if (this._buffer.length === 0) return;
+  private _checkBuffer(consumerId: string) {
+    const consumerInstanceData = this._consumers.get(consumerId);
 
-    const contentBeginIndex = this._buffer.indexOf("\r\n\r\n") + 4;
-    const contentLengthString = this._buffer.slice(
-      this._buffer.indexOf(":") + 1,
-      this._buffer.indexOf("\r\n")
+    if (!consumerInstanceData) {
+      console.error(
+        `Could not find instance data for consumer with id "${consumerId}"!`
+      );
+      return;
+    }
+
+    if (!consumerInstanceData.buffer) return;
+    if (consumerInstanceData.buffer.length === 0) return;
+
+    const contentBeginIndex =
+      consumerInstanceData.buffer.indexOf("\r\n\r\n") + 4;
+    const contentLengthString = consumerInstanceData.buffer.slice(
+      consumerInstanceData.buffer.indexOf(":") + 1,
+      consumerInstanceData.buffer.indexOf("\r\n")
     );
-    const contentString = this._buffer.slice(contentBeginIndex);
+    const contentString = consumerInstanceData.buffer.slice(contentBeginIndex);
     const byteArray = new TextEncoder().encode(contentString);
     const contentLength = parseInt(contentLengthString);
     const bytes = byteArray.slice(0, contentLength);
@@ -172,19 +404,75 @@ export class ArduinoCliLanguageServerInstance {
 
     const message = new TextDecoder().decode(bytes);
 
-    this._webSocket.send(
-      JSON.stringify({
-        type: "data",
-        data: message,
-      })
+    this._languageServerProducer.send(consumerId, {
+      type: "lsp:message",
+      content: message,
+    });
+    consumerInstanceData.buffer = new TextDecoder().decode(
+      byteArray.slice(contentLength)
     );
-    this._buffer = new TextDecoder().decode(byteArray.slice(contentLength));
-    this._checkBuffer();
+    this._checkBuffer(consumerId);
   }
 
-  private async _receiveMessage(message: DataMessage) {
+  private async _receiveMessage(
+    consumerId: string,
+    message: string,
+    isLocal: boolean
+  ) {
+    const consumerInstanceData = this._consumers.get(consumerId);
+
+    if (!consumerInstanceData) {
+      console.error(
+        `Could not find instance data for consumer with id "${consumerId}"!`
+      );
+      return;
+    }
+
     console.log("receiving message:", message);
-    const parsedMessage = JSON.parse(message.data);
+    const parsedMessage = JSON.parse(message);
+
+    // ignore remote open and close messages
+    if (
+      !isLocal &&
+      (parsedMessage.method === "textDocument/didOpen" ||
+        parsedMessage.method === "textDocument/didClose")
+    ) {
+      return;
+    }
+
+    if (parsedMessage.method === "textDocument/didOpen") {
+      if (
+        consumerInstanceData.openedDocuments.has(
+          parsedMessage.params.textDocument.uri
+        )
+      ) {
+        return;
+      }
+      consumerInstanceData.openedDocuments.add(
+        parsedMessage.params.textDocument.uri
+      );
+      console.log(
+        "open documents:",
+        JSON.stringify(Array.from(consumerInstanceData.openedDocuments))
+      );
+    }
+
+    if (parsedMessage.method === "textDocument/didClose") {
+      if (
+        !consumerInstanceData.openedDocuments.has(
+          parsedMessage.params.textDocument.uri
+        )
+      ) {
+        return;
+      }
+      consumerInstanceData.openedDocuments.delete(
+        parsedMessage.params.textDocument.uri
+      );
+      console.log(
+        "open documents:",
+        JSON.stringify(Array.from(consumerInstanceData.openedDocuments))
+      );
+    }
 
     if (parsedMessage.method === "textDocument/didSave") {
       await new Promise<void>((resolve, reject) => {
@@ -199,26 +487,10 @@ export class ArduinoCliLanguageServerInstance {
       });
     }
 
-    const encodedMessage = new TextEncoder().encode(message.data);
-    this._arduinoLanguageServerProcess?.stdin?.write(
+    const encodedMessage = new TextEncoder().encode(message);
+    consumerInstanceData.arduinoLanguageServerProcess?.stdin?.write(
       `Content-Length: ${encodedMessage.length}\r\n\r\n`
     );
-    this._arduinoLanguageServerProcess?.stdin?.write(message.data);
-
-    if (parsedMessage.method === "textDocument/didOpen") {
-      await this._receiveMessage({
-        type: "data",
-        data: JSON.stringify({
-          jsonrpc: "2.0",
-          method: "textDocument/didSave",
-          params: {
-            textDocument: {
-              uri: parsedMessage.params.textDocument.uri,
-            },
-            text: parsedMessage.params.textDocument.text,
-          },
-        }),
-      });
-    }
+    consumerInstanceData.arduinoLanguageServerProcess?.stdin?.write(message);
   }
 }

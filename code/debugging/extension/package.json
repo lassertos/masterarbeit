@@ -53,13 +53,27 @@
         "title": "Debug",
         "icon": "$(debug)",
         "shortTitle": "debug",
-        "enablement": "workbenchState == folder && !crosslab.isCompiling"
+        "enablement": "workbenchState == folder && !(crosslab.isCompiling || crosslab.isDebugging || crosslab.isTesting || crosslab.remoteDebugSession)"
+      },
+      {
+        "command": "crosslab-debugging-extension.join-debug-session",
+        "title": "Join Debug Session",
+        "icon": "$(plug)",
+        "shortTitle": "join",
+        "enablement": "workbenchState == folder && !crosslab.isDebugging && crosslab.remoteDebugSession && crosslab.canJoinDebugSession"
       }
     ],
     "menus": {
-      "editor/title/run": [
+      "editor/title": [
         {
-          "command": "crosslab-debugging-extension.debug"
+          "command": "crosslab-debugging-extension.debug",
+          "when": "workbenchState == folder && !crosslab.remoteDebugSession",
+          "group": "navigation@3"
+        },
+        {
+          "command": "crosslab-debugging-extension.join-debug-session",
+          "when": "workbenchState == folder && crosslab.remoteDebugSession",
+          "group": "navigation@3"
         }
       ]
     }
@@ -94,6 +108,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@crosslab-ide/crosslab-collaboration-service": "file:../../collaboration/service",
     "@crosslab-ide/crosslab-debugging-adapter-service": "file:../services/adapter",
     "@crosslab-ide/crosslab-filesystem-service": "file:../../filesystem/service",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",

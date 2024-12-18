@@ -9,6 +9,7 @@ import {
   CollaborationTypeName,
   CollaborationProvider,
   CollaborationUpdateEventType,
+  AwarenessProvider,
 } from "../../collaborationTypes.mjs";
 import { collaborationProtocol } from "../../protocol.mjs";
 import { yjsCollaborationProtocol } from "./protocol.mjs";
@@ -30,96 +31,12 @@ import * as decoding from "lib0/decoding.js";
 
 export class YjsCollaborationProvider extends CollaborationProvider {
   private _document: Y.Doc = new Y.Doc();
-  private _knownProperties: Set<string> = new Set();
 
-  constructor(id: string, initialValue: Record<string, unknown>) {
-    super(id);
-
-    // TODO: add observers
-    this._initialize(initialValue);
-  }
-
-  private _initialize(initialValue: Record<string, unknown>) {
-    for (const [key, value] of Object.entries(initialValue)) {
-      this._knownProperties.add(key);
-      console.log("collaboration: current entry", key, value);
-      if (
-        typeof value === "undefined" ||
-        typeof value === "function" ||
-        typeof value === "symbol"
-      ) {
-        throw new Error(
-          `Cannot initialize property "${key}" with type "${typeof value}"!`
-        );
-      }
-
-      if (Array.isArray(value)) {
-        const array = this.get(key, "array");
-        array.push(...value.map((item) => this.valueToCollaborationType(item)));
-        console.log(
-          "collaboration: initialized as array",
-          key,
-          value,
-          array.toJSON()
-        );
-        continue;
-      }
-
-      if (typeof value === "object") {
-        if (value === null) {
-          this.get(key, "null");
-          continue;
-        }
-        const object = this.get(key, "object");
-        for (const [key, val] of Object.entries(value)) {
-          console.log("collaboration: current entry", key, val);
-          object.set(key, this.valueToCollaborationType(val));
-        }
-        console.log(
-          "collaboration: initialized as object",
-          key,
-          value,
-          object.toJSON()
-        );
-        continue;
-      }
-
-      switch (typeof value) {
-        case "number": {
-          const number = this.get(key, "number");
-          number.set(value);
-          console.log(
-            "collaboration: initialized as number",
-            key,
-            value,
-            number.toJSON()
-          );
-          continue;
-        }
-        case "string": {
-          const string = this.get(key, "string");
-          string.set(value);
-          console.log(
-            "collaboration: initialized as string",
-            key,
-            value,
-            string.toJSON()
-          );
-          continue;
-        }
-        case "boolean": {
-          const boolean = this.get(key, "boolean");
-          boolean.set(value);
-          console.log(
-            "collaboration: initialized as boolean",
-            key,
-            value,
-            boolean.toJSON()
-          );
-          continue;
-        }
-      }
-    }
+  constructor(
+    awarenessProvider: AwarenessProvider,
+    initialValue: Record<string, unknown>
+  ) {
+    super(awarenessProvider, initialValue);
 
     this._document.on("update", async (update, origin) => {
       if (origin !== this) {
@@ -130,14 +47,6 @@ export class YjsCollaborationProvider extends CollaborationProvider {
           },
         } satisfies ProtocolMessage<typeof yjsCollaborationProtocol, "yjs:sync:update">);
       }
-    });
-
-    this._awarenessProvider.on("change", (changes, origin) => {
-      this.emit("awareness-change", changes, origin);
-    });
-
-    this._awarenessProvider.on("update", (changes, origin) => {
-      this.emit("awareness-update", changes, origin);
     });
   }
 
@@ -214,21 +123,7 @@ export class YjsCollaborationProvider extends CollaborationProvider {
           typeof collaborationProtocol,
           "collaboration:message"
         >["content"]
-      | (ProtocolMessage<
-          typeof collaborationProtocol,
-          "collaboration:awareness:update"
-        > & { participantId: string })
   ): Promise<Message | void> | Message | void {
-    if (
-      isProtocolMessage(
-        collaborationProtocol,
-        "collaboration:awareness:update",
-        message
-      )
-    ) {
-      return this._handleAwarenessUpdateMessage(message);
-    }
-
     if (!isIncomingMessage(yjsCollaborationProtocol, "prosumer", message)) {
       throw new Error("Received invalid yjs collaboration message!");
     }
@@ -306,26 +201,6 @@ export class YjsCollaborationProvider extends CollaborationProvider {
     }
 
     throw new Error(`Cannot get value of type "${type}"!`);
-  }
-
-  _handleAwarenessUpdateMessage(
-    awarenessUpdateMessage: ProtocolMessage<
-      typeof collaborationProtocol,
-      "collaboration:awareness:update"
-    > & { participantId: string }
-  ) {
-    console.log(
-      "collaboration: handling awareness update message",
-      awarenessUpdateMessage
-    );
-
-    // TODO: maybe change origin to id of participant it was received from
-    this._awarenessProvider.applyUpdate(
-      awarenessUpdateMessage.content,
-      awarenessUpdateMessage.participantId
-    );
-
-    console.log("collaboration: successfully handled awareness update message");
   }
 
   private _handleYjsMessage(

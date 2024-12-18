@@ -16,26 +16,37 @@ import {
   OutgoingMessage,
 } from "@crosslab-ide/abstract-messaging-channel";
 import { Directory } from "./types.mjs";
+import { v4 as uuidv4 } from "uuid";
+import { DebugAdapterProtocol } from "./dap-types.js";
 
 interface DebuggingAdapterServiceProducerEvents {
   "new-session": (
+    consumerId: string,
     requestId: string,
     sessionInfo: {
       directory: Directory;
       configuration?: unknown;
     }
   ) => void;
-  "dap-message": (sessionId: string, message: Record<string, unknown>) => void;
+  "join-session": (
+    consumerId: string,
+    requestId: string,
+    sessionId: string
+  ) => void;
+  "dap-message": (
+    sessionId: string,
+    message: DebugAdapterProtocol.ProtocolMessage
+  ) => void;
 }
 
 export class DebuggingAdapterServiceProducer
   extends TypedEmitter<DebuggingAdapterServiceProducerEvents>
   implements Service
 {
-  private _messagingChannel?: CrossLabMessagingChannel<
-    DebuggingAdapterProtocol,
-    "server"
-  >;
+  private _consumers: Map<
+    string,
+    CrossLabMessagingChannel<DebuggingAdapterProtocol, "server">
+  > = new Map();
   serviceType: string =
     "https://api.goldi-labs.de/serviceTypes/debugging-adapter";
   serviceId: string;
@@ -61,14 +72,19 @@ export class DebuggingAdapterServiceProducer
   ): void {
     // TODO: add checkConfig
     const channel = new DataChannel();
-    this._messagingChannel = new CrossLabMessagingChannel(
+    const messagingChannel = new CrossLabMessagingChannel(
       channel,
       debuggingAdapterProtocol,
       "server"
     );
-    this._messagingChannel.on("message", (message) =>
-      this._handleMessage(message)
+
+    const consumerId = uuidv4();
+    this._consumers.set(consumerId, messagingChannel);
+
+    messagingChannel.on("message", (message) =>
+      this._handleMessage(consumerId, message)
     );
+
     if (connection.tiebreaker) {
       connection.transmit(serviceConfig, "data", channel);
     } else {
@@ -76,14 +92,19 @@ export class DebuggingAdapterServiceProducer
     }
   }
 
-  async send(message: OutgoingMessage<DebuggingAdapterProtocol, "server">) {
-    if (!this._messagingChannel) {
-      throw new Error("No messaging channel has been set up!");
+  async send(
+    consumerId: string,
+    message: OutgoingMessage<DebuggingAdapterProtocol, "server">
+  ) {
+    const consumer = this._consumers.get(consumerId);
+    if (!consumer) {
+      throw new Error(`Could not find consumer with id "${consumerId}"!`);
     }
-    await this._messagingChannel.send(message);
+    await consumer.send(message);
   }
 
   private _handleMessage(
+    consumerId: string,
     message: IncomingMessage<DebuggingAdapterProtocol, "server">
   ) {
     switch (message.type) {
@@ -96,8 +117,16 @@ export class DebuggingAdapterServiceProducer
       case "session:start:request":
         return this.emit(
           "new-session",
+          consumerId,
           message.content.requestId,
           message.content
+        );
+      case "session:join:request":
+        return this.emit(
+          "join-session",
+          consumerId,
+          message.content.requestId,
+          message.content.sessionId
         );
     }
   }

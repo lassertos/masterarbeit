@@ -12,26 +12,7 @@
   ],
   "activationEvents": [],
   "browser": "./dist/web/extension.js",
-  "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "collaboration",
-          "title": "Collaboration",
-          "icon": "$(organization)"
-        }
-      ]
-    },
-    "views": {
-      "collaboration": [
-        {
-          "type": "webview",
-          "id": "collaboration.view",
-          "name": "Collaboration"
-        }
-      ]
-    }
-  },
+  "contributes": {},
   "scripts": {
     "test": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/extensionTests.js",
     "pretest": "npm run compile-web",

@@ -1,33 +1,31 @@
 import { ExtensionContext, Uri } from "vscode";
-import {
-  CloseAction,
-  ErrorAction,
-  LanguageClientOptions,
-} from "vscode-languageclient";
+import { LanguageClientOptions } from "vscode-languageclient";
 import * as vscode from "vscode";
 
 import { LanguageClient } from "vscode-languageclient/browser.js";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
-import {
-  MessageService__Consumer,
-  MessageService__Producer,
-} from "@crosslab-ide/soa-service-message";
 import path from "path";
+import {
+  LanguageServerConsumer,
+  LanguageServerMessagingProtocol,
+} from "@crosslab-ide/crosslab-lsp-service";
+import { ProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
 
-let client: LanguageClient | undefined;
-// this method is called when vs code is activated
+const clientMap: Map<
+  string,
+  {
+    client: LanguageClient;
+    messagePort: MessagePort;
+    info: ProtocolMessage<
+      LanguageServerMessagingProtocol,
+      "lsp:initialization:response"
+    >["content"];
+  }
+> = new Map();
+
+const languageServerConsumer = new LanguageServerConsumer("lsp-extension:lsp");
+
 export async function activate(context: ExtensionContext) {
-  console.log("crosslab-lsp activated!");
-
-  console.log("crosslab-lsp server is ready");
-
-  const messageServiceConsumer = new MessageService__Consumer(
-    "crosslab:lsp:in"
-  );
-  const messageServiceProducer = new MessageService__Producer(
-    "crosslab:lsp:out"
-  );
-
   const fileSystemExtension = vscode.extensions.getExtension(
     "crosslab.@crosslab-ide/crosslab-filesystem-extension"
   );
@@ -42,37 +40,108 @@ export async function activate(context: ExtensionContext) {
     ? fileSystemExtension.exports
     : await fileSystemExtension.activate();
 
-  fileSystemApi.onProjectChanged(async (project: vscode.Uri) => {
-    await stopClient();
-    await startClient(context, project);
+  languageServerConsumer.on("new-producer", async (producerId, info) => {
+    console.log("lsp: new producer", producerId);
+    const projectUri = fileSystemApi.getCurrentProject();
+    await createClient(context, projectUri, producerId, info);
+
+    const remoteProvider = new (class
+      implements vscode.TextDocumentContentProvider
+    {
+      async provideTextDocumentContent(
+        uri: vscode.Uri,
+        _token: vscode.CancellationToken
+      ): Promise<string> {
+        console.log("DEBUGGING: trying to retrieve content for file", uri.path);
+        try {
+          const { content } = await languageServerConsumer.readFile(
+            producerId,
+            uri.path
+          );
+          console.log("DEBUGGING:", content);
+          return content;
+        } catch (error) {
+          return error instanceof Error
+            ? error.message
+            : `Could retrieve file ${uri.path}!`;
+        }
+      }
+    })();
+
+    vscode.workspace.registerTextDocumentContentProvider(
+      "crosslab-remote",
+      remoteProvider
+    );
   });
 
-  await startClient(context, fileSystemApi.getCurrentProject());
+  languageServerConsumer.on("message", (producerId, message) => {
+    console.log(
+      "lsp: message",
+      producerId,
+      message,
+      Array.from(clientMap.entries())
+    );
+    const clientInfo = clientMap.get(producerId);
+    if (!clientInfo) {
+      throw new Error(
+        `Could not find information for client with id "${producerId}"!"`
+      );
+    }
+
+    if (message.type === "lsp:message") {
+      clientInfo.messagePort.postMessage(message.content);
+    }
+  });
+
+  fileSystemApi.onProjectChanged(async (project: vscode.Uri) => {
+    for (const [producerId, { client, info }] of clientMap) {
+      await languageServerConsumer.delete(
+        producerId,
+        path.join(info.sourcesPath, path.basename(project.path))
+      );
+      await stopClient(client);
+      const { content: newInfo } = await languageServerConsumer.initialize(
+        producerId
+      );
+      await createClient(context, project, producerId, newInfo);
+    }
+  });
 
   return {
-    addService: (deviceHandler: DeviceHandler) => {
-      deviceHandler.addService(messageServiceConsumer);
-      deviceHandler.addService(messageServiceProducer);
+    addServices: (deviceHandler: DeviceHandler) => {
+      console.log("adding lsp service!");
+      deviceHandler.addService(languageServerConsumer);
+      console.log("added lsp service!");
     },
   };
 }
 
 export async function deactivate(): Promise<void> {
-  await stopClient();
+  for (const { client } of clientMap.values()) {
+    await stopClient(client);
+  }
 }
 
-async function stopClient(): Promise<void> {
+async function stopClient(client: LanguageClient): Promise<void> {
   if (client?.isRunning()) {
     await client.stop();
     await client.dispose();
   }
 }
 
-async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
+async function createClient(
+  context: ExtensionContext,
+  projectUri: vscode.Uri,
+  producerId: string,
+  info: ProtocolMessage<
+    LanguageServerMessagingProtocol,
+    "lsp:initialization:response"
+  >["content"]
+): Promise<[LanguageClient, MessagePort]> {
   // Create a worker. The worker main file implements the language server.
   const serverMain = Uri.joinPath(context.extensionUri, "dist/web/server.js");
   const worker = new Worker(serverMain.toString(true));
-  const { port1: commandPort1, port2: commandPort2 } = new MessageChannel();
+  const { port1, port2 } = new MessageChannel();
 
   const projectName = path.basename(projectUri.path);
 
@@ -80,99 +149,63 @@ async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
     {
       type: "init",
       data: {
+        path: info.sourcesPath,
         projectName,
       },
     },
-    [commandPort2]
+    [port2]
   );
 
-  const lspPath = await new Promise<string>(
-    (resolve) =>
-      (commandPort1.onmessage = (event) => {
-        resolve(event.data);
-        commandPort1.onmessage = null;
-      })
-  );
-
-  console.log("received path", lspPath);
+  port1.onmessage = async (event) => {
+    console.log("lsp: message on port", producerId, event.data);
+    await languageServerConsumer.sendLspMessage(producerId, event.data);
+  };
 
   const fileSystemWatcher = vscode.workspace.createFileSystemWatcher(
     new vscode.RelativePattern(projectUri, "*")
   );
 
-  fileSystemWatcher.onDidCreate(async (uri) => {
-    console.log("created", uri);
-    const isDirectory =
-      (await vscode.workspace.fs.stat(uri)).type === vscode.FileType.Directory;
-    if (!uri.path.startsWith(projectUri.path + "/")) return;
-
-    if (!isDirectory) {
-      console.log("sending didOpen notification from onDidCreate!");
-      // await vscode.workspace.openTextDocument(uri);
-    } else {
-      commandPort1.postMessage({
-        type: "filesystem:create",
-        data: {
-          type: isDirectory ? "directory" : "file",
-          path: uri.path.replace(
-            projectUri.path,
-            path.join(lspPath, projectName)
-          ),
-          content: new TextDecoder().decode(
-            await vscode.workspace.fs.readFile(uri)
-          ),
-        },
-      });
-    }
-  });
-
-  fileSystemWatcher.onDidDelete(async (uri) => {
-    console.log("deleted", uri);
-    if (!uri.path.startsWith(projectUri.path + "/")) return;
-    commandPort1.postMessage({
-      type: "filesystem:delete",
-      data: {
-        path: uri.path.replace(
-          projectUri.path,
-          path.join(lspPath, projectName)
-        ),
-      },
-    });
-  });
-
-  await setupDirectory(
-    vscode.Uri.from({ scheme: "crosslabfs", path: "/workspace" }),
-    path.join(lspPath, projectName),
-    commandPort1
-  );
-
   const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ language: "c" }, { language: "cpp" }],
-    // synchronize: { fileEvents: fileSystemWatcher },
-    initializationOptions: {},
+    ...info.configuration,
     uriConverters: {
       code2Protocol: (value) => {
         return value
           .with({
             scheme: "file",
             path: value.path.startsWith(projectUri.path)
-              ? value.path.replace(projectUri.path, `${lspPath}/${projectName}`)
-              : value.path.replace("/workspace", `${lspPath}/${projectName}`),
+              ? value.path.replace(
+                  projectUri.path,
+                  `${info.sourcesPath}/${projectName}`
+                )
+              : value.path.replace(
+                  "/workspace",
+                  `${info.sourcesPath}/${projectName}`
+                ),
           })
           .toString(true);
       },
       protocol2Code: (value) => {
         const uri = vscode.Uri.parse(value);
+
+        if (uri.path.startsWith(info.sourcesPath)) {
+          return uri.with({
+            scheme: "crosslabfs",
+            path: uri.path.replace(
+              `${info.sourcesPath}/${projectName}`,
+              "/workspace"
+            ),
+          });
+        }
+
         return uri.with({
-          scheme: "crosslabfs",
-          path: uri.path.replace(`${lspPath}/${projectName}`, "/workspace"),
+          scheme: "crosslab-remote",
+          path: uri.path,
         });
       },
     },
   };
 
-  // create the language server client to communicate with the server running in the worker
-  client = new LanguageClient(
+  const client = new LanguageClient(
     "crosslab-language-client",
     "CrossLab Language Client",
     clientOptions,
@@ -181,50 +214,64 @@ async function startClient(context: ExtensionContext, projectUri: vscode.Uri) {
 
   client.error = () => {};
 
+  clientMap.set(producerId, { client, messagePort: port1, info });
+
+  fileSystemWatcher.onDidCreate(async (uri) => {
+    const isDirectory =
+      (await vscode.workspace.fs.stat(uri)).type === vscode.FileType.Directory;
+    if (!uri.path.startsWith(projectUri.path + "/")) return;
+
+    if (isDirectory) {
+      await languageServerConsumer.createDirectory(
+        producerId,
+        uri.path.replace(
+          projectUri.path,
+          path.join(info.sourcesPath, projectName)
+        )
+      );
+    } else {
+      await languageServerConsumer.writeFile(
+        producerId,
+        uri.path.replace(
+          projectUri.path,
+          path.join(info.sourcesPath, projectName)
+        ),
+        new TextDecoder().decode(await vscode.workspace.fs.readFile(uri))
+      );
+    }
+  });
+
+  fileSystemWatcher.onDidDelete(async (uri) => {
+    if (!uri.path.startsWith(projectUri.path + "/")) return;
+    await languageServerConsumer.delete(
+      producerId,
+      uri.path.replace(
+        projectUri.path,
+        path.join(info.sourcesPath, projectName)
+      )
+    );
+  });
+
   await client.start();
 
-  await setupFiles(
+  await setupDirectory(
     vscode.Uri.from({ scheme: "crosslabfs", path: "/workspace" }),
-    path.join(lspPath, projectName),
-    commandPort1
+    path.join(info.sourcesPath, projectName),
+    producerId
   );
 
-  // const sketchUri = vscode.Uri.from({
-  //   scheme: "crosslabfs",
-  //   path: `/workspace/${path.basename(projectName)}.ino`,
-  // });
-  // try {
-  //   await vscode.workspace.fs.stat(sketchUri);
-  // } catch {
-  //   client.sendNotification("textDocument/didSave", {
-  //     textDocument: {
-  //       uri: sketchUri
-  //         .with({
-  //           scheme: "file",
-  //           path: sketchUri.path.replace(
-  //             "/workspace",
-  //             path.join(lspPath, projectName)
-  //           ),
-  //         })
-  //         .toString(true),
-  //     },
-  //     text: "",
-  //   });
-  // }
+  return [client, port1];
 }
 
 async function setupDirectory(
   directoryUri: vscode.Uri,
   pathReplacement: string,
-  port: MessagePort
+  producerId: string
 ) {
-  port.postMessage({
-    type: "filesystem:create",
-    data: {
-      type: "directory",
-      path: directoryUri.path.replace("/workspace", pathReplacement),
-    },
-  });
+  await languageServerConsumer.createDirectory(
+    producerId,
+    directoryUri.path.replace("/workspace", pathReplacement)
+  );
   const entries = await vscode.workspace.fs.readDirectory(directoryUri);
   for (const entry of entries) {
     const entryUri = directoryUri.with({
@@ -234,65 +281,17 @@ async function setupDirectory(
       case vscode.FileType.Unknown:
         break;
       case vscode.FileType.File:
-        port.postMessage({
-          type: "filesystem:create",
-          data: {
-            type: "file",
-            path: entryUri.path.replace("/workspace", pathReplacement),
-            content: new TextDecoder().decode(
-              await vscode.workspace.fs.readFile(entryUri)
-            ),
-          },
-        });
-        break;
-      case vscode.FileType.Directory:
-        await setupDirectory(
-          directoryUri.with({ path: path.join(directoryUri.path, entry[0]) }),
-          pathReplacement,
-          port
+        await languageServerConsumer.writeFile(
+          producerId,
+          entryUri.path.replace("/workspace", pathReplacement),
+          new TextDecoder().decode(await vscode.workspace.fs.readFile(entryUri))
         );
         break;
-      case vscode.FileType.SymbolicLink:
-        break;
-    }
-  }
-}
-
-async function setupFiles(
-  directoryUri: vscode.Uri,
-  pathReplacement: string,
-  port: MessagePort
-) {
-  const entries = await vscode.workspace.fs.readDirectory(directoryUri);
-  for (const entry of entries) {
-    const entryUri = directoryUri.with({
-      path: path.join(directoryUri.path, entry[0]),
-    });
-    switch (entry[1]) {
-      case vscode.FileType.Unknown:
-        break;
-      case vscode.FileType.File:
-        // const document = await vscode.workspace.openTextDocument(entryUri);
-        console.log("sending didSave notification from setupFiles!");
-        await client?.sendNotification("textDocument/didSave", {
-          textDocument: {
-            uri: entryUri
-              .with({
-                scheme: "file",
-                path: entryUri.path.replace("/workspace", pathReplacement),
-              })
-              .toString(true),
-          },
-          text: new TextDecoder().decode(
-            await vscode.workspace.fs.readFile(entryUri)
-          ),
-        });
-        break;
       case vscode.FileType.Directory:
         await setupDirectory(
           directoryUri.with({ path: path.join(directoryUri.path, entry[0]) }),
           pathReplacement,
-          port
+          producerId
         );
         break;
       case vscode.FileType.SymbolicLink:

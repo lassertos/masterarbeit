@@ -62,25 +62,6 @@ const testBundlePlugin = {
   },
 };
 
-async function view() {
-  const ctx = await esbuild.context({
-    entryPoints: ["src/web/main.mts"],
-    bundle: true,
-    format: "iife",
-    minify: production,
-    sourcemap: !production,
-    sourcesContent: false,
-    platform: "browser",
-    outdir: "dist/web",
-  });
-  if (watch) {
-    await ctx.watch();
-  } else {
-    await ctx.rebuild();
-    await ctx.dispose();
-  }
-}
-
 async function main() {
   const ctx = await esbuild.context({
     entryPoints: [
@@ -123,13 +104,7 @@ async function main() {
   }
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .then(view)
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

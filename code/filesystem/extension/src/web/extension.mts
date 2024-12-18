@@ -375,5 +375,8 @@ export async function activate(context: vscode.ExtensionContext) {
     refreshProjectsView: () => {
       projectViewDataProvider.refresh();
     },
+    changeProject: async (projectUri: vscode.Uri) => {
+      await fileSystemProvider.setProject(projectUri);
+    },
   };
 }

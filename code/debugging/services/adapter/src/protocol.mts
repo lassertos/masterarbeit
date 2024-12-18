@@ -1,18 +1,29 @@
 import { MessagingProtocol } from "@crosslab-ide/abstract-messaging-channel";
 import { z } from "zod";
 import { DirectorySchema } from "./types.mjs";
+import { DebugAdapterProtocolSchemas } from "./dap-zod-schemas.js";
+
+type DebuggingAdapterProtocolMessageType =
+  | "message:dap"
+  | "session:start:request"
+  | "session:start:response"
+  | "session:join:request"
+  | "session:join:response";
+type DebuggingAdapterProtocolRole = "client" | "server";
 
 export const debuggingAdapterProtocol = {
   messageTypes: [
     "message:dap",
     "session:start:request",
     "session:start:response",
+    "session:join:request",
+    "session:join:response",
   ],
   roles: ["client", "server"],
   messages: {
     "message:dap": z.object({
       sessionId: z.string(),
-      message: z.record(z.unknown()),
+      message: DebugAdapterProtocolSchemas.ProtocolMessage,
     }),
     "session:start:request": z.object({
       requestId: z.string(),
@@ -33,17 +44,54 @@ export const debuggingAdapterProtocol = {
         message: z.optional(z.string()),
       }),
     ]),
+    "session:join:request": z.object({
+      requestId: z.string(),
+      sessionId: z.string(),
+    }),
+    "session:join:response": z.union([
+      z.object({
+        requestId: z.string(),
+        success: z.literal(true),
+        message: z.optional(z.string()),
+        sessionId: z.string(),
+        configuration: z.optional(z.record(z.unknown())),
+      }),
+      z.object({
+        requestId: z.string(),
+        success: z.literal(false),
+        message: z.optional(z.string()),
+      }),
+    ]),
   },
   roleMessages: {
     client: {
-      incoming: ["message:dap", "session:start:response"],
-      outgoing: ["message:dap", "session:start:request"],
+      incoming: [
+        "message:dap",
+        "session:start:response",
+        "session:join:response",
+      ],
+      outgoing: [
+        "message:dap",
+        "session:start:request",
+        "session:join:request",
+      ],
     },
     server: {
-      incoming: ["message:dap", "session:start:request"],
-      outgoing: ["message:dap", "session:start:response"],
+      incoming: [
+        "message:dap",
+        "session:start:request",
+        "session:join:request",
+      ],
+      outgoing: [
+        "message:dap",
+        "session:start:response",
+        "session:join:response",
+      ],
     },
   },
-} as const satisfies MessagingProtocol;
+} as const satisfies MessagingProtocol<
+  DebuggingAdapterProtocolMessageType,
+  DebuggingAdapterProtocolRole
+>;
 
 export type DebuggingAdapterProtocol = typeof debuggingAdapterProtocol;

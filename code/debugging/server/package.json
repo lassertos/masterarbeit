@@ -20,6 +20,8 @@
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@crosslab-ide/soa-service-message": "file:../../shared/message-service-js",
     "@types/express": "^4.17.21",
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "tiny-typed-emitter": "^2.1.0",
+    "zod": "^3.24.1"
   }
 }

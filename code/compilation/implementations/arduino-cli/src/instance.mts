@@ -81,12 +81,14 @@ export class ArduinoCliCompilationInstance {
     this._recreateDirectory(directory, sourceDirectoryPath);
 
     try {
+      // NOTE: the last build-property "compiler.cpp.flags" removed the -Os flag since it causes
+      // problems when debugging since it removes source files from the debugging information
       const message = execSync(
         `arduino-cli compile -b arduino:avr:mega ${projectDirectoryPath} --build-path ${buildDirectoryPath} --build-property "build.extra_flags=-fdebug-prefix-map=${path.dirname(
           projectDirectoryPath
         )}=." --build-property "compiler.c.elf.extra_flags=-fdebug-prefix-map=${path.dirname(
           projectDirectoryPath
-        )}=."`,
+        )}=." --build-property "compiler.cpp.flags=-c -g {compiler.warning_flags} -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -MMD -flto"`,
         { encoding: "utf-8", stdio: "pipe", cwd: sourceDirectoryPath }
       );
 

@@ -6,7 +6,6 @@ import {
   ExperimentServiceTypes,
 } from "@cross-lab-project/api-client";
 import { configuration } from "./configuration.js";
-import codeEditor from "./helper/code-editor.js";
 import { getDeviceUrl } from "./helper/index.js";
 
 @customElement("test-page-experiment-selection")
@@ -102,19 +101,26 @@ export class ExperimentSelection extends LitElement {
         ).name;
       }
 
-      if (template.name !== "Minimal Collaboration Setup") {
+      if (!template.name.includes("Collaboration Setup")) {
         this.dispatchEvent(
           new CustomEvent("experiment", { detail: experiment })
         );
       } else {
-        console.log(
-          experiment.instantiatedDevices.map((instantiatedDevice) => {
+        const devices = await Promise.all(
+          experiment.instantiatedDevices.map(async (instantiatedDevice) => {
             const url = new URL(instantiatedDevice.codeUrl);
             url.searchParams.set("instanceUrl", instantiatedDevice.url);
             url.searchParams.set("deviceToken", instantiatedDevice.token);
-            return url.toString();
+            const name = (
+              await apiClient.getDevice(instantiatedDevice.instanceOf)
+            ).name;
+            return `${name}: ${url.toString()}`;
           })
         );
+
+        for (const device of devices) {
+          console.log(device);
+        }
       }
     };
   }

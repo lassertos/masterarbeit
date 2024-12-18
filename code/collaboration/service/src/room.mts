@@ -1,6 +1,7 @@
 import { YjsCollaborationProvider } from "./collaborationProviders/index.mjs";
 import {
   Awareness,
+  AwarenessProvider,
   CollaborationProvider,
   CollaborationType,
   CollaborationUpdateEventType,
@@ -21,6 +22,7 @@ export class Room extends TypedEmitter<RoomEvents> {
   > = new Map();
   private _name: string;
   private _collaborationProvider: CollaborationProvider;
+  private _awarenessProvider: AwarenessProvider;
 
   constructor(
     id: string,
@@ -31,10 +33,28 @@ export class Room extends TypedEmitter<RoomEvents> {
     console.log("collaboration: creating room", initialValue);
     super();
     this._name = name;
+    this._awarenessProvider = new AwarenessProvider(id);
     this._collaborationProvider = new YjsCollaborationProvider(
-      id,
+      this._awarenessProvider,
       initialValue
     );
+
+    this._awarenessProvider.on("update", (_changes, origin) => {
+      for (const [id, participant] of this._participants.entries()) {
+        if (id === origin) {
+          continue;
+        }
+
+        participant.send({
+          type: "collaboration:awareness:update",
+          content: {
+            room: this._name,
+            states: this._awarenessProvider.encodeStates(),
+          },
+        });
+      }
+    });
+
     this._collaborationProvider.on("update-message", (update) => {
       for (const participant of this._participants.values()) {
         participant.send({
@@ -43,24 +63,28 @@ export class Room extends TypedEmitter<RoomEvents> {
         });
       }
     });
+
     this._collaborationProvider.on("update", (events) => {
       this.emit("update", events);
     });
-    this._collaborationProvider.on(
-      "awareness-update-message",
-      (message, origin) => {
-        for (const [id, participant] of this._participants.entries()) {
-          if (id === origin) {
-            continue;
-          }
-          participant.send(message);
-        }
-      }
-    );
   }
 
   get awareness(): Awareness {
-    return this._collaborationProvider.awareness;
+    return {
+      getLocalState: this._awarenessProvider.getLocalState.bind(
+        this._awarenessProvider
+      ),
+      getStates: this._awarenessProvider.getStates.bind(
+        this._awarenessProvider
+      ),
+      setLocalState: this._awarenessProvider.setLocalState.bind(
+        this._awarenessProvider
+      ),
+      setLocalStateField: this._awarenessProvider.setLocalStateField.bind(
+        this._awarenessProvider
+      ),
+      on: this._awarenessProvider.on.bind(this._awarenessProvider),
+    };
   }
 
   // TODO: change depending on service direction
@@ -94,10 +118,24 @@ export class Room extends TypedEmitter<RoomEvents> {
       }
 
       if (message.type === "collaboration:awareness:update") {
-        return await this._collaborationProvider.handleCollaborationMessage({
-          ...message,
-          participantId,
-        });
+        if (message.content.room !== this._name) {
+          return;
+        }
+
+        console.log(
+          "collaboration: handling awareness update message",
+          message
+        );
+
+        this._awarenessProvider.applyUpdate(
+          message.content.states,
+          participantId
+        );
+
+        console.log(
+          "collaboration: successfully handled awareness update message"
+        );
+        return;
       }
 
       if (message.type !== "collaboration:message") {

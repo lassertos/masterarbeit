@@ -1,0 +1,22 @@
+{
+  "name": "@crosslab-ide/crosslab-lsp-service",
+  "version": "0.0.1",
+  "description": "A crosslab service for the language server protocol.",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@crosslab-ide/abstract-messaging-channel": "file:../../shared/abstract-messaging-channel",
+    "@crosslab-ide/crosslab-messaging-channel": "file:../../shared/crosslab-messaging-channel",
+    "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
+    "tiny-typed-emitter": "^2.1.0",
+    "uuid": "^11.0.3",
+    "zod": "3.23.8"
+  }
+}

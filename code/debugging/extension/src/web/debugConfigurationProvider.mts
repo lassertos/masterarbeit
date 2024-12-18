@@ -23,8 +23,8 @@ export class DebugConfigurationProvider
   }
 
   provideDebugConfigurations(
-    folder: vscode.WorkspaceFolder | undefined,
-    token?: vscode.CancellationToken
+    _folder: vscode.WorkspaceFolder | undefined,
+    _token?: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.DebugConfiguration[]> {
     return [
       {
@@ -38,27 +38,41 @@ export class DebugConfigurationProvider
   async resolveDebugConfiguration(
     folder: vscode.WorkspaceFolder | undefined,
     debugConfiguration: vscode.DebugConfiguration,
-    token?: vscode.CancellationToken
+    _token?: vscode.CancellationToken
   ): Promise<vscode.DebugConfiguration> {
-    const directory = await this._readDirectory(folder);
+    console.log("debugging: resolving debug configuration");
 
-    const debuggingSessionInfo =
-      await this._debuggingAdapterServiceConsumer.startSession({
-        directory,
-        configuration: debugConfiguration,
-      });
+    const debuggingSessionInfo = debugConfiguration.sessionId
+      ? await this._debuggingAdapterServiceConsumer.joinSession(
+          debugConfiguration.producerId,
+          debugConfiguration.sessionId
+        )
+      : await this._debuggingAdapterServiceConsumer.startSession(
+          debugConfiguration.producerId,
+          {
+            directory: await this._readDirectory(folder),
+            configuration: debugConfiguration,
+          }
+        );
 
-    return {
+    const resolvedDebugConfiguration = {
       ...debugConfiguration,
       ...debuggingSessionInfo.configuration,
       sessionId: debuggingSessionInfo.sessionId,
     };
+
+    console.log(
+      "debugging: resolved debug configuration",
+      resolvedDebugConfiguration
+    );
+
+    return resolvedDebugConfiguration;
   }
 
   resolveDebugConfigurationWithSubstitutedVariables(
-    folder: vscode.WorkspaceFolder | undefined,
+    _folder: vscode.WorkspaceFolder | undefined,
     debugConfiguration: vscode.DebugConfiguration,
-    token?: vscode.CancellationToken
+    _token?: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.DebugConfiguration> {
     return debugConfiguration;
   }

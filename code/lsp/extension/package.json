@@ -52,8 +52,9 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@crosslab-ide/abstract-messaging-channel": "file:../../shared/abstract-messaging-channel",
+    "@crosslab-ide/crosslab-lsp-service": "file:../service",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
-    "@crosslab-ide/soa-service-message": "file:../../shared/message-service-js",
     "esbuild-plugin-polyfill-node": "^0.3.0",
     "vscode-languageclient": "^9.0.1",
     "vscode-languageserver": "^9.0.1",

@@ -1,23 +1,45 @@
-import { ArduinoCliLanguageServerInstance } from "./instance.mjs";
+import express from "express";
 import { Configuration } from "./configuration.mjs";
-import { WebSocketServer } from "ws";
+import { ArduinoCliLanguageServerInstance } from "./instance.mjs";
 
-export class ArduinoCliCompilationServer {
+export class ArduinoCliLanguageServer {
   start(configuration: Configuration): void {
-    const wss = new WebSocketServer({
-      port: configuration.PORT,
+    const app = express();
+
+    app.post("/", async (req, res) => {
+      const instanceUrl = req.query.instanceUrl;
+      const deviceToken = req.query.deviceToken;
+
+      if (typeof instanceUrl !== "string") {
+        throw new Error(
+          `Expected parameter "instanceUrl" to be of type "string" instead got "${typeof instanceUrl}"`
+        );
+      }
+
+      if (typeof deviceToken !== "string") {
+        throw new Error(
+          `Expected parameter "instanceUrl" to be of type "string" instead got "${typeof instanceUrl}"`
+        );
+      }
+
+      const instance = new ArduinoCliLanguageServerInstance(
+        instanceUrl,
+        deviceToken
+      );
+
+      try {
+        await instance.connect();
+      } catch (error) {
+        return res.status(400).send();
+      }
+
+      return res.status(201).send();
     });
 
-    wss.on("connection", (ws) => {
-      const interval = setInterval(() => ws.ping(), 5000);
-      ws.on("close", () => {
-        clearInterval(interval);
-      });
-      new ArduinoCliLanguageServerInstance(ws);
+    app.listen(configuration.PORT, () => {
+      console.log(
+        `Arduino-cli language server listening on port ${configuration.PORT}`
+      );
     });
-
-    console.log(
-      `Arduino-cli compilation server listening on port ${configuration.PORT}`
-    );
   }
 }

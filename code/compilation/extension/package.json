@@ -17,17 +17,17 @@
       {
         "command": "crosslab-compilation-extension.compile",
         "title": "Compile",
-        "icon": "$(run)",
+        "icon": "$(file-code)",
         "shortTitle": "compile",
-        "enablement": "workbenchState == folder && !crosslab.isCompiling",
+        "enablement": "workbenchState == folder && !(crosslab.isCompiling || crosslab.isDebugging || crosslab.isTesting || crosslab.remoteDebugSession)",
         "category": "compile"
       },
       {
         "command": "crosslab-compilation-extension.upload",
         "title": "Upload",
-        "icon": "$(cloud-upload)",
+        "icon": "$(run)",
         "shortTitle": "upload",
-        "enablement": "workbenchState == folder && !crosslab.isCompiling",
+        "enablement": "workbenchState == folder && !(crosslab.isCompiling || crosslab.isDebugging || crosslab.isTesting || crosslab.remoteDebugSession)",
         "category": "upload"
       }
     ],
@@ -77,6 +77,7 @@
   },
   "dependencies": {
     "@crosslab-ide/compilation-messaging-protocol": "file:../libraries/compilation-messaging-protocol",
+    "@crosslab-ide/crosslab-collaboration-service": "file:../../collaboration/service",
     "@crosslab-ide/crosslab-compilation-service": "file:../service",
     "@crosslab-ide/crosslab-filesystem-service": "file:../../filesystem/service",
     "@crosslab-ide/filesystem-messaging-protocol": "file:../../filesystem/libraries/filesystem-messaging-protocol",

@@ -1,11 +1,17 @@
 export type Configuration = {
   PORT: number;
+  WEBSOCKET_ENDPOINT: string;
 };
 
 function loadConfiguration(): Configuration {
   const PORT = parseInt(process.env["PORT"] ?? "3025");
+  const WEBSOCKET_ENDPOINT = process.env["WEBSOCKET_ENDPOINT"];
 
-  return { PORT };
+  if (!WEBSOCKET_ENDPOINT) {
+    throw new Error('Environment variable "WEBSOCKET_ENDPOINT" is undefined!');
+  }
+
+  return { PORT, WEBSOCKET_ENDPOINT };
 }
 
 export const configuration = loadConfiguration();

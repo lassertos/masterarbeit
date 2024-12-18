@@ -9,12 +9,16 @@ export default (deviceUrls: {
   vpspu: string;
 }): ExperimentServiceTypes.Template<"request"> => {
   return {
-    name: "Simulated Microcontroller + Virtual Device",
+    name: "Complete Collaboration Setup",
     configuration: {
       devices: [
         {
           device: deviceUrls["code-editor"],
-          role: "code-editor",
+          role: "code-editor-1",
+        },
+        {
+          device: deviceUrls["code-editor"],
+          role: "code-editor-2",
         },
         {
           device: deviceUrls["compiler"],
@@ -39,7 +43,201 @@ export default (deviceUrls: {
       ],
       roles: [
         {
-          name: "code-editor",
+          name: "code-editor-1",
+          configuration: {
+            tests: [
+              {
+                name: "Should drive in a circle",
+                functions: [
+                  // stop and set all sensors to 0
+                  {
+                    producerId: "simulation",
+                    functionName: "stop",
+                    args: [],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A0", 0], // set limit x left to 0
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A1", 0], // set limit x right to 0
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A2", 0], // set limit y top to 0
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A3", 0], // set limit y bottom to 0
+                  },
+                  // start and check that only motor x left is on
+                  {
+                    producerId: "simulation",
+                    functionName: "start",
+                    args: [],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A4"],
+                    expect: 1, // expect motor x left to be on
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A5"],
+                    expect: 0, // expect motor x right to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A6"],
+                    expect: 0, // expect motor y top to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A7"],
+                    expect: 0, // expect motor y bottom to be off
+                  },
+                  // activate limit x left and check that only motor y top is on
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A0", 1],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A4"],
+                    expect: 0, // expect motor x left to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A5"],
+                    expect: 0, // expect motor x right to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A6"],
+                    expect: 1, // expect motor y top to be on
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A7"],
+                    expect: 0, // expect motor y bottom to be off
+                  },
+                  // activate limit y top and check that only motor x right is on
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A2", 1],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A4"],
+                    expect: 0, // expect motor x left to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A5"],
+                    expect: 1, // expect motor x right to be on
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A6"],
+                    expect: 0, // expect motor y top to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A7"],
+                    expect: 0, // expect motor y bottom to be off
+                  },
+                  // activate limit x right and check that only motor y bottom is on
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A1", 1],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A4"],
+                    expect: 0, // expect motor x left to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A5"],
+                    expect: 0, // expect motor x right to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A6"],
+                    expect: 0, // expect motor y top to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A7"],
+                    expect: 1, // expect motor y bottom to be on
+                  },
+                  // deactivate limit x left
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A0", 0],
+                  },
+                  // activate limit y bottom and check that only motor x left is on
+                  {
+                    producerId: "simulation",
+                    functionName: "setPinValue",
+                    args: ["A3", 1],
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A4"],
+                    expect: 1, // expect motor x left to be on
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A5"],
+                    expect: 0, // expect motor x right to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A6"],
+                    expect: 0, // expect motor y top to be off
+                  },
+                  {
+                    producerId: "simulation",
+                    functionName: "getPinValue",
+                    args: ["A7"],
+                    expect: 0, // expect motor y bottom to be off
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          name: "code-editor-2",
           configuration: {
             tests: [
               {
@@ -240,10 +438,43 @@ export default (deviceUrls: {
       ],
       serviceConfigurations: [
         {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/collaboration",
+          configuration: {
+            rooms: ["projects", "status"],
+          },
+          participants: [
+            {
+              role: "code-editor-1",
+              serviceId: "collaboration",
+              config: {},
+            },
+            {
+              role: "code-editor-2",
+              serviceId: "collaboration",
+              config: {},
+            },
+          ],
+        },
+        {
           serviceType: "https://api.goldi-labs.de/serviceTypes/lsp",
           participants: [
             {
-              role: "code-editor",
+              role: "code-editor-1",
+              config: {},
+              serviceId: "lsp-extension:lsp",
+            },
+            {
+              role: "language-server",
+              config: {},
+              serviceId: "lsp",
+            },
+          ],
+        },
+        {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/lsp",
+          participants: [
+            {
+              role: "code-editor-2",
               config: {},
               serviceId: "lsp-extension:lsp",
             },
@@ -258,7 +489,24 @@ export default (deviceUrls: {
           serviceType: "https://api.goldi-labs.de/serviceTypes/testing",
           participants: [
             {
-              role: "code-editor",
+              role: "code-editor-1",
+              config: {
+                producerId: "simulation",
+              },
+              serviceId: "testing-extension:testing",
+            },
+            {
+              role: "simulation",
+              config: {},
+              serviceId: "testing",
+            },
+          ],
+        },
+        {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/testing",
+          participants: [
+            {
+              role: "code-editor-2",
               config: {
                 producerId: "simulation",
               },
@@ -276,7 +524,23 @@ export default (deviceUrls: {
             "https://api.goldi-labs.de/serviceTypes/debugging-adapter",
           participants: [
             {
-              role: "code-editor",
+              role: "code-editor-1",
+              config: {},
+              serviceId: "debugging:debugging-adapter",
+            },
+            {
+              role: "debugger",
+              config: {},
+              serviceId: "debugging-adapter",
+            },
+          ],
+        },
+        {
+          serviceType:
+            "https://api.goldi-labs.de/serviceTypes/debugging-adapter",
+          participants: [
+            {
+              role: "code-editor-2",
               config: {},
               serviceId: "debugging:debugging-adapter",
             },
@@ -337,12 +601,27 @@ export default (deviceUrls: {
           serviceType: "https://api.goldi-labs.de/serviceTypes/filesystem",
           participants: [
             {
-              role: "code-editor",
+              role: "code-editor-1",
               config: {},
               serviceId: "debugging:filesystem",
             },
             {
-              role: "code-editor",
+              role: "code-editor-1",
+              config: {},
+              serviceId: "filesystem",
+            },
+          ],
+        },
+        {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/filesystem",
+          participants: [
+            {
+              role: "code-editor-2",
+              config: {},
+              serviceId: "debugging:filesystem",
+            },
+            {
+              role: "code-editor-2",
               config: {},
               serviceId: "filesystem",
             },
@@ -351,7 +630,22 @@ export default (deviceUrls: {
         {
           serviceType: "https://api.goldi-labs.de/serviceTypes/file",
           participants: [
-            { role: "code-editor", config: {}, serviceId: "compilation:file" },
+            {
+              role: "code-editor-1",
+              config: {},
+              serviceId: "compilation:file",
+            },
+            { role: "simulation", config: {}, serviceId: "program" },
+          ],
+        },
+        {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/file",
+          participants: [
+            {
+              role: "code-editor-2",
+              config: {},
+              serviceId: "compilation:file",
+            },
             { role: "simulation", config: {}, serviceId: "program" },
           ],
         },
@@ -359,12 +653,27 @@ export default (deviceUrls: {
           serviceType: "https://api.goldi-labs.de/serviceTypes/filesystem",
           participants: [
             {
-              role: "code-editor",
+              role: "code-editor-1",
               config: {},
               serviceId: "compilation:filesystem",
             },
             {
-              role: "code-editor",
+              role: "code-editor-1",
+              config: {},
+              serviceId: "filesystem",
+            },
+          ],
+        },
+        {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/filesystem",
+          participants: [
+            {
+              role: "code-editor-2",
+              config: {},
+              serviceId: "compilation:filesystem",
+            },
+            {
+              role: "code-editor-2",
               config: {},
               serviceId: "filesystem",
             },
@@ -374,7 +683,22 @@ export default (deviceUrls: {
           serviceType: "https://api.goldi-labs.de/serviceTypes/compilation",
           participants: [
             {
-              role: "code-editor",
+              role: "code-editor-1",
+              config: {},
+              serviceId: "compilation",
+            },
+            {
+              role: "compiler",
+              config: {},
+              serviceId: "compilation",
+            },
+          ],
+        },
+        {
+          serviceType: "https://api.goldi-labs.de/serviceTypes/compilation",
+          participants: [
+            {
+              role: "code-editor-2",
               config: {},
               serviceId: "compilation",
             },

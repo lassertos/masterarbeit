@@ -50,6 +50,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@crosslab-ide/crosslab-collaboration-service": "file:../../collaboration/service",
     "@crosslab-ide/crosslab-testing-service": "file:../service",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "esbuild-plugin-polyfill-node": "^0.3.0"

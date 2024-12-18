@@ -207,6 +207,28 @@ crosslab-compilation-service:
       dependencies:
         - crosslab-compilation-service:build
 
+crosslab-lsp-service:
+  path: code/lsp/service
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - abstract-messaging-channel:publish
+        - soa-client-js:publish
+        - crosslab-messaging-channel:publish
+    publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - crosslab-lsp-service:build
+
 crosslab-debugging-adapter-service:
   path: code/debugging/services/adapter
   jobs:
@@ -349,8 +371,7 @@ arduino-language-server:
         execute: npm run build
       dependencies:
         - soa-client-js:publish
-        - file-service-js:publish
-        - message-service-js:publish
+        - crosslab-lsp-service:publish
     build-docker:
       helper-functions:
         before:
@@ -453,7 +474,8 @@ crosslab-lsp-extension:
         prepare: npm ci
         execute: npm run package-web
       dependencies:
-        - message-service-js:publish
+        - crosslab-lsp-service:publish
+        - abstract-messaging-channel:publish
 
 crosslab-testing-extension:
   path: code/testing/extension
@@ -464,6 +486,7 @@ crosslab-testing-extension:
         execute: npm run package-web
       dependencies:
         - crosslab-testing-service:build
+        - crosslab-collaboration-service:build
 
 crosslab-collaboration-extension:
   path: code/collaboration/extension
@@ -505,6 +528,7 @@ crosslab-compilation-extension:
         - filesystem-messaging-protocol:build
         - crosslab-compilation-service:build
         - crosslab-filesystem-service:build
+        - crosslab-collaboration-service:build
         - soa-client-js:build
 
 crosslab-debugging-extension:
@@ -517,6 +541,7 @@ crosslab-debugging-extension:
       dependencies:
         - crosslab-debugging-adapter-service:build
         - electrical-connection-service-js:build
+        - crosslab-collaboration-service:build
 
 crosslab-editor:
   path: code/editor

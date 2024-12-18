@@ -1,4 +1,6 @@
+import { ChildProcessWithoutNullStreams } from "child_process";
 import { ResultFormat } from "../../../compilation/libraries/compilation-messaging-protocol/dist/index.mjs";
+import { DebugAdapterProtocolHandler } from "./debugAdapterProtocolHandler.mjs";
 
 export const resultFormats = [
   {
@@ -11,3 +13,17 @@ export const resultFormats = [
     },
   },
 ] as const satisfies ResultFormat[];
+
+export type Session = {
+  paths: {
+    tmpDir: string;
+    srcDir: string;
+    projectDir: string;
+    elfDir: string;
+    elfFile: string;
+  };
+  gdbProcess: ChildProcessWithoutNullStreams;
+  buffer: string;
+  configuration?: Record<string, unknown>;
+  debugAdapterProtocolHandler: DebugAdapterProtocolHandler;
+};

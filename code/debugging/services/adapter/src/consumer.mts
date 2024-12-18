@@ -21,7 +21,9 @@ import { PromiseManager } from "./promiseManager.mjs";
 import { v4 as uuidv4 } from "uuid";
 
 interface DebuggingAdapterServiceConsumerEvents {
+  "new-producer": (producerId: string) => void;
   message: (
+    producerId: string,
     message: IncomingMessage<DebuggingAdapterProtocol, "client">
   ) => void;
 }
@@ -30,11 +32,11 @@ export class DebuggingAdapterServiceConsumer
   extends TypedEmitter<DebuggingAdapterServiceConsumerEvents>
   implements Service
 {
+  private _producers: Map<
+    string,
+    CrossLabMessagingChannel<DebuggingAdapterProtocol, "client">
+  > = new Map();
   private _promiseManager: PromiseManager = new PromiseManager();
-  private _messagingChannel?: CrossLabMessagingChannel<
-    DebuggingAdapterProtocol,
-    "client"
-  >;
   serviceType: string =
     "https://api.goldi-labs.de/serviceTypes/debugging-adapter";
   serviceId: string;
@@ -60,20 +62,30 @@ export class DebuggingAdapterServiceConsumer
   ): void {
     // TODO: add checkConfig function
     const channel = new DataChannel();
-    this._messagingChannel = new CrossLabMessagingChannel(
+    const messagingChannel = new CrossLabMessagingChannel(
       channel,
       debuggingAdapterProtocol,
       "client"
     );
-    this._messagingChannel.on("message", (message) => {
+
+    const producerId = uuidv4();
+    this._producers.set(producerId, messagingChannel);
+
+    messagingChannel.on("message", (message) => {
       console.log("emitting debug adapter message", message);
 
-      if (message.type === "session:start:response") {
+      if (
+        message.type === "session:start:response" ||
+        message.type === "session:join:response"
+      ) {
         return this._promiseManager.resolve(message.content.requestId, message);
       }
 
-      this.emit("message", message);
+      this.emit("message", producerId, message);
     });
+
+    this.emit("new-producer", producerId);
+
     if (connection.tiebreaker) {
       connection.transmit(serviceConfig, "data", channel);
     } else {
@@ -81,24 +93,32 @@ export class DebuggingAdapterServiceConsumer
     }
   }
 
-  async send(message: OutgoingMessage<DebuggingAdapterProtocol, "client">) {
-    if (!this._messagingChannel) {
-      throw new Error("No messaging channel has been set up!");
+  async send(
+    producerId: string,
+    message: OutgoingMessage<DebuggingAdapterProtocol, "client">
+  ) {
+    const producer = this._producers.get(producerId);
+    if (!producer) {
+      throw new Error(`Could not find producer with id "${producerId}"!`);
     }
-    await this._messagingChannel.send(message);
+    await producer.send(message);
   }
 
-  async startSession(session: {
-    configuration: Record<string, unknown>;
-    directory: Directory;
-  }) {
-    if (!this._messagingChannel) {
-      throw new Error("No messaging channel has been set up!");
+  async startSession(
+    producerId: string,
+    session: {
+      configuration: Record<string, unknown>;
+      directory: Directory;
+    }
+  ) {
+    const producer = this._producers.get(producerId);
+    if (!producer) {
+      throw new Error(`Could not find producer with id "${producerId}"!`);
     }
 
     const requestId = uuidv4();
 
-    await this._messagingChannel.send({
+    await producer.send({
       type: "session:start:request",
       content: { requestId, ...session },
     });
@@ -121,6 +141,46 @@ export class DebuggingAdapterServiceConsumer
       throw new Error(
         response.content.message ??
           "Something went wrong while trying to start the debugging session!"
+      );
+    }
+
+    return {
+      sessionId: response.content.sessionId,
+      configuration: response.content.configuration,
+    };
+  }
+
+  async joinSession(producerId: string, sessionId: string) {
+    const producer = this._producers.get(producerId);
+    if (!producer) {
+      throw new Error(`Could not find producer with id "${producerId}"!`);
+    }
+
+    const requestId = uuidv4();
+
+    await producer.send({
+      type: "session:join:request",
+      content: { requestId, sessionId },
+    });
+
+    const response = await this._promiseManager.add(requestId);
+
+    if (
+      !isProtocolMessage(
+        debuggingAdapterProtocol,
+        "session:join:response",
+        response
+      )
+    ) {
+      throw new Error(
+        'Received response is not a valid "session:join:response" message!'
+      );
+    }
+
+    if (!response.content.success) {
+      throw new Error(
+        response.content.message ??
+          `Something went wrong while trying to join the debugging session with id "${sessionId}"!`
       );
     }
 

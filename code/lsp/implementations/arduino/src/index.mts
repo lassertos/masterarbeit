@@ -1,5 +1,5 @@
 import { configuration } from "./configuration.mjs";
-import { ArduinoCliCompilationServer } from "./server.mjs";
+import { ArduinoCliLanguageServer } from "./server.mjs";
 
-const arduinoCliCompilationServer = new ArduinoCliCompilationServer();
+const arduinoCliCompilationServer = new ArduinoCliLanguageServer();
 arduinoCliCompilationServer.start(configuration);

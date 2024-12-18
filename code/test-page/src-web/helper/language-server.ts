@@ -24,7 +24,14 @@ export default async () => {
       type: "cloud instantiable",
       name: "language-server",
       instantiateUrl: configuration.languageServerUrl,
-      services: [],
+      services: [
+        {
+          serviceDirection: "producer",
+          serviceId: "lsp",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/lsp",
+          supportedConnectionTypes: ["websocket", "local"],
+        },
+      ],
       isPublic: true,
     })
   ).url;
