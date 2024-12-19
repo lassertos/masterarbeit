@@ -1,4 +1,4 @@
-\chapter{Konzeption} \label{konzeption}
+\chapter{Konzeption}\label{section:konzeption}
 
 Im Fokus dieser Arbeit liegt die Programmierung von Mikrocontrollern im Rahmen des GOLDi Remotelab. Bei den verwendeten Microcontrollern handelt es sich um ATmega2560. Damit diese mit der CrossLab Infrastruktur kommunizieren können sind sie über einen FPGA mit einem Raspberry Pi Compute Module 4 verbunden. Dabei übernimmt der FPGA die Kommunikation zwischen dem CM und dem Microcontroller, während das CM die Kommunikationsschnittstelle zur CrossLab Infrastruktur übernimmt. Als Beispiel für ein steuerbares elektromechanisches Modell wird das 3-Achs-Portal verwendet. Neben den realen Systemen sollen auch die virtuellen Versionen in Betracht gezogen werden. Daraus folgen vier verschiedene Experiment-Konfigurationen, die für die Konzeption betrachtet werden:
 
@@ -11,11 +11,11 @@ Im Fokus dieser Arbeit liegt die Programmierung von Mikrocontrollern im Rahmen d
 
 Weiterhin ist zu beachten, dass auch mehrere Steuereinheiten und Modelle in einem Experiment enthalten sein können.
 
-In \autoref{konzeption:crosslab-kompatibilität} wird zunächst dargelegt wie die CrossLab-Kompatibilität erreicht werden kann. Danach wird in \autoref{konzeption:kollaboration} der Ansatz für die Bereitstellung von Kollaborationsmöglichkeiten beschrieben. In \autoref{konzeption:datenspeicherung} wird das Konzept für die Datenspeicherung erläutert. Darauf folgend wird in \autoref{konzeption:kompilierung} die Funktionsweise der Kompilierung dargelegt. Danach wird in \autoref{konzeption:debugging} das Konzept zur Ermöglichung von Debugging beschrieben. In \autoref{konzeption:testen} wird die Vorgehensweise für die Ausführung von Tests erläutert. Weiterhin wird in \autoref{konzeption:language_server} die Einbindung von Language Servern dargelegt. Schließlich wird in \autoref{konzeption:simulation} ein Konzept für die Simulation von Steuereinheiten beschrieben.
+In \autoref{section:konzeption:crosslab-kompatibilität} wird zunächst dargelegt wie die CrossLab-Kompatibilität erreicht werden kann. Danach wird in \autoref{section:konzeption:kollaboration} der Ansatz für die Bereitstellung von Kollaborationsmöglichkeiten beschrieben. In \autoref{section:konzeption:dateisystem} wird das Konzept für das Dateisystem erläutert. Darauf folgend wird in \autoref{section:konzeption:kompilierung} die Funktionsweise der Kompilierung dargelegt. Danach wird in \autoref{section:konzeption:debugging} das Konzept zur Ermöglichung von Debugging beschrieben. In \autoref{section:konzeption:testen} wird die Vorgehensweise für die Ausführung von Tests erläutert. Weiterhin wird in \autoref{section:konzeption:language-server} die Einbindung von Language Servern dargelegt. Schließlich wird in \autoref{section:konzeption:simulation} ein Konzept für die Simulation von Steuereinheiten beschrieben.
 
 \input{content/05_konzeption/051_crosslab_kompatibilität.tex}
 \input{content/05_konzeption/052_kollaboration.tex}
-\input{content/05_konzeption/053_datenspeicherung.tex}
+\input{content/05_konzeption/053_dateisystem.tex}
 \input{content/05_konzeption/054_kompilierung.tex}
 \input{content/05_konzeption/055_debugging.tex}
 \input{content/05_konzeption/056_testen.tex}
