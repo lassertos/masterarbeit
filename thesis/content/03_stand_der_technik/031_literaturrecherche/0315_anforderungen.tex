@@ -1,5 +1,7 @@
 \subsection{Anforderungen}\label{section:stand-der-technik:literaturrecherche:anforderungen}
 
+Die Anforderungen an online IDEs sind sehr anwendungsspezifisch. Allerdings gibt es dennoch einige allgemeinere Anforderungen, die im Folgenden erläutert werden.
+
 % Anforderungen:
 % \begin{itemize}
 %     \item Angemessenes Nutzerinterface
@@ -22,4 +24,21 @@
 %     \item Interfaces für Lehrende
 % \end{itemize}
 
-Anforderungen an online IDEs sind meist sehr anwendungsspezifisch. Dementsprechend ist ein für die Zielgruppe angemessenes Nutzerinterface von hoher Bedeutung. Ein Student, der bereits mehrere Programmierkurse belegt hat und Erfahrungen mit IDEs sammeln konnte wird ein ihm vertrautes Interface mit bereits bekannten Funktionen wertschätzen, während das gleiche Interface einen Schüler, der gerade erst anfängt Programmieren zu lernen, überfordern würde. Ein für Schüler ausgelegtes Interface würde umgekehrt den Studenten frustrieren, da dieser ggf. bereits bekannte Funktionen nicht nutzen kann. Im Allgemeinen sollten aber die in einer IDE verwendeten Code Editoren Standardfunktionen wie z.B. Syntax Highlighting und Code-Vervollständigung für textbasierte Programmiersprachen unterstützen. Weiterhin sind oftmals auch die Kompilierung und Ausführung sowie das Debugging und Testen von Programmen wichtige Anforderungen an online IDEs. Zudem sollten den Nutzern auch Möglichkeiten zur Kollaboration angeboten werden. Dabei kann es den Nutzern unter anderem ermöglicht werden gleichzeitig an Projekten zu arbeiten, wobei gleichzeitig auch entsprechende Kommunikationsmöglichkeiten bereitgestellt werden können. Allerdings kann die Kollaboration auch asynchron über Versionskontrollsysteme wie z.B. Git \todoaddref[]{Git} und über Foren z.B. innerhalb eines verwendeten LMS ermöglicht werden. Eine weitere Anforderung ist die Möglichkeit zur Datenerhebung.
+\paragraph{Interface}
+Das Nutzerinterface sollte an die Zielgruppe angepasst sein. Ein professioneller Programmierer erwartet ein anderes Interface als ein Schüler, der zum ersten Mal programmiert. Dementsprechend könnte für erstere z.B. ein bereits vorhandenes IDE Interface genutzt werden, während für zweitere eine vereinfachtes Interface angeboten werden sollte, dass z.B. nur die nötigsten Funktionen anbietet um die unerfahrenen Nutzer nicht zu überfordern.
+
+\paragraph{Editor Funktionen}
+Online IDEs sollten Editor Funktionen, wie z.B. Syntax Highlighting, Code-Vervollständigung, Code-Navigation und Refactoring anbieten. Dabei müssen diese nicht für alle Programmiersprachen angeboten werden, aber es ist vom Vorteil wenn diese über entsprechende Erweiterungsmechanismen hinzugefügt werden können.
+
+\paragraph{Projektmanagement}
+Es sollte Nutzern ermöglicht werden ihre Projekte in der online IDE speichern zu können. Dabei gibt es die Möglichkeiten der clientseitigen Speicherung, bei denen die Daten z.B. im Browser des Nutzers hinterlegt werden, und der serverseitigen Speicherung. Letztere ermöglicht wie zuvor erwähnt den systemunabhängigen Zugriff auf die Projekte des Nutzers.
+
+\paragraph{Kollaboration}
+Eine häufig genannte Anforderung ist die Bereitstellung von Kollaborationsmöglichkeiten für die Nutzer der online IDE. Dabei gibt es synchrone und asynchrone Kollaborationsmöglichkeiten. Erstere beinhalten z.B. die Möglichkeit mit anderen Nutzern gleichzeitig an einer geteilten Datei arbeiten zu können. Zweitere beinhalten z.B. Versionskontrollsysteme, Chats und Foren.
+
+\paragraph{Erweiterbarkeit}
+Eine erweiterbare online IDE hat den Vorteil, dass sie ggf. für mehrere verschiedene Anwendungsfälle genutzt werden kann. Eine bereits genannte Erweiterungsmöglichkeit ist z.B. die Unterstützung neuer Programmiersprachen über die Bereitstellung der entsprechenden Editor Funktionen.
+
+
+\paragraph{Datenerhebung}
+Wie bereits in den Vorteilen erwähnt ermöglicht die Datenerhebung ein besseres Verständnis für das Nutzerverhalten. Zudem können die erhobenen Daten genutzt werden um die Nutzererfahrung zu verbessern. Daher ist die Möglichkeit der Datenerhebung eine oftmals genannte Anforderung.
