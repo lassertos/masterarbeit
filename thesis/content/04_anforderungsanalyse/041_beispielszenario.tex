@@ -1,41 +1,12 @@
 \section{Beispielszenario: Praktikumsversuch}\label{section:anforderungsanalyse:beispielszenario}
 
-In diesem Abschnitt soll ein Beispielszenario für den Einsatz der zu entwickelnden integrierten Entwicklungsumgebung beschrieben werden. Bei dem Beispielszenario handelt es sich um einen Praktikumsversuch.
+In diesem Abschnitt wird ein Beispielszenario für den Einsatz der zu entwickelnden integrierten Entwicklungsumgebung beschrieben werden. Bei dem Beispielszenario handelt es sich um einen Praktikumsversuch, bei dem die Studierenden in Zweiergruppen mehrere verschiedene Aufgaben lösen müssen. Diese Aufgaben nutzen unterschiedliche Experimentkonfigurationen.
 
-Bei der Konzipierung eines Praktikumsversuchs sollten die beabsichtigten Lernergebnisse der Studierenden ermittelt werden. Anhand dieser kann dann ein entsprechender Versuchsaufbau entwickelt bzw. ausgewählt werden. Die Entwickler eines CrossLab-kompatiblen Versuchs sind dafür verantwortlich die benötigten Laborgeräte zu implementieren.
+\paragraph{Vorbereitung}
+Für den Praktikumsversuch müssen ggf. neue CrossLab-kompatible Geräte implementiert und angebunden werden. Dafür können entweder bereits vorhandene Services genutzt oder neue Services entwickelt werden. Sollten neue Services entwickelt werden ist es ggf. notwendig bereits vorhandene Geräte mit diesen zu erweitern. Weiterhin werden Testfälle ausgearbeitet, welche die automatische Überprüfung von abgegebenen Lösungen ermöglichen.
 
-\subsection{Entwickler}
+\paragraph{Durchführung}
+Nachdem der Praktikumsversuch fertiggestellt wurde kann er den Studierenden vorgestellt werden. Dabei zeigt ein Dozent den Studierenden die Aufgaben und wie diese zu bearbeiten sind. Danach können die Studierenden mit der Bearbeitung der Aufgaben beginnen. Dafür starten sie die entsprechenden Experimente über ein ihnen bereitgestelltes Interface, z.B. über ein vorhandenes \ac{LMS}. Die Studierenden sollen die gestellten Aufgaben gemeinsam bearbeiten. Sollten während der Bearbeitung der Aufgaben Probleme auftreten können sich die Studierenden an einen entsprechenden Betreuer wenden. Die Studierenden können ihre erarbeitete Lösung jederzeit mit den hinterlegten Testfällen überprüfen. Sobald alle Testfälle erfolgreich beendet werden ist die entsprechende Aufgabe erfüllt und die Ergebnisse werden entsprechend gespeichert.
 
-Entwickler sind für den Entwurf und die Implementierung neuer Laborgeräte verantwortlich. Gegebenenfalls muss ein neues Laborgerät mit der integrierten Entwicklungsumgebung interagieren. Um dies zu ermöglichen muss die zu entwickelnde integrierte Entwicklungsumgebung entsprechende Services anbieten. Über diese Services können dann entsprechende Laborgeräte verbunden werden. Hierbei wäre es hilfreich, wenn die integrierte Entwicklungsumgebung erweiterbar wäre, ohne das zugrundeliegende Laborgerät anpassen zu müssen.
-
-\begin{note}
-    Eine Idee wäre es in der integrierten Entwicklungsumgebung eine CrossLab-Service Erweiterungen zu erlauben. Wenn ein Experiment konfiguriert wird könnte eine entsprechende Erweiterung als Konfiguration an die integrierte Entwicklungsumgebung übergeben werden. Diese würde die entsprechende Erweiterung dann laden und könnte somit dann die darin implementierten Services anbieten. Hierbei ist allerdings noch zu überlegen, wie genau das in einem Konfigurator umgesetzt werden könnte.
-\end{note}
-
-\subsection{Betreuer}
-
-Betreuer müssen die Lernenden während der Durchführung des Praktikumsversuchs begleiten. Hierbei könnte es dem Betreuer erlaubt werden, einem laufenden Experiment der Lernenden beizutreten. Über ein entsprechendes Rollenmanagement könnte es dem Betreuer somit ermöglicht werden den Code der Lernenden einzusehen und zu bearbeiten. Weiterhin könnte er weitere Features der integrierten Entwicklungsumgebung nutzen, wie zum Beispiel die Kompilierung und das Hochladen von Code.
-
-\begin{note}
-    Hierbei ist interessant, wie das Rollenmanagement implementiert werden muss und wie die entsprechenden Erweiterungen damit umgehen. Weiterhin ist interessant, wie das Beitreten von Nutzern allgemein implementiert werden sollte. Ideen: Betreuer kann Experiment updaten / Betreuer wird erkannt und dynamisch entsprechender Rolle zugeteilt / Optionales Laborgerät für Betreuer ist im Experiment hinterlegt. Wie sollten optionale Laborgeräte implementiert werden?
-\end{note}
-
-\subsection{Lernende}
-
-Lernende müssen den Praktikumsversuch durchführen. Hierbei können sie alle bereitgestellten Hilfsmittel der integrierten Entwicklungsumgebung nutzen. Um die Kollaboration von Lernenden zu ermöglichen sollte die integrierte Entwicklungsumgebung über entsprechende Mechanismen verfügen. So könnten den Lernenden zum Beispiel die Kommunikation über Text und Video, sowie das gleichzeitige Editieren von Dateien ermöglicht werden.
-
-\begin{note}
-    Hierbei könnte auch über weitere Interaktionsmöglichkeiten nachgedacht werden, wie zum Beispiel eine Git-Integration oder ein Kurs-übergreifendes Wiki.
-\end{note}
-
-\subsection{Lehrende}
-
-Lehrende sind für die didaktische Konzipierung des Praktikumsversuchs verantwortlich. Lehrende können sich darauf aufbauend ein Experiment zusammenstellen, welches ihrem didaktischen Konzept entspricht. Weiterhin könnten Lehrenden auch bereits vorkonfigurierte Experimente angezeigt werden, mit denen sie ihre angestrebten Ziele erreichen können.
-
-\begin{note}
-    Dabei ist es allerdings notwendig, dass die Geräte und Experimente mit entsprechenden Meta-Informationen ausgestattet werden, welche die Kategorisierung bzw. das Zusammenstellen von passenden Experimenten vereinfacht.
-\end{note}
-
-\subsection{Administrator}
-
-Administratoren sind für die Verwaltung und Bereitstellung der Laborgeräte verantwortlich. Um den Administrator bei der Einrichtung der Softwarekomponenten zu unterstützen könnte ein entsprechendes Tool konzipiert werden. Bei diesem könnte der Administrator die benötigten Softwarekomponenten auswählen und würde dann eine Konfiguration in einem passenden Format ausgegeben bekommen (z.B. Dockerfile, Docker-Compose, ...).
+\paragraph{Nachbereitung}
+Während der Ausführung der Experimente können Daten erfasst werden, die es Lehrenden ermöglicht nachzuvollziehen bei welchen Aufgaben die Studierenden Probleme hatten bzw. wofür sie die meiste Zeit aufwenden mussten. Dazu kann z.B. die Code-Historie der Studierenden gespeichert werden sowie die in einem Experiment verbrachte Zeit. Durch die Analyse der entsprechenden Daten können Lehrende Änderungen am Praktikumsversuch vornehmen um diesen zu verbessern.

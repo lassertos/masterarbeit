@@ -32,6 +32,10 @@
 \usepackage{parskip}
 \usepackage{pgf-umlsd}
 \usepackage{booktabs}
+\usepackage{arrayjobx}
+\usepackage{biblatex}
+\usepackage{longtable}
+\addbibresource{NIKR_bibliography.bib}
 
 % based on \newthread macro from pgf-umlsd.sty
 % add fourth argument (third mandatory) that defines the xshift of a thread.
@@ -77,16 +81,16 @@
 \ifdefstring{\settingsLanguage}{german}{%
     \usepackage[ngerman]{babel}			% Spracheinstellungen (für deutsch z.B. Contents -> Inhaltsverzeichnis, etc.)
     \usepackage{bibgerm}            	% Stylefile für deutsche Literaturstellenangabe
-    \bibliographystyle{unsrt}		    % Stil für Literaturangaben festlegen
+    % \bibliographystyle{unsrt}		    % Stil für Literaturangaben festlegen
 }%
 {%
     \usepackage[american]{babel}		% Spracheinstellungen (für deutsch z.B. Contents -> Inhaltsverzeichnis, etc.)
-    \bibliographystyle{unsrt}			% Stil für Literaturangaben festlegen
+    % \bibliographystyle{unsrt}			% Stil für Literaturangaben festlegen
     \frenchspacing						% einfaches Leerzeiches nach Satzende (für deutsch bereits Standard)
 }%
-\usepackage[%
-    noadjust        					% noadjust verhindert automatische Leerzeichen um die Referenz, was am Zeilenanfang zu Problemen führt
-]{cite}     							% erlaubt Zeilenumbruch innerhalb von Zitierungen
+% \usepackage[%
+%     noadjust        					% noadjust verhindert automatische Leerzeichen um die Referenz, was am Zeilenanfang zu Problemen führt
+% ]{cite}     							% erlaubt Zeilenumbruch innerhalb von Zitierungen
 
 \usepackage{graphicx}					% erweiterte Argumente in \in­clude­graph­ics
 \graphicspath{{\settingsGraphicsPath}}	% Standard-Pfad für Bilder siehe NIKR_settings.tex
@@ -108,9 +112,9 @@
 
 \usepackage[%							% Einbettung von Links im Dokument und erlaubt die Nutzugn von \url
     hyperfootnotes=false,				% keine Fußnoten als Link im Dokument (geht nicht mit footmisc)
-    pagebackref=true					% Backrefs im Literaturverzeichnis
+    % pagebackref=true					% Backrefs im Literaturverzeichnis
 ]{hyperref}           					% Einbettung von Links im Dokument und erlaubt die Nutzugn von \url
-\renewcommand*{\backref}[1]{\textit{(\pagename:~#1)}}   % Format für backrefs
+% \renewcommand*{\backref}[1]{\textit{(\pagename:~#1)}}   % Format für backrefs
 
 \usepackage[%							% erlaubt erweiterte Formatierungen von Fußnoten (siehe unten)
     multiple,							% mehrere mit Komma abtrennen
