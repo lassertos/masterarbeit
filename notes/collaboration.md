@@ -163,3 +163,79 @@ So if the user deletes / created a file / folder the corresponding entry has to 
 Besides updating the filesystem there is also the possibility of making simultaneous changes inside of a file. If a user opens a shared file a corresponding binding needs to be created which will listen for any changes made by either the user or another participant on this shared file. If a change occurs locally the corresponding update should be sent to all participants. If a remote change is received the contents of the file should be updated accordingly. Furthermore awareness information should be shared between the participants to allow all participants to see where the others are working currently.
 
 Another kind of information to be shared between participants is status information. For this it would either be possible to attach it to the projects room or to create a new status room. This status information could be extended by other extensions. E.g. the compilation extension could add a status `isCompiling`. If a user starts a compilation this would be set to true and the other participants would be notified of this change. Using this information the vscode instance of the other participants could change their compilation icon to a disabled state while another compilation is currently running. Or in the case of a debugging session the code editor could allow them to join the current debugging session. Since this status information would be sent via awareness states it has a timeout of 30s so if a client disconnects it would still be possible to recover a usable experiment state.
+
+## General Concept
+
+The general concept of the collaboration services revolves around sharing json resources. Since there are many different techniques for achieving real time sharing of such resources a common description is needed that allows for the implementation of a collaboration service with these different techniques. If we take a look at json schemas we can identify the following basic types:
+
+- object
+- array
+- number
+- integer
+- boolean
+- string
+- null
+
+These need to be representable by the collaboration system. Furthermore the concept of rooms is introduced. Rooms offer a way for different participants to offer and consume different resources. If we take for example an experiment containing three participants A, B and C. If A wants to share a project only with B and B itself wants to share a project only with C, then both A and B could open a room with the shared project as the json resource. They could then share the room information (e.g. room name and password) with the correspoding participants they want to share their project with. Using this information these participants could then join the room and start collaboration on the given projects.
+
+Using a schema for describing the contents of a room allows for the continous runtime validation of the shared json resources. Each change made to the shared resources should result in a valid resource.
+
+A collaboration system should be able to transform a given json value into a collaborative object.
+
+```typescript
+type CollaborationType =
+  | CollaborationObject
+  | CollaborationArray
+  | CollaborationNumber
+  | CollaborationInteger
+  | CollaborationBoolean
+  | CollaborationString
+  | CollaborationNull;
+
+class Room {
+  name: string;
+  password?: string;
+  set(key: string, value: CollaborationType);
+  get(key: CollaborationType);
+  toJSON();
+}
+
+class CollaborationObject {
+  children: CollaborationType[];
+  set(key: string, value: CollaborationType);
+  get(key: string): CollaborationType;
+  toJSON(): unknown;
+}
+
+class CollaborationArray {
+  children: CollaborationType[];
+  push(item: CollaborationType);
+  toJSON();
+}
+
+class CollaborationNumber {
+  set(value: number);
+  toJSON();
+}
+
+class CollaborationInteger {
+  set(value: number);
+  toJSON();
+}
+
+class CollaborationBoolean {
+  set(value: boolean);
+  toJSON();
+}
+
+class CollaborationString {
+  set(value: string);
+  insert(index: number, value: string);
+  delete(index: number, count: number);
+  toJSON();
+}
+
+class CollaborationNull {
+  toJSON();
+}
+```
