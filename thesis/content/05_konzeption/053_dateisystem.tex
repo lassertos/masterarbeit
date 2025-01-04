@@ -1,3 +1,35 @@
 \section{Dateisystem}\label{section:konzeption:dateisystem}
 
+Nach \autoref{requirement:Dateisystem} soll die IDE ein integriertes Dateisystem besitzen. Für dieses werden im Folgenden zwei verschiedene Lösungsansätze in beschrieben, ein client-seitiger und eine server-seitiger.
+
+Für den client-seitigen Lösungsansatz bietet sich eine Speicherung der Dateien des Nutzers innerhalb des Browsers an. Für die persistente Speicherung von Daten innerhalb des Browsers kann die Indexed Database API \cite{noauthor_indexed-database-api_nodate} genutzt werden. Diese wird von allen aktuellen Browsern unterstützt und erlaubt die langfristige Speicherung von größeren Datenmengen. Der Vorteil des client-seitigen Ansatzes ist die Tatsache, das kein weiterer Speicherplatz für die Nutzer bereitgestellt werden muss, da die Daten auf dem Rechner des Nutzers gespeichert werden. Allerdings sind die Daten sowohl an die Domain der IDE, das Gerät des Nutzers als auch an den spezifischen Browser gebunden und müssen durch entsprechendes Exportieren und Importieren übertragen werden.
+
+Der server-seitige Lösungsansatz basiert darauf jedem Nutzer einen entsprechenden Bereich zuzuteilen, in welchem seine Dateien gespeichert werden. Dies kann entweder über das Dateisystem des Servers oder über eine Datenbank geschehen. Der Vorteil dieser Art der Datenspeicherung liegt darin, dass sie geräteunabhängig ist. Allerdings werden für die Speicherung der Nutzerdaten entsprechender Speicherplatz auf dem Server benötigt wodurch höhere Kosten und ein höherer Verwaltungsaufwand bestehen. Zudem muss sichergestellt werden, dass das System nicht ausgenutzt werden kann.
+
+\autoref{requirement:Dateisystem: CrossLab-Kompatibilität} verlangt die Entwicklung von CrossLab-Services für die Bereitstellung und Nutzung von Dateisystemen. Dementsprechend werden im Folgenden der \textit{Dateisystem Service Producer} und der \textit{Dateisystem Service Consumer} beschrieben. Die grundlegende Kommunikation zwischen den beiden Services geschieht über den Austausch von Nachrichten. Diese bestehen aus einem Typen und dem dazugehörigen Inhalt. Durch die Definition der Nachrichten kann eine Validierung dieser innerhalb der Services geschehen. In \autoref{figure:klassendiagramm-dateisystem-services} ist ein Klassendiagramm für die beiden Services dargestellt. Aus diesem können die bereitgestellten Operationen eines Dateisystems abgelesen werden. So müssen Dateisysteme die Erstellung von Ordnern und Dateien, das Lesen, Verschieben und Löschen dieser sowie das Schreiben von Dateien unterstützen. Dabei besitzt der Consumer Funktionen um die einzelnen Operationen auszuführen, während der Producer die Möglichkeit bietet auf eingehende Anfragen zu reagieren und entsprechende Antworten an den Consumer zu senden.
+
+\begin{figure}[tbp]
+    \centering
+    \begin{tikzpicture}
+        \begin{class}[text width=8.25cm]{DateisystemServiceConsumer}{-4,0}
+            \operation{+ createDirectory(path, content)}
+            \operation{+ delete(path)}
+            \operation{+ move(path, newPath)}
+            \operation{+ readDirectory(path)}
+            \operation{+ readFile(path)}
+            \operation{+ writeFile(path, content)}
+        \end{class}
+        \begin{class}[text width=6cm]{DateisystemServiceProducer}{4,0}
+            \operation{+ onRequest(request)}
+            \operation{+ send(message)}
+        \end{class}
+    \end{tikzpicture}
+    \caption{Klassendiagramm Dateisystem Services}
+    \label{figure:klassendiagramm-dateisystem-services}
+\end{figure}
+
+Eine mögliche Erweiterung der Services besteht in der Unterstützung mehrerer Kommunikationspartner. Sollten bei der Erstellung eines Experiments mehrere Verbindungen hergestellt werden so wird für jeden Kommunikationspartner ein eindeutiger Kennzeichner erstellt. Dieser wird dann in den jeweiligen Funktionen mit angegeben um die Nachrichten an den korrekten Kommunikationspartner zu schicken. Zudem könnte auch die Überwachung von Ordnern und Dateien angeboten werden. Dafür würde der Consumer eine entsprechende Anfrage an den Producer senden, in welcher er die zu überwachenden Pfade angibt. Sollte dann eine Änderung in einem der überwachten Pfade auftreten wird eine entsprechende Nachricht vom Producer an den Consumer gesendet.
+
+Nach \autoref{requirement:Dateisystem: Kollaboration} soll das Dateisystem das Teilen von Ordnern mit anderen Nutzern innerhalb eines Experiments unterstützen. Dafür können die in \autoref{section:konzeption:kollaboration} beschriebenen Kollaborationsmechanismen genutzt werden. Beim Erstellen eines Experiments öffnen Nutzer einen Raum zum Teilen ihrer Ordner. Die geteilte Datenstruktur hat dabei die Kennzeichner der verschiedenen Teilnehmer als Schlüssel mit den geteilten Ordnern als den dazugehörigen Wert. Am Anfang einer Sitzung hat ein Nutzer noch keine geteilten Ordner und setzt somit seinen eigenen Wert auf ein leeres Objekt. Wenn ein Nutzer einen Ordner teilt so wird dieser den anderen Nutzern angezeigt und sie können mit den Inhalt einsehen und bearbeiten. Die Implementierung der Synchronisation ist hierbei abhängig von dem verwendeten Code Editor. Weiterhin kann auch die aktuelle Position von Nutzern über deren Zustandsinformationen mit den anderen Nutzern geteilt werden. Die Position kann dann den anderen Nutzern innerhalb der entsprechenden Datei angezeigt werden.
+
 % Das bisherige WIDE System nutzt ein projektbasiertes Dateisystem. In diesem muss der Name eines Projektes einzigartig sein. Weiterhin können nicht mehrere Projekte gleichzeitig geöffnet werden. Zudem werden Metadaten zu einem Projekt gespeichert. Diese umfassen das elektromechanische Modell, die Steuereinheit sowie die Programmiersprache, die bei der Erstellung des Projekts genutzt bzw. ausgewählt wurden. Dadurch ist es möglich dem Nutzer nur die Projekte anzuzeigen, die in dem aktuellen Experiment von Interesse sein könnten. In der neuen CrossLab Architektur ist es nun allerdings möglich mehrere Steuereinheiten und elektromechanische Modelle sowie weitere Laborgeräte zu einem Experiment zusammenzustellen. Deshalb sollte es dem Nutzer ermöglicht werden mehrere Projekte gleichzeitig öffnen und bearbeiten zu können. Ein weiteres Feature von WIDE ist die Bereitstellung von Beispielprojekten. Diese können von Nutzern verwendet werden um einen Einblick in die Programmierung einer gegebenen Steuereinheit zu bekommen. Um dieses Feature weiterhin unterstützen zu können sollte eine Konfigurationsmöglichkeit gegeben werden, welche die Bereitstellung derartiger Beispiele ermöglicht.

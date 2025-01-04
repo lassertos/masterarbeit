@@ -9,13 +9,13 @@
 \refstepcounter{requirement}
 \label{\reqlabel}
 \Requirements(\value{requirement})={\autoref{requirement:#1} & #1}
-\begin{longtable}{p{0.2\textwidth}p{0.75\textwidth}}
-  \toprule
-  \multicolumn{1}{l}{\textbf{Anforderung \arabic{requirement}}} & \multicolumn{1}{c}{\textbf{#1}} \\
-  \midrule
-  }{
-  \bottomrule
-\end{longtable}
+\tabularx{\textwidth}{p{2.5cm} X}
+\toprule
+\multicolumn{1}{l}{\textbf{Anforderung \arabic{requirement}}} & \multicolumn{1}{c}{\textbf{#1}} \\
+\midrule
+}{
+\bottomrule
+\endtabularx
 }
 \newcommand{\reqdescription}{Beschreibung &}
 \newcommand{\reqrationale}{Begründung &}
@@ -24,180 +24,138 @@
 \def\replspacesA#1#2 #3{#2\ifx\end#3\else#1\afterfi{\replspacesA#1#3}\fi}
 \def\afterfi#1#2\fi{\fi#1}
 \def\replace#1#2#3{%
-  \def\tmp##1#2{##1#3\tmp}%
-  \tmp#1\stopreplace#2\stopreplace}
+    \def\tmp##1#2{##1#3\tmp}%
+    \tmp#1\stopreplace#2\stopreplace}
 \def\stopreplace#1\stopreplace{}
 
 Im Folgenden werden die Anforderungen an die zu entwickelnde IDE beschrieben. Dabei wird für jede der Anforderungen eine entsprechende Begründung angegeben. Eine Übersicht aller Anforderungen ist in \autoref{table:anforderungen} gegeben.
 
 \begin{requirement}{CrossLab-Kompatibilität}
-  \reqdescription Die zu entwickelnde IDE soll CrossLab-Services anbieten und konsumieren können. \\
-  \reqrationale Durch das Anbieten von CrossLab-Services für die verschiedenen Funktionen der IDE kann diese in einem Experiment mit anderen Laborgeräten verbunden werden. Dadurch können einzelne Komponenten der IDE auf weitere Laborgeräte ausgelagert werden, wodurch die Erweiterbarkeit der IDE verbessert werden kann. \\
+    \reqdescription Die zu entwickelnde IDE soll CrossLab-Services anbieten und konsumieren können. \\
+    \reqrationale Durch das Anbieten von CrossLab-Services für die verschiedenen Funktionen der IDE kann diese in einem Experiment mit anderen Laborgeräten verbunden werden. Dadurch können einzelne Komponenten der IDE auf weitere Laborgeräte ausgelagert werden, wodurch die Erweiterbarkeit der IDE verbessert werden kann. \\
 \end{requirement}
 
 \begin{requirement}{Erweiterbarkeit}
-  \reqdescription Die zu entwickelnde IDE soll Schnittstellen zum Hinzufügen von CrossLab-Services und Benutzerinterfaces besitzen. \\
-  \reqrationale Um die Weiterentwicklung der IDE zu vereinfachen sollen entsprechende Schnittstellen zur Verfügung stehen. Dabei sollte mindestens das Hinzufügen neuer CrossLab-Services und Benutzerinterfaces möglich sein. \\
+    \reqdescription Die zu entwickelnde IDE soll Schnittstellen zum Hinzufügen von CrossLab-Services und Benutzerinterfaces besitzen. \\
+    \reqrationale Um die Weiterentwicklung der IDE zu vereinfachen sollen entsprechende Schnittstellen zur Verfügung stehen. Dabei sollte mindestens das Hinzufügen neuer CrossLab-Services und Benutzerinterfaces möglich sein. \\
 \end{requirement}
 
 \begin{requirement}{Komplett im Browser nutzbar}
-  \reqdescription Die zu entwickelnde IDE soll komplett im Browser nutzbar sein. \\
-  \reqrationale Durch die Nutzbarkeit der kompletten IDE direkt im Browser des Nutzers wird die Verwendung dieser vereinfacht, da Nutzer keine weitere Software installieren müssen. \\
+    \reqdescription Die zu entwickelnde IDE soll komplett im Browser nutzbar sein. \\
+    \reqrationale Durch die Nutzbarkeit der kompletten IDE direkt im Browser des Nutzers wird die Verwendung dieser vereinfacht, da Nutzer keine weitere Software installieren müssen. \\
 \end{requirement}
 
 \begin{requirement}{Kollaboration}
-  \reqdescription Die zu entwickelnde IDE soll in der Lage sein Echtzeit-Kollaboration durch die Synchronisation von geteilten Daten und den Austausch von Zustandsinformationen zu ermöglichen. \\
-  \reqrationale Durch die Ermöglichung der Synchronisation von Daten und dem Austausch von Zustandsinformationen zwischen Nutzern innerhalb eines Experiments kann die Zusammenarbeit dieser gefördert werden. \\
+    \reqdescription Die zu entwickelnde IDE soll in der Lage sein Echtzeit-Kollaboration durch die Synchronisation von geteilten Daten und den Austausch von Zustandsinformationen zu ermöglichen. \\
+    \reqrationale Durch die Ermöglichung der Synchronisation von Daten und dem Austausch von Zustandsinformationen zwischen Nutzern innerhalb eines Experiments kann die Zusammenarbeit dieser gefördert werden. \\
 \end{requirement}
 
 \begin{requirement}{Dateisystem}
-  \reqdescription Die zu entwickelnde IDE soll ein integriertes Dateisystem mit einem entsprechenden Benutzerinterface besitzen, dass die Erstellung, Bearbeitung, Verschiebung, Löschung und persistente Speicherung von Dateien und Ordnern, innerhalb des Browsers des Nutzers, ermöglicht. \\
-  \reqrationale Ein in der IDE integriertes Dateisystem vereinfacht die Nutzung der IDE, da kein externes Dateisystem benötigt wird. \\
+    \reqdescription Die zu entwickelnde IDE soll ein integriertes Dateisystem mit einem entsprechenden Benutzerinterface besitzen, dass die Erstellung, Bearbeitung, Verschiebung, Löschung und persistente Speicherung von Dateien und Ordnern, innerhalb des Browsers des Nutzers, ermöglicht. \\
+    \reqrationale Ein in der IDE integriertes Dateisystem vereinfacht die Nutzung der IDE, da kein externes Dateisystem benötigt wird. \\
 \end{requirement}
 
 \begin{requirement}{Dateisystem: CrossLab-Kompatibilität}
-  \reqdescription Die zu entwickelnde IDE soll die Anbindung weiterer Dateisysteme über entsprechende CrossLab-Services ermöglichen. \\
-  \reqrationale Die Möglichkeit weitere Dateisysteme über CrossLab-Services hinzuzufügen erlaubt unter anderem die Anbindung externer Dateisysteme. Diese könnten z.B. den Zugriff auf lokale Dateien des Nutzers ermöglichen oder eine geräteunabhängige Speicherung von Dateien ermöglichen. \\
+    \reqdescription Die zu entwickelnde IDE soll die Anbindung weiterer Dateisysteme über entsprechende CrossLab-Services ermöglichen. \\
+    \reqrationale Die Möglichkeit weitere Dateisysteme über CrossLab-Services hinzuzufügen erlaubt unter anderem die Anbindung externer Dateisysteme. Diese könnten z.B. den Zugriff auf lokale Dateien des Nutzers ermöglichen oder eine geräteunabhängige Speicherung von Dateien ermöglichen. \\
 \end{requirement}
 
 \begin{requirement}{Dateisystem: Kollaboration}
-  \reqdescription Die zu entwickelnde IDE soll das Teilen von Ordnern und den darin enthaltenen Dateien zwischen Nutzern innerhalb eines Experiments ermöglichen. Änderungen innerhalb geteilter Ordner sollen zwischen allen teilnehmenden Nutzern synchronisiert werden. Geteilte Ordner können nur von ihrem Besitzer gelöscht, verschoben oder umbenannt werden. Das Teilen von Ordnern soll auch beendet werden können. \\
-  \reqrationale Durch das Teilen von Ordnern und den enthaltenen Dateien können Nutzer gemeinsam an diesen arbeiten. Dadurch können z.B. Gruppenarbeiten im Rahmen eines Praktikumsversuch effizienter durchgeführt werden, während die Lernenden gleichzeitig ihre Teamfähigkeit verbessern können. \\
+    \reqdescription Die zu entwickelnde IDE soll das Teilen von Ordnern und den darin enthaltenen Dateien zwischen Nutzern innerhalb eines Experiments ermöglichen. Änderungen innerhalb geteilter Ordner sollen zwischen allen teilnehmenden Nutzern synchronisiert werden. Geteilte Ordner können nur von ihrem Besitzer gelöscht, verschoben oder umbenannt werden. Das Teilen von Ordnern soll auch beendet werden können. \\
+    \reqrationale Durch das Teilen von Ordnern und den enthaltenen Dateien können Nutzer gemeinsam an diesen arbeiten. Dadurch können z.B. Gruppenarbeiten im Rahmen eines Praktikumsversuch effizienter durchgeführt werden, während die Lernenden gleichzeitig ihre Teamfähigkeit verbessern können. \\
 \end{requirement}
 
 \begin{requirement}{Kompilierung}
-  \reqdescription Die zu entwickelnde IDE soll die Kompilierung von Quellcode unterstützen. Dabei sollen entsprechende Bedienelemente für die Kompilierung bereitgestellt werden.  \\
-  \reqrationale Die Kompilierung des Quellcodes ist in vielen Programmiersprachen ein wichtiger Schritt um das Programm auf dem Zielsystem ausführen zu können. Dementsprechend sollte die IDE bei Vorhandensein eines Compilers entsprechende Bedienelemente zur Kompilierung des Quellcodes bereitstellen. \\
+    \reqdescription Die zu entwickelnde IDE soll die Kompilierung von Quellcode unterstützen. Dabei sollen entsprechende Bedienelemente für die Kompilierung bereitgestellt werden.  \\
+    \reqrationale Die Kompilierung des Quellcodes ist in vielen Programmiersprachen ein wichtiger Schritt um das Programm auf dem Zielsystem ausführen zu können. Dementsprechend sollte die IDE bei Vorhandensein eines Compilers entsprechende Bedienelemente zur Kompilierung des Quellcodes bereitstellen. \\
 \end{requirement}
 
 \begin{requirement}{Kompilierung: CrossLab-Kompatibilität}
-  \reqdescription Die zu entwickelnde IDE soll die Anbindung von Compilern über entsprechende CrossLab-Services ermöglichen. \\
-  \reqrationale Die Möglichkeit weitere Compiler über entsprechende CrossLab-Services an die IDE anschließen zu können erlaubt die Unterstützung vieler verschiedener Steuereinheiten innerhalb eines Experiments. \\
+    \reqdescription Die zu entwickelnde IDE soll die Anbindung von Compilern über entsprechende CrossLab-Services ermöglichen. \\
+    \reqrationale Die Möglichkeit weitere Compiler über entsprechende CrossLab-Services an die IDE anschließen zu können erlaubt die Unterstützung vieler verschiedener Steuereinheiten innerhalb eines Experiments. \\
 \end{requirement}
 
 \begin{requirement}{Hochladen von Programmen auf Steuereinheiten}
-  \reqdescription Die zu entwickelnde IDE soll das Hochladen von Programmen auf Steuereinheiten unterstützen und entsprechende Bedienelemente dafür besitzen. Das Hochladen von kompilierten Programmen kann in einen Schritt zusammengefasst werden um den Ablauf effizienter zu gestalten. \\
-  \reqrationale Nutzer können innerhalb eines Experiments Programme für Steuereinheiten schreiben. Zur Ausführung müssen die Programme auf die entsprechende Steuereinheit hochgeladen werden.  \\
+    \reqdescription Die zu entwickelnde IDE soll das Hochladen von Programmen auf Steuereinheiten unterstützen und entsprechende Bedienelemente dafür besitzen. Das Hochladen von kompilierten Programmen kann in einen Schritt zusammengefasst werden um den Ablauf effizienter zu gestalten. \\
+    \reqrationale Nutzer können innerhalb eines Experiments Programme für Steuereinheiten schreiben. Zur Ausführung müssen die Programme auf die entsprechende Steuereinheit hochgeladen werden.  \\
 \end{requirement}
 
 \begin{requirement}{Debuggen}
-  \reqdescription Die zu entwickelnde IDE soll das Debuggen von Programmen der Nutzer ermöglichen. Dabei sollen entsprechende Bedienelemente für das Debuggen bereitgestellt werden. Beim Start des Debuggens soll die neueste Version des aktuellen Programms auf die entsprechende Steuereinheit geladen werden. \\
-  \reqrationale Nutzer können durch das Debuggen ihrer Programme schneller Fehler in diesen finden und beheben. Weiterhin erlaubt das Debuggen eines Programms einen besseren Einblick in das Verhalten dessen. \\
+    \reqdescription Die zu entwickelnde IDE soll das Debuggen von Programmen der Nutzer ermöglichen. Dabei sollen entsprechende Bedienelemente für das Debuggen bereitgestellt werden. Beim Start des Debuggens soll die neueste Version des aktuellen Programms auf die entsprechende Steuereinheit geladen werden. \\
+    \reqrationale Nutzer können durch das Debuggen ihrer Programme schneller Fehler in diesen finden und beheben. Weiterhin erlaubt das Debuggen eines Programms einen besseren Einblick in das Verhalten dessen. \\
 \end{requirement}
 
 \begin{requirement}{Debuggen: CrossLab-Kompatibilität}
-  \reqdescription Die zu entwickelnde IDE soll die Anbindung von Debuggern über entsprechende CrossLab-Services ermöglichen. Weiterhin sollen auch CrossLab-Services für die Kommunikation zwischen dem Debugger und der zu debuggenden Steuereinheit entwickelt werden. \\
-  \reqrationale Die Möglichkeit weitere Debugger über entsprechende CrossLab-Services an die IDE und Steuereinheiten anschließen zu können erlaubt eine größere Anzahl an verschiedenen Experimentkonfigurationen. \\
+    \reqdescription Die zu entwickelnde IDE soll die Anbindung von Debuggern über entsprechende CrossLab-Services ermöglichen. Weiterhin sollen auch CrossLab-Services für die Kommunikation zwischen dem Debugger und der zu debuggenden Steuereinheit entwickelt werden. \\
+    \reqrationale Die Möglichkeit weitere Debugger über entsprechende CrossLab-Services an die IDE und Steuereinheiten anschließen zu können erlaubt eine größere Anzahl an verschiedenen Experimentkonfigurationen. \\
 \end{requirement}
 
 \begin{requirement}{Debuggen: Kollaboration}
-  \reqdescription Die zu entwickelnde IDE soll es Nutzern ermöglichen gleichzeitig an einer Debug-Sitzung teilzunehmen, falls dies mit dem verwendeten Debugger möglich ist. Dabei müssen beide Nutzer Zugriff auf die gleichen Dateien besitzen. Weiterhin sollen die Breakpoints aller an der Debug-Sitzung teilnehmenden Nutzer synchronisiert werden. Pro Steuereinheit soll nur eine Debug-Session gestartet werden können. Nur der Ersteller der Debug-Sitzung kann diese beenden. \\
-  \reqrationale Durch das kollaborative Debuggen können Nutzer gemeinsam einen Einblick in das Laufzeitverhalten des Programs erlangen. Dadurch kann auch die Suche nach Fehlern sowie deren Behebung effizienter erfolgen. \\
+    \reqdescription Die zu entwickelnde IDE soll es Nutzern ermöglichen gleichzeitig an einer Debug-Sitzung teilzunehmen, falls dies mit dem verwendeten Debugger möglich ist. Dabei müssen beide Nutzer Zugriff auf die gleichen Dateien besitzen. Weiterhin sollen die Breakpoints aller an der Debug-Sitzung teilnehmenden Nutzer synchronisiert werden. Pro Steuereinheit soll nur eine Debug-Session gestartet werden können. Nur der Ersteller der Debug-Sitzung kann diese beenden. \\
+    \reqrationale Durch das kollaborative Debuggen können Nutzer gemeinsam einen Einblick in das Laufzeitverhalten des Programs erlangen. Dadurch kann auch die Suche nach Fehlern sowie deren Behebung effizienter erfolgen. \\
 \end{requirement}
 
 \begin{requirement}{Testen}
-  \reqdescription Die zu entwickelnde IDE soll es ermöglichen Testfälle für ein Experiment zu konfigurieren und die Ausführung dieser während des Experiments unterstützen. Die Testfälle sollen über ein entsprechendes Benutzerinterface eingesehen und ausgeführt werden können. Testfälle sollen die Interaktionen zwischen verschiedenen Laborgeräten innerhalb eines Experiments überprüfen können. \\
-  \reqrationale Die Möglichkeit Testfälle für ein Experiment zu konfigurieren erlaubt es z.B. Lehrenden die Ziele ihrer Lehrveranstaltung im Vorhinein festzulegen. Während des Experiments können die Lernenden dann ihre erstellte Lösung überprüfen. \\
+    \reqdescription Die zu entwickelnde IDE soll es ermöglichen Testfälle für ein Experiment zu konfigurieren und die Ausführung dieser während des Experiments unterstützen. Die Testfälle sollen über ein entsprechendes Benutzerinterface eingesehen und ausgeführt werden können. Testfälle sollen die Interaktionen zwischen verschiedenen Laborgeräten innerhalb eines Experiments überprüfen können. \\
+    \reqrationale Die Möglichkeit Testfälle für ein Experiment zu konfigurieren erlaubt es z.B. Lehrenden die Ziele ihrer Lehrveranstaltung im Vorhinein festzulegen. Während des Experiments können die Lernenden dann ihre erstellte Lösung überprüfen. \\
 \end{requirement}
 
 \begin{requirement}{Testen: CrossLab-Kompatibilität}
-  \reqdescription Die zu entwickelnde IDE soll die Ausführung von vorkonfigurierten Testfällen in Zusammenarbeit mit den anderen Laborgeräten innerhalb eines Experiments unterstützen. Dafür können Laborgeräte entsprechende Funktionen anbieten, die dann während der Ausführung der Testfälle von der IDE aufgerufen werden können. Für die Kommunikation zwischen der IDE und den anderen Laborgeräten sollen entsprechende CrossLab-Services entwickelt werden. \\
-  \reqrationale Laborgeräte können mithilfe ihrer angebotenen Funktionen die Erstellung von Testfällen ermöglichen. Somit können Testfälle an unterschiedliche Experimentkonfigurationen angepasst werden. \\
+    \reqdescription Die zu entwickelnde IDE soll die Ausführung von vorkonfigurierten Testfällen in Zusammenarbeit mit den anderen Laborgeräten innerhalb eines Experiments unterstützen. Dafür können Laborgeräte entsprechende Funktionen anbieten, die dann während der Ausführung der Testfälle von der IDE aufgerufen werden können. Für die Kommunikation zwischen der IDE und den anderen Laborgeräten sollen entsprechende CrossLab-Services entwickelt werden. \\
+    \reqrationale Laborgeräte können mithilfe ihrer angebotenen Funktionen die Erstellung von Testfällen ermöglichen. Somit können Testfälle an unterschiedliche Experimentkonfigurationen angepasst werden. \\
 \end{requirement}
 
 \begin{requirement}{Language Server}
-  \reqdescription Die zu entwickelnde IDE soll die Anbindung von Language Servern unterstützen. \\
-  \reqrationale Durch die Anbindung von Language Servern können Editorfunktionen wie Code-Vervollständigung, Code-Navigation und Refactoring ermöglicht werden. Diese können die Benutzererfahrung verbessern. \\
+    \reqdescription Die zu entwickelnde IDE soll die Anbindung von Language Servern unterstützen. \\
+    \reqrationale Durch die Anbindung von Language Servern können Editorfunktionen wie Code-Vervollständigung, Code-Navigation und Refactoring ermöglicht werden. Diese können die Benutzererfahrung verbessern. \\
 \end{requirement}
 
 \begin{requirement}{Language Server: CrossLab-Kompatibilität}
-  \reqdescription Die zu entwickelnde IDE soll die Anbindung von Language Servern über entsprechende CrossLab-Services unterstützen. \\
-  \reqrationale Durch die Anbindbarkeit von Language Servern über entsprechende CrossLab-Services können Language Server von anderen Laborgeräten bereitgestellt und in Experimenten von der IDE genutzt werden. \\
+    \reqdescription Die zu entwickelnde IDE soll die Anbindung von Language Servern über entsprechende CrossLab-Services unterstützen. \\
+    \reqrationale Durch die Anbindbarkeit von Language Servern über entsprechende CrossLab-Services können Language Server von anderen Laborgeräten bereitgestellt und in Experimenten von der IDE genutzt werden. \\
 \end{requirement}
 
 \begin{requirement}{Kostenlos nutzbar}
-  \reqdescription Die zu entwickelnde IDE soll kostenlos nutzbar sein. Daher sollten auch die Kosten für die Implementierung und den Betrieb möglichst gering sein. \\
-  \reqrationale Um die IDE in einer Vielzahl von verschiedenen Szenarien einsetzen zu können ist es vom Vorteil keine assoziierten Kosten für die Nutzung dieser zu haben. Somit kann sie z.B. auch im GOLDi-Remotelab und anderen CrossLab-kompatiblen online Laboren eingesetzt werden. \\
+    \reqdescription Die zu entwickelnde IDE soll kostenlos nutzbar sein. Daher sollten auch die Kosten für die Implementierung und den Betrieb möglichst gering sein. \\
+    \reqrationale Um die IDE in einer Vielzahl von verschiedenen Szenarien einsetzen zu können ist es vom Vorteil keine assoziierten Kosten für die Nutzung dieser zu haben. Somit kann sie z.B. auch im GOLDi-Remotelab und anderen CrossLab-kompatiblen online Laboren eingesetzt werden. \\
 \end{requirement}
 
 \begin{requirement}{Standalone nutzbar}
-  \reqdescription Die zu entwickelnde IDE soll standalone nutzbar sein. Das bedeutet, dass sie als einziges Laborgerät in einem Experiment verwendet werden kann. Dabei kann es zu Einschränkungen der angebotenen Funktionen kommen. Die Editierung von Quellcode soll in allen Fällen gewährleistet werden. \\
-  \reqrationale Da Experimente in der CrossLab-Architektur meist aus mehreren verbundenen Laborgeräten bestehen kann es dazu kommen, dass manche dieser ggf. nicht immer verfügbar sind, da sie aktuell von anderen Nutzern verwendet werden. Wenn die IDE standalone nutzbar ist können Nutzer dennoch an ihren Programmen weiterarbeiten. \\
+    \reqdescription Die zu entwickelnde IDE soll standalone nutzbar sein. Das bedeutet, dass sie als einziges Laborgerät in einem Experiment verwendet werden kann. Dabei kann es zu Einschränkungen der angebotenen Funktionen kommen. Die Editierung von Quellcode soll in allen Fällen gewährleistet werden. \\
+    \reqrationale Da Experimente in der CrossLab-Architektur meist aus mehreren verbundenen Laborgeräten bestehen kann es dazu kommen, dass manche dieser ggf. nicht immer verfügbar sind, da sie aktuell von anderen Nutzern verwendet werden. Wenn die IDE standalone nutzbar ist können Nutzer dennoch an ihren Programmen weiterarbeiten. \\
 \end{requirement}
 
 \begin{requirement}{Nur CrossLab-Nutzerkonto nötig}
-  \reqdescription Die zu entwickelnde IDE soll nur ein CrossLab-Nutzerkonto zur Verwendung benötigen. \\
-  \reqrationale Durch die Notwendigkeit eines zweiten Nutzerkontos könnte die IDE für gewisse Nutzergruppen uninteressant werden. Somit soll nur ein CrossLab-Nutzerkonto für die Nutzung der IDE vorausgesetzt werden. \\
+    \reqdescription Die zu entwickelnde IDE soll nur ein CrossLab-Nutzerkonto zur Verwendung benötigen. \\
+    \reqrationale Durch die Notwendigkeit eines zweiten Nutzerkontos könnte die IDE für gewisse Nutzergruppen uninteressant werden. Somit soll nur ein CrossLab-Nutzerkonto für die Nutzung der IDE vorausgesetzt werden. \\
 \end{requirement}
 
-% \paragraph{REQ - Dateisystem} \mbox{} \\
-% Die zu entwickelnde IDE soll ein Dateisystem besitzen. Dieses soll es den Nutzern die Erstellung, Editierung und Löschung von Dateien und Ordnern ermöglichen. Weiterhin sollen die erstellten Dateien und Ordner persistent gespeichert werden, sodass Nutzer auch in anderen Experimenten wieder auf diese zugreifen können.
-
-% \paragraph{REQ03 - Echtzeit-Kollaboration} \mbox{} \\
-% Die zu entwickelnde IDE soll Echtzeit-Kollaboration ermöglichen. Dies erlaubt es Nutzern gleichzeitig an Projekten arbeiten zu können, wodurch eine bessere Zusammenarbeit ermöglicht werden kann. Nutzer sollen in der Lage sein Projekte miteinander zu teilen, gleichzeitig an Dateien zu arbeiten und zusammen ein Programm zu debuggen.
-
-% \paragraph{REQ - Anbindbarkeit von Compilern} \mbox{} \\
-% Die zu entwickelnde IDE soll die Anbindung von Compilern ermöglichen. Dadurch kann es Nutzern ermöglicht werden ihre erarbeiteten Programme kompilieren zu lassen und das Ergebnis sowie eventuell aufgetretene Fehlermeldungen zu erhalten. Weiterhin kann die Anzahl der unterstützten Programmiersprachen und Steuereinheiten erhöht werden. So kann z.B. für die Programmiersprache C ein Compiler angebunden werden, der Microcontroller als Zielsystem unterstützt.
-
-% \paragraph{REQ - Anbindbarkeit von Debuggern} \mbox{} \\
-% Die zu entwickelnde IDE soll die Anbindung von Debuggern ermöglichen. Dadurch kann es Nutzern ermöglicht werden ihre erarbeiteten Programme debuggen zu können, wodurch sie das Verhalten ihres Programmes besser nachvollziehen können. Weiterhin kann durch die Anbindbarkeit von Debuggern das Debugging von einer größeren Anzahl an Steuereinheiten unterstützt werden.
-
-% \paragraph{REQ - Anbindbarkeit von Language Servern} \mbox{} \\
-% Die zu entwickelnde IDE soll die Anbindung von Language Servern ermöglichen. Dadurch werden Nutzern für die von den Language Servern unterstützten Programmiersprachen entsprechende Editorfunktionen freigeschaltet. Diese umfassen u.a. Codevervollständigung, Codenavigation und Möglichkeiten für Refactoring.
-
-% \paragraph{REQ - Hinterlegbarkeit von Testfällen} \mbox{} \\
-% Die zu entwickelnde IDE soll das Hinterlegen von Testfällen ermöglichen. Dadurch können in Lehrsituationen die Lernenden ihre erarbeitete Lösung direkt in der IDE überprüfen. Dabei ist zu beachten, dass Testfälle ggf. die Interaktionen zwischen mehreren Geräten überprüfen müssen.
-
-% \paragraph{REQ - Hinterlegbarkeit von Beispielprogrammen} \mbox{} \\
-% Die zu entwickelnde IDE soll das Hinterlegen von Beispielprogrammen ermöglichen. Dadurch können Nutzer einen Einblick in die Programmierung der Steuereinheiten des Experiments erhalten. Weiterhin können Nutzer mithilfe vorhandener Vorlagen schneller und effizienter an ihr Ziel kommen.
-
-% \paragraph{REQ - Programmierung von Steuereinheiten} \mbox{} \\
-% Die zu entwickelnde IDE soll die Programmierung von Steuereinheiten ermöglichen. Dadurch kann es Nutzern vereinfacht werden ihr Programm auf die Steuereinheit zu laden. Dies kann auch in Verbindung mit der Kompilierung des Programms geschehen.
-
-% \paragraph{REQ - Debugging von Programmen auf Steuereinheiten} \mbox{} \\
-% Die zu entwickelnde IDE soll das Debugging von Programmen auf Steuereinheiten ermöglichen. Dabei sollte beim Starten des Debuggens die neueste Version des aktuellen Programms auf die Steuereinheit geladen werden.
-
-% \paragraph{REQ - Echtzeit-Kollaboration: Dateisystem} \mbox{} \\
-% Die zu entwickelnde IDE soll Funktionen für die Echtzeit-Kollaboration im Hinblick auf das Dateisystem anbieten. Dabei sollen Nutzer in der Lage sein Ordner mit anderen Nutzern innerhalb eines Experiments teilen zu können. Alle Änderungen, die innerhalb des Ordners durchgeführt werden, sollen zwischen den teilnehmenden Nutzern in Echtzeit synchronisiert werden. Weiterhin sollen Nutzer das Teilen von Ordnern auch wieder beenden können. Nur der Besitzer des geteilten Ordners sollte in der Lage sein diesen zu löschen. Falls der geteilte Ordner gelöscht wird, soll auch das Teilen des Ordners beendet werden.
-
-% \paragraph{REQ - Echtzeit-Kollaboration: Debugging} \mbox{} \\
-% Die zu entwickelnde IDE soll es Nutzern innerhalb eines Experiments erlauben Debugging Sessions miteinander zu teilen. Falls ein Nutzer eine Debugging Session beginnt soll dies mit den anderen am Experiment teilnehmenden Nutzern mitgeteilt werden. Falls diese Nutzer Zugriff auf die entsprechenden Dateien besitzen (sh. REQ\dots) sollte ihnen die Möglichkeit geboten werden an der Debugging Session teilzunehmen. Beim Beitritt soll der aktuelle Zustand der Debugging Session bei dem beitretenden Nutzer hergestellt werden. Weiterhin sollen Breakpoints zwischen den teilnehmenden Nutzern synchronisiert werden. Alle teilnehmenden Nutzer können dann die bereitgestellten Debugging Funktionen nutzen. Sollten beigetretene Nutzer die Debugging Session verlassen wird diese dennoch fortgesetzt. Erst wenn der Nutzer die Debugging Session beendet, der diese gestartet hat, wird sie tatsächlich beendet.
-
-% \paragraph{REQ - Kostenlos nutzbar} \mbox{} \\
-% Die zu entwickelnde IDE soll kostenlos nutzbar sein. Dadurch kann sie in vielen verschiedenen Szenarien eingesetzt werden, in denen Kosten sonst ein Problem darstellen könnten, wie z.B. innerhalb des GOLDi Remotelab.
-
-% \paragraph{REQ - Standalone nutzbar} \mbox{} \\
-% Die zu entwickelnde IDE soll standalone nutzbar sein. Dadurch kann es Nutzern ermöglicht werden an ihren Programmen weiterzuarbeiten ohne ggf. auf weitere Geräte warten zu müssen. Hierbei kann die Funktionalität der IDE ggf. eingeschränkt sein.
-
-% \paragraph{REQ - Nur CrossLab-Nutzerkonto nötig} \mbox{} \\
-% Die zu entwickelnde IDE soll neben einem CrossLab-Nutzerkonto kein weiteres Nutzerkonto benötigen. Dadurch müssen sich Nutzer nur mit ihrem CrossLab- bzw. über ihr \ac{LMS}-Nutzerkonto anmelden um die IDE nutzen zu können, wodurch das Benutzererlebnis verbessert werden kann.
-
 \begin{table}[t]
-  \centering
-  \begin{tabular}{l l}
-    \toprule
-    \Requirements(1)  \\
-    \Requirements(2)  \\
-    \Requirements(3)  \\
-    \Requirements(4)  \\
-    \Requirements(5)  \\
-    \Requirements(6)  \\
-    \Requirements(7)  \\
-    \Requirements(8)  \\
-    \Requirements(9)  \\
-    \Requirements(10) \\
-    \Requirements(11) \\
-    \Requirements(12) \\
-    \Requirements(13) \\
-    \Requirements(14) \\
-    \Requirements(15) \\
-    \Requirements(16) \\
-    \Requirements(17) \\
-    \Requirements(18) \\
-    \Requirements(19) \\
-    \Requirements(20) \\
-    \bottomrule
-  \end{tabular}
-  \caption{Übersicht der Anforderungen}
-  \label{table:anforderungen}
+    \centering
+    \begin{tabular}{l l}
+        \toprule
+        \Requirements(1)  \\
+        \Requirements(2)  \\
+        \Requirements(3)  \\
+        \Requirements(4)  \\
+        \Requirements(5)  \\
+        \Requirements(6)  \\
+        \Requirements(7)  \\
+        \Requirements(8)  \\
+        \Requirements(9)  \\
+        \Requirements(10) \\
+        \Requirements(11) \\
+        \Requirements(12) \\
+        \Requirements(13) \\
+        \Requirements(14) \\
+        \Requirements(15) \\
+        \Requirements(16) \\
+        \Requirements(17) \\
+        \Requirements(18) \\
+        \Requirements(19) \\
+        \Requirements(20) \\
+        \bottomrule
+    \end{tabular}
+    \caption{Übersicht der Anforderungen}
+    \label{table:anforderungen}
 \end{table}
