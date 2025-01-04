@@ -28,11 +28,12 @@ export async function activate(context: vscode.ExtensionContext) {
     'Congratulations, your extension "crosslab-filesystem-extension" is now active in the web extension host!'
   );
 
-  const fileSystemProvider = new CrossLabFileSystemProvider();
+  const fileSystemProvider = new CrossLabFileSystemProvider(
+    new MemoryFileSystemProvider()
+  );
   const projectsProvider = new IndexedDBFileSystemProvider();
   await projectsProvider.initialize();
   fileSystemProvider.addMount("/projects", projectsProvider);
-  fileSystemProvider.addMount("/workspace", new MemoryFileSystemProvider());
   await fileSystemProvider.initialize();
 
   const fileSearchProvider = new CrossLabFileSearchProvider(fileSystemProvider);

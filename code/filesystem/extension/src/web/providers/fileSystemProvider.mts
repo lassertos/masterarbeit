@@ -21,8 +21,13 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
   private _currentProjectUri: vscode.Uri | null = null;
   private _projectChangedHandlers: ((project: vscode.Uri) => void)[] = [];
   private _mounts: Map<string, CrossLabFileSystemSubProvider> = new Map();
+  private _baseProvider: CrossLabFileSystemSubProvider;
   public copied: vscode.Uri[] = [];
   public isCutting: boolean = false;
+
+  constructor(baseProvider: CrossLabFileSystemSubProvider) {
+    this._baseProvider = baseProvider;
+  }
 
   get currentProjectUri(): vscode.Uri | null {
     return this._currentProjectUri;
@@ -460,7 +465,7 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
         ];
       }
     }
-    throw new Error(`No provider found for path "${uri.path}"!`);
+    return [this._baseProvider, uri];
   }
 
   updateUri(uri: vscode.Uri) {

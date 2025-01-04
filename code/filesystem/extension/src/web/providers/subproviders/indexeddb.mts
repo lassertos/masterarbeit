@@ -1,7 +1,6 @@
 import path from "path";
 import * as vscode from "vscode";
 import { IndexedDBHandler } from "../indexeddbHandler.mjs";
-import * as Diff from "diff";
 import { CrossLabFileSystemSubProvider } from "./index.mjs";
 
 export class IndexedDBFileSystemProvider
