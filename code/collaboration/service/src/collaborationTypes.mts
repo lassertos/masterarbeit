@@ -261,16 +261,11 @@ interface CollaborationProviderEvents {
 }
 
 export abstract class CollaborationProvider extends TypedEmitter<CollaborationProviderEvents> {
-  protected _awarenessProvider: AwarenessProvider;
   protected _knownProperties: Set<string> = new Set();
 
-  constructor(
-    awarenessProvider: AwarenessProvider,
-    initialValue: Record<string, unknown>
-  ) {
+  constructor(initialValue: Record<string, unknown>) {
     super();
 
-    this._awarenessProvider = awarenessProvider;
     this._initialize(initialValue);
   }
 
@@ -356,14 +351,6 @@ export abstract class CollaborationProvider extends TypedEmitter<CollaborationPr
         }
       }
     }
-
-    this._awarenessProvider.on("change", (changes, origin) => {
-      this.emit("awareness-change", changes, origin);
-    });
-
-    this._awarenessProvider.on("update", (changes, origin) => {
-      this.emit("awareness-update", changes, origin);
-    });
   }
 
   abstract handleCollaborationMessage(

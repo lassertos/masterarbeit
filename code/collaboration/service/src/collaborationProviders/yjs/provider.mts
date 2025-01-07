@@ -3,13 +3,11 @@ import {
   Message,
   isIncomingMessage,
   IncomingMessage,
-  isProtocolMessage,
 } from "@crosslab-ide/abstract-messaging-channel";
 import {
   CollaborationTypeName,
   CollaborationProvider,
   CollaborationUpdateEventType,
-  AwarenessProvider,
 } from "../../collaborationTypes.mjs";
 import { collaborationProtocol } from "../../protocol.mjs";
 import { yjsCollaborationProtocol } from "./protocol.mjs";
@@ -32,11 +30,8 @@ import * as decoding from "lib0/decoding.js";
 export class YjsCollaborationProvider extends CollaborationProvider {
   private _document: Y.Doc = new Y.Doc();
 
-  constructor(
-    awarenessProvider: AwarenessProvider,
-    initialValue: Record<string, unknown>
-  ) {
-    super(awarenessProvider, initialValue);
+  constructor(initialValue: Record<string, unknown>) {
+    super(initialValue);
 
     this._document.on("update", async (update, origin) => {
       if (origin !== this) {

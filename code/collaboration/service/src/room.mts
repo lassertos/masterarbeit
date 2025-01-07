@@ -34,10 +34,7 @@ export class Room extends TypedEmitter<RoomEvents> {
     super();
     this._name = name;
     this._awarenessProvider = new AwarenessProvider(id);
-    this._collaborationProvider = new YjsCollaborationProvider(
-      this._awarenessProvider,
-      initialValue
-    );
+    this._collaborationProvider = new YjsCollaborationProvider(initialValue);
 
     this._awarenessProvider.on("update", (_changes, origin) => {
       for (const [id, participant] of this._participants.entries()) {
