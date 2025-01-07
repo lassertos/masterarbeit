@@ -1,5 +1,33 @@
 \section{Dateisystem}\label{section:prototypische-implementierung:dateisystem}
 
+\begin{note}
+    \textbf{Notizen:}
+    \begin{itemize}
+        \item Beschreibung des Projektbasierten Dateisystems
+        \item Erwähnung der verwendeten VSCode APIs
+              \begin{itemize}
+                  \item FileSystemProvider
+                  \item FileSearchProvider (proposed API)
+                  \item TextSeachProvider (proposed API)
+                  \item TreeDataProvider
+              \end{itemize}
+        \item Beschreibung der Anbindung weiterer Dateisysteme
+              \begin{itemize}
+                  \item Indexed Database
+                  \item In-Memory
+              \end{itemize}
+        \item Beschreibung der Probleme während der Implementierung
+              \begin{itemize}
+                  \item Neuladen von VSCode bei Ordnerwechsel
+                  \item Copy, Cut und Paste Probleme wegen Umschreiben der Pfade
+                  \item
+              \end{itemize}
+        \item Beschreibung der Implementierung der Kollaboration
+        \item Ggf. Beschreibung der Benutzerinterfaces + Screenshots
+        \item (Weitere Beschreibung der CrossLab-Services?)
+    \end{itemize}
+\end{note}
+
 Während der prototypische Implementierung wurde eine Erweiterung zur Bereitstellung eines integrierten Dateisystems entwickelt. Dafür wurde ein entsprechender \texttt{FileSystemProvider} implementiert. Dieser kann genutzt werden um Dateisystem Operationen für ein spezielles URL-Schema anzubieten. Der implementierte \texttt{FileSystemProvider} nutzt weitere Subprovider zur Bereitstellung der tatsächlichen Dateisystem Operationen. Dabei wird bei der Erstellung des \texttt{FileSystemProvider} ein entsprechender Provider angegeben, der zunächst alle Pfade abdeckt. Zusätzlich können dann für gewisse Pfade andere Provider registriert werden. Die Provider sind dann für die Ausführung aller Dateisystem-Operationen verantwortlich die innerhalb dieser Pfade ausgeführt werden. Im Rahmen der prototypischen Implementierung wurde ein In-Memory Provider sowie ein Indexed Database Provider implementiert.
 
 Bei dem integrierten Dateisystem handelt es sich um ein projektbasiertes Dateisystem. Im Detail bedeutet dies, dass Nutzer Projekte erstellen können, welche innerhalb des Dateisystems unter dem Pfad \texttt{/projects} gespeichert werden. Dieser Pfad nutzt den Indexed Database Provider um die persistente Speicherung der Projekte des Nutzers sicherzustellen. Alle weiteren Funktionen der IDE werden dann im Rahmen dieser Projekte ausgeführt. So werden z.B. für die Kompilierung alle Dateien des aktuell geöffneten Projekts betrachtet. Die URL des aktuell geöffneten Projekts kann über eine entsprechende Funktion von anderen Erweiterungen abgefragt werden. Weiterhin bietet die Erweiterung die Möglichkeit Funktionen zur Ausführung bei einem Projektwechsel zu registrieren. Außerdem erlaubt es die Erweiterung auch anderen Erweiterungen das aktuelle Projekt zu wechseln.

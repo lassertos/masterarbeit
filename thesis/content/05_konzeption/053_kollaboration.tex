@@ -1,0 +1,237 @@
+\section{Kollaboration}\label{section:konzeption:kollaboration}
+
+\usetikzlibrary{arrows.meta}
+
+\begin{note}
+    \textbf{Notizen:}
+    \begin{itemize}
+        \item Erwähnung von \autoref{requirement:Kollaboration} und \autoref{requirement:Kollaboration: CrossLab-Kompatibilität}
+        \item Beschreibung der grundlegenden Konzepte
+        \item Klassendiagramm kollaborative Datentypen
+        \item Klassendiagramm Collaboration Services \& dazugehörige Klassen
+        \item Beschreibung der verschiedenen Interaktionen zwischen den Services
+              \begin{itemize}
+                  \item Beginn der Synchronisation
+                  \item Synchronisation des geteilten JSON-Objekts
+                  \item Austausch von Zustandsinformationen
+                  \item high-level Sequenzdiagramme + low-level Beschreibung
+              \end{itemize}
+        \item Beschreibung der Einbindung in die betrachtete Experimentkonfiguration
+    \end{itemize}
+\end{note}
+
+Nach \autoref{requirement:Kollaboration} soll die IDE die Echtzeit-Kollaboration mit anderen Laborgeräten innerhalb eines Experiments unterstützen. Dies soll laut \autoref{requirement:Kollaboration: CrossLab-Kompatibilität} über entsprechende CrossLab-Services erfolgen. Es gibt viele verschiedene Methoden zur Synchronisierung von Daten zwischen mehreren Teilnehmern. Beispiele derartiger Methoden sind \emph{\ac{OT}} \cite{sun_operational_1998}, \emph{Differential Synchronization} \cite{fraser_differential_2009} und \emph{\acp{CRDT}} \cite{shapiro_conflict-free_2011}. Aufgrund der Tatsache, dass jede dieser Methoden eigene Vor- und Nachteile besitzt, sollte die entwickelte Lösung möglichst unabhängig von dem zugrunde liegenden Synchronisationsalgorithmus sein. Daher werden zunächst die grundlegenden Konzepte beschrieben, bevor die konzipierten CrossLab-Services vorgestellt werden.
+
+\begin{figure}[tbp]
+    \centering
+    \resizebox{\textwidth}{!}{\begin{tikzpicture}
+            \begin{interface}[text width=4cm]{CollaborationType}{0,0}
+                \operation{+ toJSON()}
+                \operation{+ onUpdate()}
+            \end{interface}
+            \begin{class}[text width=5cm]{CollaborationObject}{-6,2.25}
+                \operation{+ setProperty()}
+                \operation{+ getProperty()}
+                \operation{+ deleteProperty()}
+            \end{class}
+            \begin{class}[text width=5cm]{CollaborationNull}{-6,-0.75}
+            \end{class}
+            \begin{class}[text width=5cm]{CollaborationArray}{-6,-2.25}
+                \operation{+ push()}
+                \operation{+ get()}
+                \operation{+ delete()}
+            \end{class}
+            \begin{class}[text width=5cm]{CollaborationNumber}{6,2.25}
+                \operation{+ set()}
+            \end{class}
+            \begin{class}[text width=5cm]{CollaborationString}{6,0}
+                \operation{+ set()}
+                \operation{+ insert()}
+                \operation{+ delete()}
+            \end{class}
+            \begin{class}[text width=5cm]{CollaborationBoolean}{6,-3.35}
+                \operation{+ set()}
+            \end{class}
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationObject.east) -- ([yshift=5mm] CollaborationType.west);
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationNull.east) -- (CollaborationType.west);
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationArray.east) -- ([yshift=-5mm] CollaborationType.west);
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationNumber.west) -- ([yshift=5mm] CollaborationType.east);
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationString.west) -- (CollaborationType.east);
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationBoolean.west) -- ([yshift=-5mm] CollaborationType.east);
+        \end{tikzpicture}}
+    \caption{Klassendiagramm kollaborative Datentypen}
+    \label{figure:klassendiagramm-kollaborative-datentypen}
+\end{figure}
+
+\begin{figure}[tbp]
+    \centering
+    \begin{tikzpicture}
+        \begin{class}[text width=7cm]{CollaborationServiceProducer}{-4,0}
+        \end{class}
+        \begin{class}[text width=7cm]{CollaborationServiceConsumer}{4,0}
+            \operation{+ getAwareness()}
+            \operation{+ joinRoom()}
+            \operation{+ executeTransaction()}
+            \operation{+ valueToCollaborationType()}
+            \operation{+ getProperty()}
+            \operation{+ onUpdate()}
+        \end{class}
+        \begin{class}[text width=7cm]{Room}{0,-5}
+            \attribute{+ awareness: Awareness}
+            \operation{+ addParticipant()}
+            \operation{+ removeParticipant()}
+            \operation{+ valueToCollaborationType()}
+            \operation{+ executeTransaction()}
+            \operation{+ startSynchronization()}
+            \operation{+ getProperty()}
+            \operation{+ onUpdate()}
+        \end{class}
+        \begin{interface}[text width=7cm]{Awareness}{-4,-14}
+            \operation{+ getLocalState()}
+            \operation{+ setLocalState()}
+            \operation{+ setLocalStateField()}
+            \operation{+ getStates()}
+            \operation{+ onChange()}
+            \operation{+ onUpdate()}
+        \end{interface}
+        \begin{class}[text width=7cm]{AwarenessProvider}{-4,-11}
+            \implement{Awareness}
+            \operation{+ applyUpdate()}
+            \operation{+ encodeStates()}
+        \end{class}
+        \begin{class}[text width=7cm]{CollaborationProvider}{4,-11}
+            \operation{+ handleCollaborationMessage()}
+            \operation{+ startSynchronization()}
+            \operation{+ executeTransaction()}
+            \operation{+ valueToColloraborationType()}
+            \operation{+ getProperty()}
+            \operation{+ onCollaborationMessage()}
+            \operation{+ onUpdate()}
+        \end{class}
+        \draw[stroke] ([xshift=-10mm]CollaborationServiceProducer.south) -- ([xshift=-10mm] CollaborationServiceProducer.south |- , |- Room.west) -- (Room.west) node [above, xshift=-6mm] () {rooms} node [below, xshift=-4mm] () {0..*};
+        \draw[stroke] ([xshift=10mm] CollaborationServiceConsumer.south) -- ([xshift=10mm] CollaborationServiceConsumer.south |- , |- Room.east) -- (Room.east) node [above, xshift=6mm] () {rooms} node [below, xshift=4mm] () {0..*};
+        \draw[stroke] ([xshift=-5mm] Room.south) -- (-0.5,-10.5) -- (-4,-10.5) -- (AwarenessProvider.north) node [left, yshift=2mm] () {awarenessProvider} node [right, yshift=2mm] () {1};
+        \draw[stroke] ([xshift=5mm] Room.south) -- (0.5,-10.5) -- (3.5,-10.5) -- ([xshift=-5mm] CollaborationProvider.north) node [left, yshift=2mm] () {1} node [right, yshift=2mm] () {collaborationProvider};
+    \end{tikzpicture}
+    \caption{Klassendiagramm Collaboration Services}
+    \label{figure:klassendiagramm-collaboration-services}
+\end{figure}
+
+Im Folgenden wird für die Erklärung der Konzepte von mehreren an der Kollaboration teilnehmenden Clients und einem zentralen Synchronisationsserver ausgegangen. Die Clients besitzen die Möglichkeit sogenannte \textit{Räume} zu erstellen bzw. ihnen beizutreten. Jeder Raum verwaltet ein geteiltes JSON-Objekt. Dieses nutzt Strings als Schlüssel mit entsprechenden kollaborativen Datentypen als Werten. Diese kollaborativen Datentypen sind in \autoref{figure:klassendiagramm-kollaborative-datentypen} dargestellt. Dabei gibt jeweils einen kollaborativen Datentypen für die JSON-kompatiblen Datentypen Objekt, Array, Number, String, Boolean und Null. Jeder kollaborative Datentyp bietet neben speziellen Funktionen zur Bearbeitung dessen auch eine Funktion zur Umwandlung in den zugrunde liegenden Datentyp sowie eine Funktion zur Registrierung von Event Handlern für Update-Events an. Änderungen an dem geteilten JSON-Objekt werden über den zentralen Server an die anderen Teilnehmer weitergeleitet. Zusätzlich können die Clients Zustandsinformationen an den Server melden, welcher diese ebenso an die anderen Clients weiterleitet. Die Zustandsinformationen eines Clients können nur von diesem selbst verändert werden. Allerdings können Clients die Zustandsinformationen eines anderen Teilnehmers löschen, falls für eine gewisse Zeit keine Aktualisierung dieser vorgenommen wurde. Dadurch können z.B. Verbindungsabbrüche von Clients behandelt werden. Basierend auf diesen Konzepten werden nachfolgend der \textit{Collaboration Service Producer} und der \textit{Collaboration Service Consumer} anhand beispielhafter Interaktionen vorgestellt. Dabei werden auch die Verwendung der in \autoref{figure:klassendiagramm-collaboration-services} dargestellten Klassen und Funktionen an passender Stelle erläutert.
+
+\begin{figure}[tbp]
+    \centering
+    \resizebox{\textwidth}{!}{\begin{sequencediagram}
+            \newthread{consumer1}{Consumer 1}
+            \newthreadShift{producer}{Producer}{3cm}
+            \newthreadShift{consumer2}{Consumer 2}{3cm}
+
+            \begin{call}{consumer1}{trete Räumen bei}{consumer1}{}
+            \end{call}
+            \prelevel\prelevel
+            \begin{call}{consumer2}{trete Räumen bei}{consumer2}{}
+            \end{call}
+
+            \begin{call}{consumer1}{Initialisierung}{producer}{}
+                \begin{call}{producer}{registriere Consumer}{producer}{}
+                \end{call}
+            \end{call}
+            \begin{call}{consumer1}{starte Synchronisation}{producer}{}
+            \end{call}
+
+            \begin{call}{consumer2}{Initialisierung}{producer}{}
+                \begin{call}{producer}{registriere Consumer}{producer}{}
+                \end{call}
+            \end{call}
+            \begin{call}{consumer2}{starte Synchronisation}{producer}{}
+            \end{call}
+        \end{sequencediagram}}
+    \caption{Initialisierung Synchronisation}
+    \label{figure:initialisierung-synchronisation}
+\end{figure}
+
+Zunächst wird die Initialisierung der Synchronisation zwischen dem Collaboration Service Producer und dem Collaboration Service Consumer betrachtet. Dafür ist in \autoref{figure:initialisierung-synchronisation} ein möglicher Ablauf dargestellt. Zunächst treten die Collaboration Service Consumer lokal den Räumen bei, für welche sie Daten bereitstellen bzw. welche in der Konfiguration der Verbindung mit dem jeweiligen Producer, während der Erstellung des Experiments, angegeben wurden. Dafür kann die Funktion \texttt{joinRoom()} des Collaboration Service Consumer verwendet werden. Der Beitritt in Räume kann auch nach dem Beginn der Synchronisation geschehen. Nachdem der Collaboration Service Consumer den Räumen beigetreten ist sendet dieser eine Initialisierungsnachricht an den Collaboration Service Producer, welche unter anderem einen einzigartigen Kennzeichner beinhaltet. Dieser Kennzeichner kann entweder entsprechend generiert werden oder über die Konfiguration der entsprechenden Laborgeräte während der Erstellung des Experiments angegeben werden. Die Informationen der Initialisierungsnachricht werden von dem Collaboration Service Producer verwendet um die Nutzer den entsprechenden Räumen zuzuordnen. Sobald der Collaboration Service Producer eine Antwort an den Collaboration Service Consumer gesendet hat startet dieser die Synchronisation. Diese erfolgt über die zugrunde liegende Synchronisationsmethode. Aufgrund dessen können nur Collaboration Service Consumer und Collaboration Service Producer verbunden werden wenn sie die gleiche Synchronisationsmethode verwenden.
+
+\begin{figure}[tbp]
+    \centering
+    \resizebox{\textwidth}{!}{\begin{sequencediagram}
+            \newthread{consumer1}{Consumer 1}
+            \newthreadShift{producer}{Producer}{3cm}
+            \newthreadShift{consumer2}{Consumer 2}{3cm}
+
+            \begin{call}{consumer1}{ändere JSON-Objekt}{consumer1}{}
+            \end{call}
+
+            \begin{call}{consumer1}{sende Änderung}{producer}{}
+            \end{call}
+
+            \begin{call}{producer}{wende Änderung an}{producer}{}
+            \end{call}
+
+            \begin{call}{producer}{sende Änderung}{consumer2}{}
+            \end{call}
+
+            \begin{call}{consumer2}{wende Änderung an}{consumer2}{}
+            \end{call}
+        \end{sequencediagram}}
+
+    \caption{Synchronisation des geteilten JSON-Objekts}
+    \label{figure:synchronisation-des-geteilten-json-objekts}
+\end{figure}
+
+\begin{figure}[tbp]
+    \centering
+    \resizebox{\textwidth}{!}{\begin{sequencediagram}
+            \newthread{consumer1}{Consumer 1}
+            \newthreadShift{producer}{Producer}{3cm}
+            \newthreadShift{consumer2}{Consumer 2}{3cm}
+
+            \begin{call}{consumer1}{ändere Zustand}{consumer1}{}
+            \end{call}
+
+            \begin{call}{consumer1}{sende Zustände}{producer}{}
+            \end{call}
+
+            \begin{call}{producer}{aktualisiere Zustände}{producer}{}
+            \end{call}
+
+            \begin{call}{producer}{sende Zustände}{consumer2}{}
+            \end{call}
+
+            \begin{call}{consumer2}{aktualisiere Zustände}{consumer2}{}
+            \end{call}
+        \end{sequencediagram}}
+
+    \caption{Austausch der Zustandsinformationen}
+    \label{figure:austausch-der-zustandsinformationen}
+\end{figure}
+
+% In \autoref{figure:klassendiagramm-collaboration-services} ist ein Klassendiagramm für die Collaboration Services dargestellt. Jeder \texttt{Room} besitzt einen \texttt{CollaborationProvider} sowie einen \texttt{AwarenessProvider}. Der \texttt{CollaborationProvider} ist für die Verwaltung des geteilten JSON-Objekts verantwortlich. Dabei ist dessen Implementierung abhängig von der verwendeten Synchronisationsmethode und kann für Producer und Consumer unterschiedlich sein. Die Behandlung von Nachrichten für die zugrunde liegende Synchronisationsmethode geschieht über die Funktionen \texttt{handleCollaborationMessage()} für eingehende Nachrichten, während \texttt{onCollaborationMessage()} für die Registrierung von Handlern für ausgehende Nachrichten verwendet werden kann. Die Funktion \texttt{startSynchronization()} wird innerhalb der gleichnamigen Funktion des entsprechenden \texttt{Room} genutzt um die Synchronisation zu starten. Die Funktionen \texttt{getProperty()}, \texttt{executeTransaction()} und \texttt{valueToCollaborationType()} können alle, unter Angabe des entsprechenden Raums, über den Collaboration Service Consumer aufgerufen werden. Die Funktion \texttt{getProperty()} ermöglicht den Zugriff auf die Eigenschaften des geteilten JSON-Objekts. Dabei wird ein entsprechender kollaborativer Datentyp zurückgegeben. Es werden nur Eigenschaften des geteilten Objekts synchronisiert, die mindestens einmal über die Operation \texttt{getProperty()} abgefragt wurden. Die Funktion \texttt{executeTransaction()} ermöglicht die Aggregation mehrerer Änderungen an dem geteilten JSON-Objekt innerhalb einer Transaktion. Die Änderungen werden dann in einem einzelnen Update zusammengefasst. Weiterhin dient die Funktion \texttt{valueToCollaborationType()} zur Umwandlung eines unterstützen JSON-Datentyps in einen entsprechenden kollaborativen Datentypen. Das Interface \texttt{Awareness} definiert Funktionen für die Verwaltung der geteilten Zustandsinformationen. Die Klasse \texttt{AwarenessProvider} realisiert dieses Interface und bietet zusätzlich noch die Funktionen \texttt{applyUpdate()} und \texttt{encodeStates()} an. Dabei wird die Funktion \texttt{applyUpdate()} für die Anwendung von eingehenden Aktualisierungen verwendet, während \texttt{encodeStates()} für die Erstellung ausgehender Aktualisierungen verwendet wird. Die über \texttt{onUpdate()} registrierten Event Handler für Updates werden bei jeglicher Aktualisierung der Zustandsinformationen aufgerufen, während über \texttt{onChange()} registrierte Event Handler nur bei einer tatsächlichen Veränderung der Zustandsinformationen aufgerufen werden. Die Klasse \texttt{AwarenessProvider} ist unabhängig von der zugrunde liegenden Synchronisationsmethode. Die Zustandsinformationen für einen Raum können über die Funktion \texttt{getAwareness()} des Collaboration Service Consumer erhalten werden. Für den Collaboration Service Producer werden keine weiteren Funktionen definiert.
+
+% In \autoref{figure:klassendiagramm-collaboration-services} ist ein Klassendiagramm für die Collaboration Services dargestellt. Bei Experimenten mit einem zentralen Synchronisationspunkt (z.B. bei der Verwendung von \ac{OT}) bietet dieser einen Producer an während die restlichen Geräte, die an der Kollaboration teilnehmen, einen Consumer nutzen. Dahingegen nutzen bei Experimenten ohne einen zentralen Synchronisationspunkt (z.B. bei der Verwendung von \acp{CRDT}) alle Geräte, die an der Kollaboration teilnehmen, einen Prosumer. In der Experimentbeschreibung sollten bei den Konfigurationen der Verbindungen von Kollaborationsdiensten stets die Synchronisationsmethode sowie die sogenannten \emph{Räume} angegeben werden, die in der Verbindung genutzt werden sollen. Räume besitzen einen eindeutigen Namen und ein JSON-Objekt, das zwischen allen Teilnehmern innerhalb des Raums synchronisiert wird. Das synchronisierte JSON-Objekt kann z.B. Ordner oder Dateien abbilden, die von den Teilnehmern geteilt werden. Jeder Raum besitzt einen sogenannten \emph{Provider}. Dieser nutzt die in der Konfiguration der Verbindung angegebene Synchronisationsmethode um den Inhalt des Raums zu synchronisieren. Weiterhin bietet der Provider eine Schnittstelle um Statusinformationen auszutauschen. Diese Informationen sind teilnehmerspezifisch, d.h. sie können nur von dem jeweiligen Teilnehmer aktualisiert werden. Ein Beispiel für derartige Statusinformationen ist z.B. die aktuelle Position eines Teilnehmers innerhalb einer Datei.
+
+% Die verwendeten Räume sowie deren zugrunde liegende Synchronisationsmethode werden bereits in der Experimentbeschreibung in der Konfiguration der Verbindung zwischen dem Collaboration Service Producer und dem Collaboration Service Consumer angegeben. Dementsprechend können diese auf der Seite des Collaboration Service Consumer erstellt werden, bevor die Verbindung hergestellt wird. 
+
+% \begin{figure}[htbp]
+%     \centering
+%     \begin{sequencediagram}
+%         \newthread{consumer}{Consumer}
+%         \newthreadShift{producer}{Producer}{4cm}
+
+%         \begin{call}{consumer}{erstelle Räume}{consumer}{}
+%         \end{call}
+
+%         \begin{call}{consumer}{sende ID}{producer}{}
+%             \begin{call}{producer}{registriere Consumer}{producer}{}
+%             \end{call}
+%         \end{call}
+
+%         \begin{call}{consumer}{starte Synchronisation}{producer}{}
+%         \end{call}
+%     \end{sequencediagram}
+%     \caption{Initialisierung Kollaboration}\label{abbildung:initialisierung-kollaboration}
+% \end{figure}
+
+% Die Kommunikation zwischen den Kollaborationsteilnehmern erfolgt über ein entsprechendes Nachrichtenprotokoll. In \autoref{abbildung:initialisierung-kollaboration} ist der Verbindungsaufbau zwischen einem Consumer und einem Producer dargestellt. Zunächst erstellen beide die in der Verbindungskonfiguration festgelegten Räume. Dabei verknüpft der Consumer den Raum direkt mit der Verbindung. Der Producer hingegen wartet auf die Initialisierungsnachricht des Consumer, welche dessen ID beinhaltet. Die ID kann dann genutzt werden um den Consumer dem entsprechenden Räumen zuzuweisen. Sobald der Producer das erfolgreiche Ende der Initialisierung an den Consumer meldet beginnt dieser mit der Synchronisation. Da die verschiedenen Synchronisationsmethoden ggf. unterschiedliche Nachrichtenformate besitzen wird eine allgemeine Nachricht definiert, die dann die spezifischen Informationen für die zugrunde liegende Methode beinhalten. Daraus folgt auch, dass es nicht möglich ist einen Consumer mit einem Producer zu verbinden, der eine andere Synchronisationsmethode verwendet. Weiterhin ist darauf zu achten, dass ggf. mehrere Provider für eine Synchronisationsmethode benötigt werden. Dies ist z.B. der Fall bei Methoden mit einem zentralen Synchronisationspunkt.
+
+% Während die Behandlung von Aktualisierungen der Räume durch das Protokoll der zugrunde liegenden Synchronisationsmethode erfolgt, wird für die Behandlung von Statusaktualisierungen der Teilnehmer ein allgemeines Protokoll eingeführt. Dabei ist der Status eines Teilnehmers immer als ein JSON-Objekt darstellbar, wobei ein Wert von \texttt{null} angibt, dass der Teilnehmer nicht mehr erreichbar ist. Zu Beginn der Synchronisation schicken Consumer ihren aktuellen Status an den Producer. Dieser speichert den aktuellen Status und sendet ihn an die restlichen Consumer. Wenn sich der Status eines Consumer kann er entweder den kompletten Status an den Producer senden oder nur die vorgenommenen Änderungen. Der Producer aktualisiert seine gespeicherten Statusinformationen für den Consumer und leitet die Änderungen an die restlichen Consumer weiter. Diese aktualisieren ebenfalls ihre lokalen Statusinformationen und können dann auf die vorgenommenen Änderungen reagieren. Sollte ein Consumer nicht innerhalb eines vordefinierten Zeitraums seinen Status aktualisieren wird dieser auf \texttt{null} gesetzt und die Änderung an die restlichen Consumer weitergeleitet.

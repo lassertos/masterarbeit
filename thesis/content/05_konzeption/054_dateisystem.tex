@@ -1,30 +1,42 @@
 \section{Dateisystem}\label{section:konzeption:dateisystem}
 
+\begin{note}
+    \textbf{Notizen:}
+    \begin{itemize}
+        \item Erwähnung von \autoref{requirement:Dateisystem}, \autoref{requirement:Dateisystem: CrossLab-Kompatibilität} und \autoref{requirement:Dateisystem: Kollaboration}
+        \item Ggf. Erwähnung von \autoref{requirement:Standalone nutzbar}
+        \item Vergleich verschiedener Konzepte (client- vs. server-side)
+        \item Beschreibung der CrossLab-Services + Klassendiagramm
+        \item Beschreibung der Kollaboration
+        \item Beschreibung der Einbindung in die betrachtete Experimentkonfiguration
+    \end{itemize}
+\end{note}
+
 Nach \autoref{requirement:Dateisystem} soll die IDE ein integriertes Dateisystem besitzen. Für dieses werden im Folgenden zwei verschiedene Lösungsansätze in beschrieben, ein client-seitiger und eine server-seitiger.
 
 Für den client-seitigen Lösungsansatz bietet sich eine Speicherung der Dateien des Nutzers innerhalb des Browsers an. Für die persistente Speicherung von Daten innerhalb des Browsers kann die Indexed Database API \cite{noauthor_indexed-database-api_nodate} genutzt werden. Diese wird von allen aktuellen Browsern unterstützt und erlaubt die langfristige Speicherung von größeren Datenmengen. Der Vorteil des client-seitigen Ansatzes ist die Tatsache, das kein weiterer Speicherplatz für die Nutzer bereitgestellt werden muss, da die Daten auf dem Rechner des Nutzers gespeichert werden. Allerdings sind die Daten sowohl an die Domain der IDE, das Gerät des Nutzers als auch an den spezifischen Browser gebunden und müssen durch entsprechendes Exportieren und Importieren übertragen werden.
 
 Der server-seitige Lösungsansatz basiert darauf jedem Nutzer einen entsprechenden Bereich zuzuteilen, in welchem seine Dateien gespeichert werden. Dies kann entweder über das Dateisystem des Servers oder über eine Datenbank geschehen. Der Vorteil dieser Art der Datenspeicherung liegt darin, dass sie geräteunabhängig ist. Allerdings werden für die Speicherung der Nutzerdaten entsprechender Speicherplatz auf dem Server benötigt wodurch höhere Kosten und ein höherer Verwaltungsaufwand bestehen. Zudem muss sichergestellt werden, dass das System nicht ausgenutzt werden kann.
 
-\autoref{requirement:Dateisystem: CrossLab-Kompatibilität} verlangt die Entwicklung von CrossLab-Services für die Bereitstellung und Nutzung von Dateisystemen. Dementsprechend werden im Folgenden der \textit{Dateisystem Service Producer} und der \textit{Dateisystem Service Consumer} beschrieben. Die grundlegende Kommunikation zwischen den beiden Services geschieht über den Austausch von Nachrichten. Diese bestehen aus einem Typen und dem dazugehörigen Inhalt. Durch die Definition der Nachrichten kann eine Validierung dieser innerhalb der Services geschehen. In \autoref{figure:klassendiagramm-dateisystem-services} ist ein Klassendiagramm für die beiden Services dargestellt. Aus diesem können die bereitgestellten Operationen eines Dateisystems abgelesen werden. So müssen Dateisysteme die Erstellung von Ordnern und Dateien, das Lesen, Verschieben und Löschen dieser sowie das Schreiben von Dateien unterstützen. Dabei besitzt der Consumer Funktionen um die einzelnen Operationen auszuführen, während der Producer die Möglichkeit bietet auf eingehende Anfragen zu reagieren und entsprechende Antworten an den Consumer zu senden.
+\autoref{requirement:Dateisystem: CrossLab-Kompatibilität} verlangt die Entwicklung von CrossLab-Services für die Bereitstellung und Nutzung von Dateisystemen. Dementsprechend werden im Folgenden der \textit{Filesystem Service Producer} und der \textit{Filesystem Service Consumer} beschrieben. Die grundlegende Kommunikation zwischen den beiden Services geschieht über den Austausch von Nachrichten. Diese bestehen aus einem Typen und dem dazugehörigen Inhalt. Durch die Definition der Nachrichten kann eine Validierung dieser innerhalb der Services geschehen. In \autoref{figure:klassendiagramm-dateisystem-services} ist ein Klassendiagramm für die beiden Services dargestellt. Aus diesem können die bereitgestellten Operationen eines Dateisystems abgelesen werden. So müssen Dateisysteme die Erstellung von Ordnern und Dateien, das Lesen, Verschieben und Löschen dieser sowie das Schreiben von Dateien unterstützen. Dabei besitzt der Consumer Funktionen um die einzelnen Operationen auszuführen, während der Producer die Möglichkeit bietet auf eingehende Anfragen zu reagieren und entsprechende Antworten an den Consumer zu senden.
 
 \begin{figure}[tbp]
     \centering
     \begin{tikzpicture}
-        \begin{class}[text width=8.25cm]{DateisystemServiceConsumer}{-4,0}
-            \operation{+ createDirectory(path, content)}
-            \operation{+ delete(path)}
-            \operation{+ move(path, newPath)}
-            \operation{+ readDirectory(path)}
-            \operation{+ readFile(path)}
-            \operation{+ writeFile(path, content)}
+        \begin{class}[text width=6cm]{FilesystemServiceProducer}{0,0}
+            \operation{+ onRequest()}
+            \operation{+ send()}
         \end{class}
-        \begin{class}[text width=6cm]{DateisystemServiceProducer}{4,0}
-            \operation{+ onRequest(request)}
-            \operation{+ send(message)}
+        \begin{class}[text width=6cm]{FilesystemServiceConsumer}{7,0}
+            \operation{+ createDirectory()}
+            \operation{+ delete()}
+            \operation{+ move()}
+            \operation{+ readDirectory()}
+            \operation{+ readFile()}
+            \operation{+ writeFile()}
         \end{class}
     \end{tikzpicture}
-    \caption{Klassendiagramm Dateisystem Services}
+    \caption{Klassendiagramm Filesystem Services}
     \label{figure:klassendiagramm-dateisystem-services}
 \end{figure}
 

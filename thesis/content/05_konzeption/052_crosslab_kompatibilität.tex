@@ -1,0 +1,36 @@
+\section{CrossLab-Kompatibilität}\label{section:konzeption:crosslab-kompatibilität}
+
+\begin{note}
+    \textbf{Notizen:}
+    \begin{itemize}
+        \item Erwähnung \autoref{requirement:CrossLab-Kompatibilität} und \autoref{requirement:Erweiterbarkeit}
+        \item Vergleich der möglichen Anbindungen der IDE als Laborgerät
+        \item Grundlegender Kommunikationsmechanismus der entwickelten Services
+    \end{itemize}
+\end{note}
+
+Die Sicherstellung der CrossLab-Kompatibilität für die verschiedenen Features der zu entwickelnden IDE ist in \autoref{requirement:CrossLab-Kompatibilität} festgelegt, mit spezifischeren Forderungen für das Dateisystem in \autoref{requirement:Dateisystem: CrossLab-Kompatibilität}, die Kompilierung in \autoref{requirement:Kompilierung: CrossLab-Kompatibilität}, das Debuggen in \autoref{requirement:Debuggen: CrossLab-Kompatibilität}, Language Server in \autoref{requirement:Language Server: CrossLab-Kompatibilität} und das Testen in \autoref{requirement:Testen: CrossLab-Kompatibilität}. Die Funktionsweise von Experimenten innerhalb der CrossLab-Architektur wird in \autoref{section:grundlagen:crosslab} dargestellt, daher folgt nur eine kurze Wiederholung der wichtigsten Begriffe. Die CrossLab-Architektur ermöglicht die Definition von sogenannten \emph{Services}. Diese Services können als \emph{Consumer}, \emph{Producer} oder \emph{Prosumer} implementiert werden. Innerhalb eines Experiments können dann Consumer und Producer miteinander verbunden werden. Prosumer implementieren sowohl einen Consumer als auch einen Producer und können dementsprechend mit allen Varianten eine Verbindung aufbauen. Weiterhin gibt es neben konkreten Laborgeräten auch edge- und cloud-instanziierbare Laborgeräte. Diese können beim Start eines Experiments instanziiert werden, wobei die Instanzen edge-instanziierbarer Laborgeräte im Browser des Nutzers ausgeführt werden wohingegen die Instanzen cloud-instanziierbarer Laborgeräte auf einem Server ausgeführt werden.
+
+\autoref{requirement:Erweiterbarkeit} verlangt die Erweiterbarkeit der IDE um zusätzliche CrossLab-Services. Um dies zu erreichen gibt es verschiedene Möglichkeiten. So könnte eine zentrale Komponente genutzt werden, um alle vorhandenen CrossLab-Services zu verwalten. Diese zentrale Komponente könnte entweder selbst in der Lage sein CrossLab-Services, die von anderen Komponenten bereitgestellt werden, zum Laborgerät hinzuzufügen oder sie könnte eine entsprechende Schnittstelle bereitstellen, die es anderen Komponenten ermöglicht das Laborgerät mit ihren angebotenen Services zu erweitern. In der ersten Variante könnte die zentrale Komponente einschränken welche CrossLab-Services zu dem Laborgerät hinzugefügt werden. So könnte z.B. für eine IDE mit verschiedenen Erweiterungen in der Experimentbeschreibung eine Liste an Erweiterungen festgelegt werden, deren CrossLab-Services geladen werden sollen. Somit müssen ggf. nicht alle Erweiterungen für alle Experimente geladen werden. Der beschriebene Ablauf ist in \autoref{abbildung:initialisierung-laborgerät-ide} dargestellt.
+
+\begin{figure}[tbp]
+    \centering
+    \begin{sequencediagram}
+        \newthread{ide}{IDE}
+        \newinst[4]{erweiterung}{Erweiterung}
+
+        \begin{call}{ide}{warte auf Konfiguration}{ide}{}
+        \end{call}
+
+        \begin{sdblock}{alt}{[Erweiterung inaktiv]}
+            \begin{call}{ide}{starte Erweiterung}{erweiterung}{}
+            \end{call}
+        \end{sdblock}
+
+        \begin{call}{ide}{lade CrossLab-Services}{erweiterung}{}
+        \end{call}
+    \end{sequencediagram}
+    \caption{Initialisierung Laborgerät IDE}\label{abbildung:initialisierung-laborgerät-ide}
+\end{figure}
+
+Weiterhin besteht die Frage welche Art eines Laborgeräts für die Einbindung der IDE in die CrossLab-Architektur am besten geeignet ist. Dabei ist zu beachten, dass die IDE von mehreren Nutzern gleichzeitig und auch standalone in Experimenten verwendet werden soll (sh. \autoref{requirement:Standalone nutzbar} und \autoref{requirement:Kollaboration}). Daher kommt nur die Einbindung als cloud- oder edge-instanziierbares Gerät in Frage. Die Instanzen von cloud-instanziierbare Laborgeräten werden auf Servern ausgeführt und benötigen dementsprechende Ressourcen. Aufgrund dieser Tatsache kann es ggf. dazu kommen, dass Nutzer warten müssen bis die entsprechenden Serverkapazitäten vorhanden sind. Dies könnte die Benutzererfahrung verschlechtern. Eine Einbindung der IDE als edge-instanziierbares Laborgerät kann dieses Problem umgehen, da die Instanzen auf der Seite des Nutzers ausgeführt werden. Allerdings muss dabei beachtet werden, dass für eine Implementierung der IDE als edge-instanziierbares Gerät die grundlegenden Funktionen dieser komplett im Browser des Nutzers ausgeführt werden können müssen. Zu den grundlegenden Funktionen gehören dabei ein Dateisystem für die Bearbeitung und persistente Speicherung von Dateien und Ordnern sowie der Code Editor zum Editieren von Dateien. Zusätzliche Funktionen wie z.B. Kompilierung und Debuggen müssen in den meisten Fällen auf Servern ausgeführt werden und benötigen somit weiterhin entsprechende Ressourcen. Die benötigten Serverresourcen sollten allerdings geringer sein als bei einer cloud-instanziierbareren Variante. Eine Implementierung der IDE als cloud-instanziierbares Gerät kann allerdings die Anbindung und Nutzung von Compilern, Debuggern und Language Servern stark vereinfachen, da diese auf demselben System laufen können. Die in den folgenden Abschnitten beschriebenen Konzepte sollen in beiden Varianten angewandt werden können.

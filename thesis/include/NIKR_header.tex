@@ -56,14 +56,21 @@
 
 \newcommand{\quoted}[1]{\glqq#1\grqq}
 
-\newenvironment{note}
-{
-    \begin{tcolorbox}[boxrule=0pt,frame hidden,sharp corners,enhanced,borderline west={2pt}{0pt}{pink}, colback=black!3,breakable]
-        \textbf{Notiz:} \\
-        }
-        {
-    \end{tcolorbox}
-}
+\usepackage{comment}
+\newif\ifshownotes
+\shownotestrue
+\ifshownotes
+    \newenvironment{note}
+    {
+        \begin{tcolorbox}[boxrule=0pt,frame hidden,sharp corners,enhanced,borderline west={2pt}{0pt}{pink}, colback=black!3,breakable]
+            }
+            {
+        \end{tcolorbox}
+    }
+\else
+    \excludecomment{note}
+    
+\fi
 
 % === Übersetzungen ===========================================================
 % Definitionen je nach \mylanguage (siehe NIKR_settings.tex)

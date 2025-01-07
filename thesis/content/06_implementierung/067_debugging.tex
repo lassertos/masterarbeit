@@ -1,5 +1,28 @@
 \section{Debugging}\label{section:prototypische-implementierung:debugging}
 
+\begin{note}
+    \textbf{Notizen:}
+    \begin{itemize}
+        \item Begründung warum gdb für die Implementierung genutzt wurde
+        \item Beschreibung der Anbindung von gdb als Laborgerät
+        \item Erwähnung der verwendeten VSCode APIs
+              \begin{itemize}
+                  \item \dots
+              \end{itemize}
+        \item Beschreibung der Kollaboration
+              \begin{itemize}
+                  \item Behandlung von Breakpoints
+                  \item Behandlung von Start- und Stoppanfragen
+                  \item Behandlung von Neustarts
+                  \item Behandlung von Beenden der Sitzung
+                  \item Behandlung von Initialisierungsnachrichten
+              \end{itemize}
+        \item Eigenheiten der gdb DAP-Implementierung (keine new-events)
+        \item Beschreibung der Einbindung externer Dateien
+        \item Ggf. Beschreibung der Benutzerinterfaces + Screenshots
+    \end{itemize}
+\end{note}
+
 Für die Bereitstellung der Debug-Funktionen wurde in der prototypischen Implementierung der Debugger gdb \todoaddref[]{gdb} verwendet. Dieser erlaubt das Debuggen von Microcontrollern und implementiert zudem Teile des \ac{DAP}. Um gdb in Experimenten nutzen zu können wurde ein cloud-instanziierbares Laborgerät entwickelt. Dieses stellt einen Debugging Adapter Service Producer und einen Debugging Target Service Consumer bereit für die Kommunikation mit der IDE sowie der zu debuggenden Steuereinheit.
 
 Wenn ein Nutzer eine Debug-Sitzung startet wird über den Debugging Adapter Service eine entsprechende Nachricht an das Laborgerät des Debuggers gesendet. Diese Nachricht beinhaltet das aktuelle Projekt des Nutzers. Dieses benötigt der Debugger während der Debug-Sitzung, weshalb es für die Dauer der Debug-Sitzung in einem entsprechenden Ordner auf dem Dateisystem hinterlegt wird. Weiterhin wird das Projekt an den Compiler gesendet, wobei für die Ermöglichung des Debuggens spezielle Einstellungen vorgenommen werden müssen. Das Ergebnis der Kompilierung wird dann über den Debugging Target Service an die Steuereinheit gesendet, wodurch gleichzeitig der Steuereinheit der Beginn einer Debug-Sitzung mitgeteilt wird. Weiterhin wird der Debugger selbst gestartet, wobei der tatsächliche Start der Debug-Sitzung erst durch die Nachrichten des \ac{DAP} geschieht. Nachdem alle Vorbereitungen getroffen wurden und eine Antwort von der Steuereinheit empfangen wurde, wird eine Antwort an die IDE gesendet. Die Antwort enthält den Kennzeichner der Debug-Sitzung sowie Einstellungen für diese. Im Falle der prototypischen Implementierung werden hierbei der Kennzeichner der Debug-Sitzung, das Debug-Ziel sowie der Pfad des kompilierten Programms als Einstellungen übergeben. Diese werden dann von der IDE beim Start des \ac{DAP} verwendet.

@@ -1,5 +1,59 @@
 \section{Debugging}\label{section:konzeption:debugging}
 
+\begin{note}
+    \textbf{Notizen:}
+    \begin{itemize}
+        \item Erwähnung von \autoref{requirement:Debuggen}, \autoref{requirement:Debuggen: CrossLab-Kompatibilität} und \autoref{requirement:Debuggen: Kollaboration}
+        \item Beschreibung der CrossLab-Services + Klassendiagramm (Adapter)
+        \item Beschreibung der CrossLab-Services + Klassendiagramm (Target)
+        \item Konzept für die Ermöglichung der Kollaboration
+        \item Konzept für die Bereitstellung von Debuggern als Laborgeräte
+        \item Beschreibung der Einbindung in die betrachtete Experimentkonfiguration
+        \item (Beschreibung möglicher Einstellungen?)
+    \end{itemize}
+\end{note}
+
+\begin{figure}[tbp]
+    \centering
+    \resizebox{\textwidth}{!}{
+        \begin{tikzpicture}
+            \begin{class}[text width=7.5cm]{DebuggingAdapterServiceProducer}{0,0}
+                \operation{+ send()}
+                \operation{+ onStartSession()}
+                \operation{+ onJoinSession()}
+                \operation{+ onMessage()}
+            \end{class}
+            \begin{class}[text width=7.5cm]{DebuggingAdapterServiceConsumer}{8,0}
+                \operation{+ send()}
+                \operation{+ startSession()}
+                \operation{+ joinSession()}
+                \operation{+ onMessage()}
+            \end{class}
+        \end{tikzpicture}
+    }
+    \caption{Klassendiagramm Debugging Adapter Services}
+    \label{figure:klassendiagramm-debugging-adapter-services}
+\end{figure}
+
+\begin{figure}[tbp]
+    \centering
+    \resizebox{\textwidth}{!}{
+        \begin{tikzpicture}
+            \begin{class}[text width=7.5cm]{DebuggingTargetServiceProducer}{0,0}
+                \operation{+ send()}
+                \operation{+ onStartDebugging()}
+                \operation{+ onEndDebugging()}
+            \end{class}
+            \begin{class}[text width=7.5cm]{DebuggingTargetServiceConsumer}{8,0}
+                \operation{+ startDebugging()}
+                \operation{+ endDebugging()}
+            \end{class}
+        \end{tikzpicture}
+    }
+    \caption{Klassendiagramm Debugging Target Services}
+    \label{figure:klassendiagramm-debugging-target-services}
+\end{figure}
+
 Um ein Programm debuggen zu können muss zunächst ein entsprechender Debugger an die IDE angebunden werden. Dabei ist zu beachten, dass die meisten Debugger nicht direkt im Browser ausgeführt werden können, weshalb sich cloud-instanziierbare Laborgeräte für die Anbindung eines Debuggers eignen. Dabei könnte für jeden Nutzer bzw. jedes Experiment eine entsprechende Instanz des Debuggers erstellt werden. Der Debugger muss dabei sowohl eine Verbindung zur IDE besitzen als auch eine weitere Verbindung zu der zu debuggenden Steuereinheit. Für beide dieser Verbindungen wird ein entsprechender Service benötigt. Für die Verbindung zwischen der IDE und dem Debugger wird der \textit{Debugging Adapter Service} genutzt und für die Verbindung zwischen dem Debugger und der Steuereinheit wird der \textit{Debugging Target Service} verwendet.
 
 Der Debugging Adapter Service baut auf dem \ac{DAP} \cite{noauthor_debug-adapter-protocol_nodate} von Microsoft auf. Dieses spezifiert Nachrichten die zwischen einer IDE und einem sogenannten \textit{Debug Adapter} ausgetauscht werden. Ein Debug Adapter bildet die Schnittstelle zwischen einem Debugger und einer IDE. Das Protokoll erlaubt somit die Anbindung bestehender Debugger über die Implementierung eines entsprechenden Debug Adapters. Weiterhin wird der Implementierungsaufwand für die Einbindung von Debuggern in IDEs verringert, da in der Theorie nur eine Schnittstelle implementiert werden muss, anstatt jeden Debugger an eine eigens entwickelte Schnittstelle anpassen zu müssen. Somit sollte durch die Verwendung des \ac{DAP} die Einbindung der meisten Debugger stark vereinfacht werden. \dots

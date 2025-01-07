@@ -1,0 +1,29 @@
+\section{Kompilierung}\label{section:konzeption:kompilierung}
+
+\begin{note}
+    \textbf{Notizen:}
+    \begin{itemize}
+        \item Erwähnung von \autoref{requirement:Kompilierung} und \autoref{requirement:Kompilierung: CrossLab-Kompatibilität}
+        \item Beschreibung der CrossLab-Services + Klassendiagramm
+        \item Konzept für die Bereitstellung von Compilern als Laborgeräte
+        \item Beschreibung der Einbindung in die betrachtete Experimentkonfiguration
+        \item (Beschreibung möglicher Einstellungen?)
+    \end{itemize}
+\end{note}
+
+Nach \autoref{requirement:Kompilierung} soll die Kompilierung der Programme von Nutzern ermöglicht werden. Dafür soll laut \autoref{requirement:Kompilierung: CrossLab-Kompatibilität} eine Anbindung von Compilern über entsprechende CrossLab-Services ermöglicht werden. Dementsprechend können dafür der \textit{Compilation Service Producer} und der \textit{Compilation Service Consumer} verwendet werden. In \autoref{figure:klassendiagramm-compilation-services} ist ein Klassendiagramm für die beiden CrossLab-Services angegeben. Dabei besitzt der Compilation Service Consumer nur eine Funktion \texttt{compile}, die es Nutzern ermöglicht die Kompilierung eines Ordners anzufragen. Dabei können zusätzliche Optionen für den Compiler sowie das gewünschte Format der Ausgabe angegeben werden. Die möglichen Ausgabeformate können auf der Seite des Compilation Service Producer über entsprechende Schemas definiert werden. Diese werden  Für ein spezifisches Experiment kann die Konfiguration des gewünschten Ausgabeformats während der Konfiguration des Experiments auf Ebene der Verbindung zwischen dem Compilation Service Producer und Consumer angegeben werden. Der Compilation Service Producer ruft beim Erhalten einer Kompilieranfrage die Funktion \texttt{onCompilationRequest} mit den in der Anfrage enthaltenen Argumenten auf. Die Implementierung dieser Funktion ist abhängig von dem verwendeten Compiler. Diese Funktion muss das Ergebnis der Kompilierung augeben. Dieses wird dann an den Compilation Service Consumer zurückgesendet.
+
+\begin{figure}[tbp]
+    \centering
+    \begin{tikzpicture}
+        \begin{class}[text width=6cm]{CompilationServiceProducer}{0,0}
+            \operation{+ addResultFormat()}
+            \operation{+ onCompilationRequest()}
+        \end{class}
+        \begin{class}[text width=6cm]{CompilationServiceConsumer}{7,0}
+            \operation{+ compile()}
+        \end{class}
+    \end{tikzpicture}
+    \caption{Klassendiagramm Compilation Services}
+    \label{figure:klassendiagramm-compilation-services}
+\end{figure}

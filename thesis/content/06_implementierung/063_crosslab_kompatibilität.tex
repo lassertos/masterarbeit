@@ -1,3 +1,11 @@
 \section{CrossLab Kompatibilität}\label{section:prototypische-implementierung:crosslab-kompatibilität}
 
+\begin{note}
+    \textbf{Notizen:}
+    \begin{itemize}
+        \item Beschreibung der Basis-Erweiterung
+        \item Beschreibung wie CrossLab-Services hinzugefügt werden können
+    \end{itemize}
+\end{note}
+
 Zur Herstellung der CrossLab-Kompatibilität wurde eine entsprechende Erweiterung implementiert. Diese ist für die Verwaltung eines sogenannten \texttt{DeviceHandler} zuständig. Dieser wird über den SOA-Client der CrossLab-Implementierung bereitgestellt. Der \texttt{DeviceHandler} erlaubt das Hinzufügen von Services zu einem Laborgerät. Die Erweiterung ist in der Lage alle anderen Erweiterungen sowie deren exportierten Objekte einzusehen. Sollte eine Erweiterung entsprechende CrossLab-Services anbieten können diese über den \texttt{DeviceHandler} hinzugefügt werden. Dabei besteht auch die Möglichkeit die betrachteten Erweiterungen für ein spezifischen Experiment einzuschränken indem bei der Konfiguration des Laborgeräts der IDE die Eigenschaft \texttt{extensions} auf ein Array gesetzt wird, dass die Kennzeichner der zu betrachtenden Erweiterungen beinhaltet. Weiterhin wird für die Anmeldung der IDE als Laborgerät bei einer CrossLab-Instanz die URL des Laborgeräts sowie ein dazugehöriger Token benötigt. Da es sich bei der IDE um ein edge-instanziierbares Laborgerät handelt werden diese Informationen über Query-Parameter innerhalb der vom Nutzer aufzurufenden URL hinterlegt. Die benötigten Parameter werden dann ausgelesen und wieder als Query-Parameter an die URL der Erweiterung angehangen. Dadurch können die Parameter wieder innerhalb der Erweiterung ausgelesen und dort für die Anmeldung des Laborgeräts bei der CrossLab-Instanz verwendet werden.

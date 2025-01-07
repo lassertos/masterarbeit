@@ -1,3 +1,15 @@
 \section{Kollaboration}\label{section:prototypische-implementierung:kollaboration}
 
+\begin{note}
+    \textbf{Notizen:}
+    \begin{itemize}
+        \item Kurze Begründung warum Yjs für die Implementierung ausgewählt wurde
+        \item Beschreibung der Implementierung mit Yjs
+              \begin{itemize}
+                  \item CollaborationProvider
+                  \item CollaborationTypes
+              \end{itemize}
+    \end{itemize}
+\end{note}
+
 Für die prototypische Implementierung der Kollaborationsmechanismen wurde Yjs \cite{noauthor_yjs_nodate} verwendet. Yjs basiert auf dem Konzept von \acp{CRDT}. Alle Teilnehmer einer Kollaborationssitzung sind in Yjs gleichberechtig. Das bedeutet, dass alle Nutzer sowohl als Producer als auch als Consumer auftreten. Dementsprechend wurde ein Prosumer implementiert, der beide Rollen abdeckt. Die entwickelte Erweiterung bietet eine entsprechende Instanz des Prosumers an und erlaubt auch den direkten Zugriff auf diese von anderen Erweiterungen aus. Dadurch können auch andere Erweiterung den Prosumer nutzen um ihre Daten innerhalb eines Experiments zu synchronisieren.

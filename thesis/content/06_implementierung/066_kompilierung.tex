@@ -1,5 +1,15 @@
 \section{Kompilierung}\label{section:prototypische-implementierung:kompilierung}
 
+\begin{note}
+    \textbf{Notizen:}
+    \begin{itemize}
+        \item Begründung warum Arduino CLI für die Implementierung genutzt wurde
+        \item Beschreibung der Anbindung der Arduino CLI als Laborgerät
+        \item (Angabe der Rückgabeformate?)
+        \item Ggf. Beschreibung der Benutzerinterfaces + Screenshots
+    \end{itemize}
+\end{note}
+
 Für die Kompilierung wurde in der prototypischen Implementierung das Arduino Command Line Interface \todoaddref[]{Arduino CLI} verwendet. Dieses nutzt intern den Compiler gcc\todoaddref[]{gcc}. Neben der Kompilierung des Quellcodes werden auch Arduino spezifische Vorverarbeitungsschritte durchgeführt. Dadurch können Nutzer auch ggf. ihnen bereits bekannte Arduino Funktionen wie z.B. \texttt{digitalWrite} und \texttt{digitalRead} nutzen. Im Allgemeinen sollte dadurch die Programmierung der Microcontroller für die Nutzer vereinfacht werden. Um die Arduino-cli zur Kompilierung innerhalb eines Experiments nutzen zu können muss diese als ein entsprechendes Laborgerät bereitgestellt werden. Dafür wurde ein cloud-instanziierbares Laborgerät entwickelt. Dieses bietet einen entsprechenden Kompilierungs Service Producer an, welcher während einem Experiment mit der IDE verbunden werden kann. Das instanziierte Laborgerät nimmt die entsprechenden Kompilieranfragen entgegen und bearbeitet diese. Sollte die Kompilierung erfolgreich sein wird eine entsprechende Antwort mit dem Ergebnis der Kompilierung an die IDE gesendet. Im Fehlerfall wird die Fehlermeldung in der Antwort mitgesendet.
 
 Um die Kompilierung aus der IDE starten zu können wurde eine entsprechende Erweiterung entwickelt. Diese fügt zwei Bedienelemente hinzu. Eine Schaltfläche zur Kompilierung des aktuellen Projekts sowie eine Taste zum Kompilieren und Hochladen des aktuellen Projekts. Die erste Schaltfläche kann dazu genutzt werden um zu überprüfen ob das aktuelle Projekt kompiliert werden kann und um die entsprechenden Mitteilungen vom Compiler zu erhalten. Die zweite Schaltfläche führt auch eine Kompilierung des aktuellen Projekts durch und zeigt entsprechende Rückmeldungen an. Sollte die Kompilierung erfolgreich sein wird anschließend das Ergebnis dieser an die zu programmierende Steuereinheit gesendet. In einer kollaborativen Sitzung ist das Kompilieren von Projekten stets erlaubt. Allerdings wird das Hochladen von Projekten deaktiviert falls ein anderer Nutzer aktuell ein Projekt auf die Steuereinheit hochlädt oder falls die Steuereinheit in einer Debug-Sitzung verwendet wird.
