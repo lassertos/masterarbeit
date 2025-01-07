@@ -285,7 +285,7 @@ export class TestingServiceConsumer
       id,
       name: test.name,
       functions: test.functions,
-      children: test.children?.map(this.addTest),
+      children: test.children?.map((child) => this.addTest(child)),
     };
   }
 

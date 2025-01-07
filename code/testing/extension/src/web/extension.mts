@@ -70,16 +70,35 @@ export async function activate(context: vscode.ExtensionContext) {
     "testing-extension:testing"
   );
 
-  function parseTest(test: TestWithId): vscode.TestItem {
+  function parseTest(
+    test: TestWithId,
+    isChild: boolean = false
+  ): vscode.TestItem {
     console.log("parsing test:", test);
     const testItem = testController.createTestItem(test.id, test.name);
-    testController.items.add(testItem);
 
-    for (const child of test.children ?? []) {
-      testItem.children.add(parseTest(child));
+    if (!isChild) {
+      testController.items.add(testItem);
     }
 
-    console.log("parsed test successfully:", test);
+    if (!test.children) {
+      return testItem;
+    }
+
+    for (const [index, child] of test.children.entries()) {
+      const childTestItem = parseTest(child, true);
+      childTestItem.sortText = index
+        .toString()
+        .padStart(test.children.length.toString().length);
+      testItem.children.add(childTestItem);
+    }
+
+    console.log(
+      "parsed test successfully:",
+      test,
+      testItem,
+      Array.from(testItem.children)
+    );
     return testItem;
   }
 
@@ -124,7 +143,8 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       while (queue.length > 0 && !token.isCancellationRequested) {
-        const test = queue.pop()!;
+        const test = queue.shift()!;
+        console.log("running:", test);
 
         if (request.exclude?.includes(test)) {
           continue;
@@ -144,7 +164,9 @@ export async function activate(context: vscode.ExtensionContext) {
           );
         }
 
-        test.children.forEach((test) => queue.push(test));
+        Array.from(test.children)
+          .reverse()
+          .forEach(([_, child]) => queue.unshift(child));
       }
 
       testRun.end();
