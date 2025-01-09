@@ -18,46 +18,93 @@
     \resizebox{\textwidth}{!}{
         \begin{tikzpicture}
             \begin{class}[text width=7.5cm]{DebuggingAdapterServiceProducer}{0,0}
-                \operation{+ send()}
+                \operation{+ sendMessageDAP()}
                 \operation{+ onStartSession()}
                 \operation{+ onJoinSession()}
-                \operation{+ onMessage()}
+                \operation{+ onMessageDAP()}
             \end{class}
             \begin{class}[text width=7.5cm]{DebuggingAdapterServiceConsumer}{8,0}
-                \operation{+ send()}
+                \operation{+ sendMessageDAP()}
                 \operation{+ startSession()}
                 \operation{+ joinSession()}
-                \operation{+ onMessage()}
+                \operation{+ onDapMessageDAP()}
+            \end{class}
+            \begin{class}[text width=7.5cm]{DebuggingTargetServiceProducer}{0,-3.5}
+                \operation{+ sendDebuggingMessage()}
+                \operation{+ onStartDebugging()}
+                \operation{+ onEndDebugging()}
+                \operation{+ onDebuggingMessage()}
+            \end{class}
+            \begin{class}[text width=7.5cm]{DebuggingTargetServiceConsumer}{8,-3.5}
+                \operation{+ sendDebuggingMessage()}
+                \operation{+ startDebugging()}
+                \operation{+ endDebugging()}
+                \operation{+ onDebuggingMessage()}
             \end{class}
         \end{tikzpicture}
     }
-    \caption{Klassendiagramm Debugging Adapter Services}
-    \label{figure:klassendiagramm-debugging-adapter-services}
+    \caption{Klassendiagramm Debugging Services}
+    \label{figure:klassendiagramm-debugging-services}
 \end{figure}
+
+Nach \autoref{requirement:Debuggen} soll das Debuggen der Programme von Nutzern innerhalb der IDE ermöglicht werden. Dafür sollen laut \autoref{requirement:Debuggen: CrossLab-Kompatibilität} CrossLab-Services für die Bereitstellung und Nutzung von Debuggern sowie für die Kommunikation zwischen Debuggern und Steuereinheiten konzipiert werden. Dementsprechend werden im Folgenden der \textit{Debugging Adapter Service Producer} und der \textit{Debugging Adapter Service Consumer} für die Bereitstellung und Nutzung von Debuggern sowie der \textit{Debugging Target Service Producer} und der \textit{Debugging Target Service Consumer} für die Kommunikation zwischen Debuggern und Steuereinheiten vorgestellt. \autoref{figure:klassendiagramm-debugging-services} zeigt ein Klassendiagramm für die Debugging Services.
+
+Der Debugging Adapter Service baut auf dem \ac{DAP} \cite{noauthor_debug-adapter-protocol_nodate} von Microsoft auf. Dieses spezifiert Nachrichten die zwischen einer IDE und einem sogenannten \textit{Debug Adapter} ausgetauscht werden. Ein Debug Adapter bildet die Schnittstelle zwischen einem Debugger und einer IDE. Das Protokoll erlaubt somit die Anbindung bestehender Debugger über die Implementierung eines entsprechenden Debug Adapters. Weiterhin wird der Implementierungsaufwand für die Einbindung von Debuggern in IDEs verringert, da in der Theorie nur eine Schnittstelle implementiert werden muss, anstatt jeden Debugger an eine eigens entwickelte Schnittstelle anpassen zu müssen. Somit sollte durch die Verwendung des \ac{DAP} die Einbindung der meisten Debugger stark vereinfacht werden.
 
 \begin{figure}[tbp]
     \centering
-    \resizebox{\textwidth}{!}{
-        \begin{tikzpicture}
-            \begin{class}[text width=7.5cm]{DebuggingTargetServiceProducer}{0,0}
-                \operation{+ send()}
-                \operation{+ onStartDebugging()}
-                \operation{+ onEndDebugging()}
-            \end{class}
-            \begin{class}[text width=7.5cm]{DebuggingTargetServiceConsumer}{8,0}
-                \operation{+ startDebugging()}
-                \operation{+ endDebugging()}
-            \end{class}
-        \end{tikzpicture}
-    }
-    \caption{Klassendiagramm Debugging Target Services}
-    \label{figure:klassendiagramm-debugging-target-services}
+    \begin{sequencediagram}
+        \newthread{ide}{IDE}
+        \newthreadShift{debugger}{Debugger}{3cm}
+        \newthreadShift{steuereinheit}{Steuereinheit}{3cm}
+
+        \begin{call}{ide}{starte Debug-Sitzung}{debugger}{}
+            \begin{call}{debugger}{speichere Programm}{debugger}{}
+            \end{call}
+            \begin{call}{debugger}{kompiliere Programm}{debugger}{}
+            \end{call}
+            \begin{call}{debugger}{starte Debuggen}{steuereinheit}{}
+                \begin{call}{steuereinheit}{lade Programm}{steuereinheit}{}
+                \end{call}
+            \end{call}
+        \end{call}
+
+        \begin{call}{ide}{DAP Nachrichten}{debugger}{DAP Nachrichten}
+        \end{call}
+
+        \prelevel\prelevel
+
+        \begin{call}{debugger}{Debugger Nachrichten}{steuereinheit}{Debugger Nachrichten}
+        \end{call}
+    \end{sequencediagram}
+    \caption{Start einer Debug-Sitzung}
+    \label{figure:start-einer-debug-sitzung}
 \end{figure}
 
-Um ein Programm debuggen zu können muss zunächst ein entsprechender Debugger an die IDE angebunden werden. Dabei ist zu beachten, dass die meisten Debugger nicht direkt im Browser ausgeführt werden können, weshalb sich cloud-instanziierbare Laborgeräte für die Anbindung eines Debuggers eignen. Dabei könnte für jeden Nutzer bzw. jedes Experiment eine entsprechende Instanz des Debuggers erstellt werden. Der Debugger muss dabei sowohl eine Verbindung zur IDE besitzen als auch eine weitere Verbindung zu der zu debuggenden Steuereinheit. Für beide dieser Verbindungen wird ein entsprechender Service benötigt. Für die Verbindung zwischen der IDE und dem Debugger wird der \textit{Debugging Adapter Service} genutzt und für die Verbindung zwischen dem Debugger und der Steuereinheit wird der \textit{Debugging Target Service} verwendet.
+\paragraph{Start einer Debug-Sitzung} \autoref{figure:start-einer-debug-sitzung} zeigt ein Sequenzdiagramm für den Start einer Debug-Sitzung. Die Funktion \texttt{startSession()} des Debugging Adapter Service Consumer kann zum Starten einer Debug-Sitzung werden. Dabei werden der Ordner, welcher das zu debuggende Programm enthält, sowie Konfigurationsoptionen für den Debugger an den Debugging Adapter Service Producer gesendet. Dieser löst dann ein \texttt{StartSession}-Event mit den übergebenen Daten aus, welches durch einen entsprechenden Event Handler abgefangen werden kann. Dadurch kann die Implementierung an den jeweiligen Debugger angepasst werden. Im Allgemeinen sollte zunächst der übersendete Ordner auf dem Dateisystem des Debugging Adapter Service Producer gespeichert werden. Weiterhin kann ggf. eine Kompilierung des Programms mit speziellen Optionen für das Debuggen vorgenommen werden, wobei die in \autoref{section:konzeption:kompilierung} vorgestellten CrossLab-Services verwendet werden können. Außerdem sollte der Debugger mit den Konfigurationsoptionen gestartet werden und es sollte ein eindeutiger Kennzeichner für die Debug-Sitzung generiert werden. Weiterhin sollte die zu debuggende Steuereinheit über den Start der Debug-Sitzung informiert werden. Dafür kann die Funktion \texttt{startDebugging()} des Debugging Target Service Consumer verwendet werden. Dabei wird das Programm an den Debugging Target Service Producer übergeben. Dieses kann in Event Handlern von \texttt{StartDebugging}-Events z.B. zur Programmierung der Steuereinheit verwendet werden. Zusätzlich können ggf. noch weitere Vorbereitungen getroffen werden bevor eine Antwort an den Debugging Target Service Consumer gesendet wird. Nachdem die Sitzung erfolgreich gestartet wurde, wird eine entsprechende Antwort an den Debugging Adapter Service Consumer gesendet. Diese enthält den Kennzeicher der Debug-Sitzung sowie weitere Konfigurationsoptionen, die beim Start des \ac{DAP} übergeben werden sollen. Bei diesen Konfigurationsoptionen handelt es sich um Informationen die nur dem Debugging Adapter Service Producer bekannt sind, wie z.B. der Pfad zu dem kompilierten Programm auf dessen Dateisystem. Sobald der Debugging Adapter Service Consumer die Antwort erhalten hat kann das \ac{DAP} mit den Konfigurationsoptionen und dem Kennzeichner der Debug-Sitzung gestartet werden. Der Austausch der \ac{DAP} Nachrichten erfolgt dabei über die Funktionen \texttt{sendMessageDAP()}. Eingehende \ac{DAP} Nachrichten können über Event Handler für \texttt{MessageDAP}-Events erhalten und an den Debugger übergeben werden. Eine ähnliche Vorgehensweise wird für den Austausch von Debug-Nachrichten zwischen dem Debugging Target Service Producer und dem Debugging Target Service Consumer angewendet. Hierbei werden die Funktion \texttt{sendDebuggingMessage()} und \texttt{DebuggingMessage}-Events verwendet.
 
-Der Debugging Adapter Service baut auf dem \ac{DAP} \cite{noauthor_debug-adapter-protocol_nodate} von Microsoft auf. Dieses spezifiert Nachrichten die zwischen einer IDE und einem sogenannten \textit{Debug Adapter} ausgetauscht werden. Ein Debug Adapter bildet die Schnittstelle zwischen einem Debugger und einer IDE. Das Protokoll erlaubt somit die Anbindung bestehender Debugger über die Implementierung eines entsprechenden Debug Adapters. Weiterhin wird der Implementierungsaufwand für die Einbindung von Debuggern in IDEs verringert, da in der Theorie nur eine Schnittstelle implementiert werden muss, anstatt jeden Debugger an eine eigens entwickelte Schnittstelle anpassen zu müssen. Somit sollte durch die Verwendung des \ac{DAP} die Einbindung der meisten Debugger stark vereinfacht werden. \dots
+\begin{figure}[tbp]
+    \centering
+    \resizebox{\textwidth}{!}{\begin{sequencediagram}
+            \newthread{ide}{IDE}
+            \newthreadShift{debugger}{Debugger}{4cm}
+            \newthreadShift{steuereinheit}{Steuereinheit}{3cm}
 
-Der Debugging Target Service übernimmt die Kommunikation zwischen dem Debugger und einer Steuereinheit. Dabei wird beim Start des Debuggens zunächst das aktuelle Programm auf die Steuereinheit geladen. Beim Erhalt dieser ersten Nachricht können neben der Programmierung der Steuereinheit auch weitere Vorbereitungen vorgenommen werden. Ein Beispiel hierfür wäre ein Experiment bei dem die Steuereinheit im normalen Betrieb mit einem elektromechanischen Hardwaremodell verbunden ist, aber während dem Debuggen ein Interface auf der Nutzerseite als Eingabe für die Sensoren verwendet. Somit könnten Nutzer schneller in den zu debuggenden Zustand gelangen. Nachdem alle Vorbereitungen getroffen wurden wird eine Antwort an den Debugger gesendet. Dieser beginnt daraufhin mit dem Austausch der Debugger-spezifischen Nachrichten. Diese sind nicht standardisiert und daher wird kein spezifisches Format für diese Nachrichten angegeben. Die Debugger sollten das Debugging von entfernten Geräten unterstützen. Wenn das Debuggen beendet wird sendet der Debugger eine entsprechende Nachricht an die Steuereinheit. Diese kann somit wieder in ihren Normalbetrieb wechseln und sendet dann eine Antwort an den Debugger.
+            \begin{call}{ide}{DAP Terminate Anfrage}{debugger}{}
+                \begin{call}{debugger}{lösche Sitzungsdaten}{debugger}{}
+                \end{call}
+                \begin{call}{debugger}{stoppe Debugger}{debugger}{}
+                \end{call}
+                \begin{call}{debugger}{beende Debuggen}{steuereinheit}{}
+                    \begin{call}{steuereinheit}{lade Programm neu}{steuereinheit}{}
+                    \end{call}
+                \end{call}
+            \end{call}
+        \end{sequencediagram}}
+    \caption{Ende einer Debug-Sitzung}
+    \label{figure:ende-einer-debug-sitzung}
+\end{figure}
 
-Um die Echtzeit-Kollaboration während des Debuggens zu ermöglichen \dots
+\paragraph{Ende einer Debug-Sitzung} \autoref{figure:ende-einer-debug-sitzung} zeigt ein Sequenzdiagramm für das Ende einer Debug-Sitzung. Dieses wird durch eine entsprechende Nachricht des \ac{DAP} wie z.B. \texttt{Terminate} ausgelöst. Sobald der Debugger diese Nachricht erhält werden die Sitzungsdaten gelöscht und der Debugger gestoppt. Weiterhin wird die Funktion \texttt{endDebugging()} des Debugging Target Service Consumer verwendet um den Debugging Target Service Producer über das Ende des Debug-Sitzung zu informieren. In einem Event Handler des dadurch ausgelösten \texttt{EndDebugging}-Events könnte z.B. das aktuelle Programm neugeladen werden und weitere vorgenommene Änderungen für das Debugging rückgängig gemacht werden. Danach wird eine entsprechende Antwort an den Debugging Target Service Consumer gesendet. Sobald diese erhalten wurde wird noch eine finale Antwort auf die ursprüngliche \ac{DAP} Anfrage gesendet.
+
+\paragraph{Kollaboration} Nach \autoref{requirement:Debuggen: Kollaboration} soll es Nutzern innerhalb eines Experiments ermöglicht werden laufenden Debug-Sitzungen beizutreten. Dafür können die in \autoref{section:konzeption:kollaboration} vorgestellten CrossLab-Services verwendet werden. Dabei könnte z.B. beim Start einer Debug-Sitzung der Kennzeichner der Sitzung und der verwendete Ordner in den Zustandsinformationen des Nutzers hinterlegt werden. Dadurch können andere Nutzer über die gestartete Sitzung informiert werden. Falls sie Zugriff auf den angegebenen Ordner haben können sie der Debug-Sitzung mithilfe der Funktion \texttt{joinSession()} des Debugging Adapter Service Consumer beitreten. Dabei wird der Kennzeichner der beizutretenden Debug-Sitzung angegeben. Die Antwort enthält einen neuen Kennzeichner für die Debug-Sitzung des beitretenden Nutzers sowie Konfigurationsoptionen für die Ausführung des \ac{DAP}. Um eine kollaborative Debug-Sitzung zu ermöglichen ist zudem eine spezielle Behandlung von einigen Nachrichten des \ac{DAP} nötig. Zum Beispiel darf nur eine \texttt{Initialize} Anfrage an einen Debug Adapter gestellt werden. Dementsprechend muss die Antwort auf diese gespeichert werden um sie später bei einer erneuten \texttt{Initialize} Anfrage an den beitretenden Nutzer senden zu können. Dabei wird die Anfrage beitretender Nutzer nicht an den Debug Adapter übergeben. Weiterhin sind z.B. die Nachrichten für Breakpoints, Stacktraces, das Starten und Stoppen des Programms sowie das Beenden der Debug-Sitzung zu betrachten. Die detaillierte Betrachtung aller dieser Nachrichten ist nicht das Ziel dieser Arbeit. In \autoref{section:prototypische-implementierung:debugging} wird die Behandlung der für die prototypische Implementierung relevanten Nachrichten erläutert.
