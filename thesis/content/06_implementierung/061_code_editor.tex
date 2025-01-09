@@ -1,14 +1,14 @@
 \section{Code Editor}\label{section:prototypische-implementierung:code-editor}
 
-\begin{note}
-    \textbf{Notizen:}
-    \begin{itemize}
-        \item \autoref{requirement:Erweiterbarkeit}, \autoref{requirement:Kostenlos nutzbar}, \autoref{requirement:Komplett im Browser nutzbar} und \autoref{requirement:Nur CrossLab-Nutzerkonto nötig}
-        \item Betrachtung verschiedener Optionen: \\ Eigenimplementierung, Visual Studio Code, Eclipse Theia und OpenSumi
-        \item Begründung warum Implementierung über VSCode Extensions
-        \item Begründung warum VSCode als Code Editor
-        \item Ggf. nicht als eigenes Unterkapitel
-    \end{itemize}
-\end{note}
+% \begin{note}
+%     \textbf{Notizen:}
+%     \begin{itemize}
+%         \item \autoref{requirement:Erweiterbarkeit}, \autoref{requirement:Kostenlos nutzbar}, \autoref{requirement:Komplett im Browser nutzbar} und \autoref{requirement:Nur CrossLab-Nutzerkonto nötig}
+%         \item Betrachtung verschiedener Optionen: \\ Eigenimplementierung, Visual Studio Code, Eclipse Theia und OpenSumi
+%         \item Begründung warum Implementierung über VSCode Extensions
+%         \item Begründung warum VSCode als Code Editor
+%         \item Ggf. nicht als eigenes Unterkapitel
+%     \end{itemize}
+% \end{note}
 
-Für die Code Editor Komponente der IDE gibt es mehrere verschiedene Möglichkeiten. So kann ein bereits vorhandener Code Editor wie z.B. Ace oder der Monaco Editor genutzt werden um diese in ein eigenes Benutzerinterface einzubinden. Dies ermöglicht die größtmögliche Kontrolle über die Implementierung der IDE, allerdings wird dadurch auch der Implementierungsaufwand stark erhöht. Eine weitere Option ist die Nutzung von Code Editoren, die bereits etablierte Benutzerinterfaces und Erweiterungsmöglichkeiten besitzen. Beispiele hierfür sind VSCode, Theia und OpenSumi. Hierbei bieten Theia und OpenSumi neben der Erweiterbarkeit durch die VSCode Extension API auch noch weitere Schnittstellen an, die zur Erweiterung von grundlegenden Funktionen genutzt werden können. Durch die Nutzung bereits vorhandener und etablierter Benutzerinterfaces und Erweiterungsmöglichkeiten kann die Entwicklung der IDE stark vereinfacht werden. Dabei ist zu beachten, dass ggf. nicht alle Änderungen möglich sind, falls diese nicht von den angebotenen Schnittstellen unterstützt werden. Zudem entsteht durch die Nutzung von tiefgreifenden Schnittstellen von Theia und OpenSumi eine Bindung an das jeweilige Framework, wodurch kein späterer Wechsel auf eine andere Plattform mehr möglich ist. Aus diesen Gründen wird eine Implementierung über die VSCode Extension API angestrebt. Diese wird von allen drei genannten Möglichkeiten unterstützt, wodurch die entwickelte Lösung auf alle anwendbar sein sollte. Während der prototypischen Implementierung wurde VSCode als Code Editor Komponente für die IDE verwendet.
+Es gibt viele verschiedene Code Editoren, die für die prototypsische Implementierung der IDE verwendet werden können. So kann ein bereits vorhandener Code Editor wie z.B. Ace oder der Monaco Editor genutzt werden um diese in ein eigenes Benutzerinterface einzubinden. Dies ermöglicht, mit Ausnahme einer Eigenimplementierung des Code Editors, die größtmögliche Kontrolle über die Implementierung der IDE. Allerdings wird dadurch auch der Implementierungsaufwand stark erhöht. Eine weitere Option ist die Nutzung von Code Editoren, die bereits etablierte Benutzerinterfaces und Erweiterungsmöglichkeiten besitzen. Beispiele hierfür sind \ac{VSCode} \cite{noauthor_vscode_nodate}, Eclipse Theia \cite{noauthor_theia_nodate} und OpenSumi \cite{noauthor_opensumi_nodate}. Hierbei bieten Theia und OpenSumi neben der Erweiterbarkeit durch die VSCode Extension API \cite{noauthor_vscode-extension-api_nodate} auch noch weitere Schnittstellen an, die zur Erweiterung und Anpassung von grundlegenden Funktionen genutzt werden können. Durch die Nutzung bereits vorhandener und etablierter Benutzerinterfaces und Erweiterungsmöglichkeiten kann die Entwicklung der IDE stark vereinfacht werden. Dabei ist zu beachten, dass ggf. nicht alle erwünschten Änderungen über die angebotenen Schnittstellen umgesetzt werden können. Zudem entsteht durch die Nutzung von tiefgreifenden Schnittstellen von Theia und OpenSumi eine Bindung an das jeweilige Framework, wodurch ein späterer Wechsel auf eine andere Plattform erschwert wird. Aus diesen Gründen wird eine Implementierung über die VSCode Extension API angestrebt. Diese wird von allen drei genannten Möglichkeiten unterstützt, wodurch die entwickelte Lösung auf alle anwendbar sein sollte. Während der prototypischen Implementierung wurde \ac{VSCode} als Code Editor für die IDE verwendet.

@@ -45,20 +45,20 @@ Im Folgenden werden die Anforderungen an die zu entwickelnde IDE beschrieben. Da
     \reqrationale Um die IDE in einer Vielzahl von verschiedenen Szenarien einsetzen zu können ist es vom Vorteil keine assoziierten Kosten für die Nutzung dieser zu haben. Somit kann sie z.B. auch im GOLDi-Remotelab und anderen CrossLab-kompatiblen online Laboren eingesetzt werden. \\
 \end{requirement}
 
-\begin{requirement}{Nur CrossLab-Nutzerkonto nötig}
-    \reqdescription Die zu entwickelnde IDE soll nur das bereits zur Ausführung von CrossLab Experimenten verwendete Nutzerkonto benötigen. \\
-    \reqrationale Durch die Notwendigkeit eines zweiten Nutzerkontos könnte die IDE für gewisse Nutzergruppen uninteressant werden. Somit soll nur ein CrossLab-Nutzerkonto für die Nutzung der IDE vorausgesetzt werden. \\
+\begin{requirement}{Eigenständig nutzbar}
+    \reqdescription Die zu entwickelnde IDE soll als einziges Laborgerät in einem Experiment verwendet werden können. Dabei können die angebotenen Funktionen der IDE eingeschränkt sein. Das Editieren von Quellcode soll stets ermöglicht werden. \\
+    \reqrationale Da Experimente in der CrossLab-Architektur meist aus mehreren verbundenen Laborgeräten bestehen kann es dazu kommen, dass manche dieser ggf. nicht immer verfügbar sind, da sie aktuell von anderen Nutzern verwendet werden. Wenn die IDE eigenständig nutzbar ist können Nutzer dennoch an ihren Programmen weiterarbeiten. \\
 \end{requirement}
 
-\begin{requirement}{Eigenständig nutzbar}
-    \reqdescription Die zu entwickelnde IDE soll als einziges Laborgerät in einem Experiment verwendet werden können. \\
-    \reqrationale Da Experimente in der CrossLab-Architektur meist aus mehreren verbundenen Laborgeräten bestehen kann es dazu kommen, dass manche dieser ggf. nicht immer verfügbar sind, da sie aktuell von anderen Nutzern verwendet werden. Wenn die IDE eigenständig nutzbar ist können Nutzer dennoch an ihren Programmen weiterarbeiten. \\
+\begin{requirement}{Nur CrossLab-Nutzerkonto nötig}
+    \reqdescription Die zu entwickelnde IDE soll nur das bereits zur Ausführung von CrossLab Experimenten benötigte Nutzerkonto voraussetzen. \\
+    \reqrationale Durch die Notwendigkeit eines zweiten Nutzerkontos könnte die IDE für gewisse Nutzergruppen uninteressant werden. Somit soll nur ein CrossLab-Nutzerkonto für die Nutzung der IDE vorausgesetzt werden. \\
 \end{requirement}
 
 \begin{requirement}{Integriertes Dateisystem}
     \reqdescription Die zu entwickelnde IDE soll ein integriertes Dateisystem besitzen. \\
     Unteranforderung (a) & Das integrierte Dateisystem soll die Erstellung, Bearbeitung, Verschiebung, Löschung und persistente Speicherung von Dateien und Ordnern unterstützen. \\
-    Unteranforderung (b) & Das integrierte Dateisystem der IDE soll bei der eigenständigen Ausführung unterstützt werden. \\
+    Unteranforderung (b) & Das integrierte Dateisystem der IDE soll bei der eigenständigen Ausführung unterstützt werden. (sh. \autoref{requirement:Eigenständig nutzbar}) \\
     \reqrationale Ein in der IDE integriertes Dateisystem vereinfacht die Nutzung der IDE, da kein externes Dateisystem benötigt wird. Durch die Unterstützung des integrierten Dateisystems bei der eigenständigen Ausführung der IDE haben Nutzer zudem weiterhin Zugriff auf ihre Dateien. \\
 \end{requirement}
 
@@ -113,7 +113,8 @@ Im Folgenden werden die Anforderungen an die zu entwickelnde IDE beschrieben. Da
 \begin{requirement}{Debuggen}
     \reqdescription Die zu entwickelnde IDE soll das Debuggen von Programmen der Nutzer ermöglichen. \\
     Unteranforderung (a) & Es soll ein CrossLab-Service für die Bereitstellung und Nutzung von Debuggern entwickelt werden. \\
-    Unteranforderung (b) & Die zu entwickelnde IDE soll den aus Unteranforderung (a) resultierenden CrossLab-Service für die Nutzung von Debuggern verwenden. \\
+    Unteranforderung (b) & Es soll ein CrossLab-Service für die Kommunikation zwischen Debuggern und Steuereinheit entwickelt werden. \\
+    Unteranforderung (c) & Die zu entwickelnde IDE soll den aus Unteranforderung (a) resultierenden CrossLab-Service für die Nutzung von Debuggern verwenden. \\
     \reqrationale Nutzer können durch das Debuggen ihrer Programme schneller Fehler in diesen finden und beheben. Weiterhin erlaubt das Debuggen eines Programms einen besseren Einblick in dessen Laufzeitverhalten. \\
 \end{requirement}
 
@@ -135,8 +136,8 @@ Im Folgenden werden die Anforderungen an die zu entwickelnde IDE beschrieben. Da
     \reqdescription Es soll ein CrossLab-Service für die Erstellung und Ausführung von Testfällen innerhalb eines Experiments entwickelt werden. \\
     Unteranforderung (a) & Der Producer des CrossLab-Service soll die Bereitstellung von Funktionen zur Verwendung in Testfällen ermöglichen. \\
     Unteranforderung (b) & Der Consumer des CrossLab-Service soll die Ausführung der bereitgestellten Funktionen ermöglichen. \\
-    Unteranforderung (b) & Die Konfiguration von Testfällen soll während der Erstellung eines Experiments erfolgen können. \\
-    Unteranforderung (c) & Die zu entwickelnde IDE soll den CrossLab-Service zur Ausführung von Testfällen innerhalb eines Experiments verwenden. \\
+    Unteranforderung (c) & Die Erstellung von Testfällen soll während der Erstellung eines Experiments erfolgen können. \\
+    Unteranforderung (d) & Die zu entwickelnde IDE soll den CrossLab-Service zur Ausführung von Testfällen innerhalb eines Experiments verwenden. \\
     \reqrationale Die Möglichkeit Testfälle für ein Experiment zu konfigurieren erlaubt es z.B. Lehrenden die Ziele ihrer Lehrveranstaltung im Vorhinein festzulegen. Während des Experiments können die Lernenden dann ihre erstellte Lösung überprüfen. \\
 \end{requirement}
 

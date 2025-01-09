@@ -1,41 +1,39 @@
 \section{Dateisystem}\label{section:prototypische-implementierung:dateisystem}
 
-\begin{note}
-    \textbf{Notizen:}
-    \begin{itemize}
-        \item Beschreibung des Projektbasierten Dateisystems
-        \item Erwähnung der verwendeten VSCode APIs
-              \begin{itemize}
-                  \item FileSystemProvider
-                  \item FileSearchProvider (proposed API)
-                  \item TextSeachProvider (proposed API)
-                  \item TreeDataProvider
-              \end{itemize}
-        \item Beschreibung der Anbindung weiterer Dateisysteme
-              \begin{itemize}
-                  \item Indexed Database
-                  \item In-Memory
-              \end{itemize}
-        \item Beschreibung der Probleme während der Implementierung
-              \begin{itemize}
-                  \item Neuladen von VSCode bei Ordnerwechsel
-                  \item Copy, Cut und Paste Probleme wegen Umschreiben der Pfade
-                  \item
-              \end{itemize}
-        \item Beschreibung der Implementierung der Kollaboration
-        \item Ggf. Beschreibung der Benutzerinterfaces + Screenshots
-        \item (Weitere Beschreibung der CrossLab-Services?)
-    \end{itemize}
-\end{note}
+% \begin{note}
+%     \textbf{Notizen:}
+%     \begin{itemize}
+%         \item Beschreibung des Projektbasierten Dateisystems
+%         \item Erwähnung der verwendeten VSCode APIs
+%               \begin{itemize}
+%                   \item FileSystemProvider
+%                   \item FileSearchProvider (proposed API)
+%                   \item TextSeachProvider (proposed API)
+%                   \item TreeDataProvider
+%               \end{itemize}
+%         \item Beschreibung der Anbindung weiterer Dateisysteme
+%               \begin{itemize}
+%                   \item Indexed Database
+%                   \item In-Memory
+%               \end{itemize}
+%         \item Beschreibung der Probleme während der Implementierung
+%               \begin{itemize}
+%                   \item Neuladen von VSCode bei Ordnerwechsel
+%                   \item Copy, Cut und Paste Probleme wegen Umschreiben der Pfade
+%                   \item
+%               \end{itemize}
+%         \item Beschreibung der Implementierung der Kollaboration
+%         \item Ggf. Beschreibung der Benutzerinterfaces + Screenshots
+%         \item (Weitere Beschreibung der CrossLab-Services?)
+%     \end{itemize}
+% \end{note}
 
-Um die in \autoref{section:konzeption:dateisystem} beschriebenen Konzepte für die Bereitstellung und Nutzung von Dateisystemen umzusetzen wurden die entsprechenden CrossLab-Services sowie eine Dateisystem-Erweiterung für die IDE entwickelt.
+Um die in \autoref{section:konzeption:dateisystem} beschriebenen Konzepte für die Bereitstellung und Nutzung von Dateisystemen umzusetzen wurde der Filesystem Service sowie eine entsprechende Erweiterung für die IDE entwickelt.
 
-Die Dateisystem-Erweiterung der IDE ist für die Bereitstellung des integrierten Dateisystems und die Ermöglichung kollaborative Arbeitens an Programmen verwantwortlich. Für das integrierte Dateisystem wurde ein projektbasierter Ansatz gewählt. Dabei besitzen Nutzer mehrere verschiedene \textit{Projektordner}, deren direkte Unterordner als \textit{Projekte} bezeichnet werden. In der aktuellen Implementierung gibt es standardmäßig deb Projektordner \texttt{/projects}. Die Projektordner sowie die enthaltenen Projekte werden dem Nutzer über ein entsprechendes Benutzerinterface angezeigt. Über dieses kann der Nutzer Projekte erstellen, öffnen, umbenennen und löschen. Für die Einbindung des Dateisystems wurde das Interface \texttt{FileSystemProvider} der VSCode Extension API implementiert. Für die Bereitstellung der Dateisystem-Funktionen können unterschiedliche \textit{Subprovider} verwendet werden. In der aktuellen Implementierung stehen dabei Subprovider für In-Memory, Indexed Database sowie Filesystem Service zur Verfügung. Dabei wird standardmäßig In-Memory verwendet und Indexed Database für die persistente Speicherung der Projekte im Pfad \texttt{/projects}. Allerdings können die Basismethode sowie die Methode für bestimmte Pfade angepasst werden und es können neue Methoden hinzugefügt werden. Weiterhin wurden auch die Interfaces \texttt{FileSearchProvider} und \texttt{TextSeachProvider} der VSCode Extension API implementiert, um es Nutzern zu ermöglichen nach Dateien und Texten innerhalb des aktuellen Projekts zu suchen. Für das Benutzerinterface wurde eine \texttt{TreeView} verwendet, deren Daten über einen entsprechenden \texttt{TreeDataProvider} bereitgestellt werden.
+Die Erweiterung der IDE ist für die Bereitstellung des integrierten Dateisystems und die Ermöglichung des kollaborativen Arbeitens an Programmen verwantwortlich. Für das integrierte Dateisystem wurde ein projektbasierter Ansatz gewählt. Dabei besitzen Nutzer mehrere verschiedene \textit{Projektordner}, deren direkte Unterordner als \textit{Projekte} bezeichnet werden. In der aktuellen Implementierung gibt es standardmäßig den Projektordner \texttt{/projects}. Die Projektordner sowie die enthaltenen Projekte werden dem Nutzer über ein entsprechendes Benutzerinterface angezeigt. Über dieses kann der Nutzer Projekte erstellen, öffnen, umbenennen und löschen. Für die Einbindung des Dateisystems wurde das Interface \texttt{FileSystemProvider} der VSCode Extension API implementiert. Für die Bereitstellung der Dateisystem-Funktionen können unterschiedliche \textit{Subprovider} verwendet werden. In der aktuellen Implementierung stehen dabei Subprovider für In-Memory, die Indexed Database sowie den Filesystem Service zur Verfügung. Dabei wird standardmäßig der In-Memory Subprovider verwendet und der Indexed Database Subprovider für die persistente Speicherung der Projekte im Pfad \texttt{/projects}. Allerdings können der standardmäßig verwendete Subprovider sowie die Subprovider für bestimmte Pfade angepasst werden und es können neue Subprovider hinzugefügt werden. Weiterhin wurden auch die Interfaces \texttt{FileSearchProvider} und \texttt{TextSeachProvider} der VSCode Extension API implementiert, um es Nutzern zu ermöglichen nach Dateien und Texten innerhalb des aktuellen Projekts zu suchen. Für das Benutzerinterface wurde eine \texttt{TreeView} verwendet, deren Daten über einen entsprechenden \texttt{TreeDataProvider} bereitgestellt werden.
 
-Bei dem Öffnen eines neuen Ordners wird VSCode standardmäßig neugeladen. Dadurch werden auch alle Erweiterungen beendet und neugestartet, was dazu führt, dass das laufende Experiment beendet wird. Um dies zu vermeiden muss der Wechsel von Projekten über einen anderen Weg geschehen. Dazu wurde zunächst ein Pfad festgelegt, welcher standardmäßig von der IDE geöffnet wird. Im Falle der prototypischen Implementierung wurde der Pfad \texttt{/workspace} ausgewählt. Dieser Pfad nutzt standardmäßig ein In-Memory Dateisystem. Sollte der Nutzer nun ein Projekt öffnen wird von diesem Moment an der Pfad \texttt{/workspace} in allen URLs durch den Pfad des geöffneten Projektes ersetzt. Dadurch wird kein Neuladen der IDE ausgelöst, aber Nutzer können dennoch zwischen ihren Projekten wechseln. Das Umschreiben der Pfade führt allerdings zu Problemen beim Kopieren, Ausschneiden und Einfügen von Ordnern und Dateien. Daher müssen die entsprechenden Kommandos überschrieben werden um die erwartete Funktionalität zu gewährleisten.
+Bei dem Öffnen eines neuen Ordners wird VSCode standardmäßig neugeladen. Dadurch werden auch alle Erweiterungen beendet und neugestartet, was dazu führt, dass das laufende Experiment beendet wird. Um dies zu vermeiden muss der Wechsel von Projekten über einen anderen Mechanismus geschehen. Dazu wurde zunächst ein Pfad festgelegt, welcher standardmäßig von der IDE geöffnet wird. Im Falle der prototypischen Implementierung wurde der Pfad \texttt{/workspace} ausgewählt. Dieser Pfad nutzt standardmäßig einen In-Memory Subprovider. Sollte der Nutzer nun ein Projekt öffnen wird von diesem Moment an der Pfad \texttt{/workspace} in allen URLs durch den Pfad des geöffneten Projektes ersetzt. Dadurch wird kein Neuladen der IDE ausgelöst und Nutzer können zwischen ihren Projekten wechseln. Das Umschreiben der Pfade führt allerdings zu Problemen beim Kopieren, Ausschneiden und Einfügen von Ordnern und Dateien. Daher müssen die entsprechenden Kommandos überschrieben werden um die erwartete Funktionalität zu gewährleisten.
 
-Um das Teilen von Projekten sowie das gleichzeitige Bearbeiten dieser zwischen Nutzern innerhalb eines Experiments zu ermöglichen wurde eine entsprechende Komponente implementiert. Diese nutzt den \texttt{FileSystemProvider} sowie den von der Kollaborationserweiterung bereitgestellten Prosumer. Zu Beginn wird kein Projekt geteilt. Sobald ein Nutzer ein Projekt teilt wird es zu dem geteilten Objekt hinzugefügt. Weiterhin werden auch Funktionen registriert, die auf Änderungen innerhalb des Projekts reagieren. Andere Nutzer die an der Kollaboration teilnehmen können dann das geteilte Projekt über das bereitgestellte Benutzerinterface aufrufen. Alle Änderungen an Dateien und Ordnern werden in der geteilten Version des Projekts synchronisiert. Weiterhin wird die aktuelle Position eines Nutzers innerhalb einer Datei über dessen Zustandsinformationen geteilt. Diese Position wird dann bei anderen Nutzern innerhalb der selben Datei markiert. Wenn der Besitzer des Projekts das Teilen beendet wird das Projekt für alle anderen Nutzer geschlossen. Geteilte Projekte besitzen Pfade der Form \texttt{/shared/\{\{user\_id\}\}/\{\{project\_name\}\}}, wobei der Pfad \texttt{/shared} ein In-Memory Dateisystem verwendet.
+Um das Teilen von Projekten sowie das gleichzeitige Bearbeiten dieser zwischen Nutzern innerhalb eines Experiments zu ermöglichen wurde eine entsprechende Komponente implementiert. Diese nutzt den \texttt{FileSystemProvider} sowie den von der Kollaborationserweiterung bereitgestellten Prosumer. Zu Beginn wird kein Projekt geteilt. Sobald ein Nutzer ein Projekt teilt wird es zu dem geteilten Objekt hinzugefügt. Weiterhin werden auch Funktionen registriert, die auf Änderungen innerhalb des Projekts reagieren. Andere Nutzer die an der Kollaboration teilnehmen können dann das geteilte Projekt über das bereitgestellte Benutzerinterface aufrufen. Alle Änderungen an Dateien und Ordnern werden zwischen den Nutzern synchronisiert. Weiterhin wird die aktuelle Position eines Nutzers innerhalb einer Datei über dessen Zustandsinformationen geteilt. Diese Position wird dann bei anderen Nutzern innerhalb der selben Datei markiert. Wenn der Besitzer des Projekts das Teilen beendet wird das Projekt für alle anderen Nutzer geschlossen. Geteilte Projekte besitzen Pfade der Form \texttt{/shared/\{\{user\_id\}\}/\{\{project\_name\}\}}, wobei der Pfad \texttt{/shared} ein In-Memory Dateisystem verwendet. Die Projektordner \texttt{/shared/\{\{user\_id\}\}} werden automatisch erstellt, wenn ein Nutzer dem entsprechenden Raum beitritt.
 
-% Während der prototypische Implementierung wurde eine Erweiterung zur Bereitstellung eines integrierten Dateisystems entwickelt. Dafür wurde ein entsprechender \texttt{FileSystemProvider} implementiert. Dieser kann genutzt werden um Dateisystem Operationen für ein spezielles URL-Schema anzubieten. Der implementierte \texttt{FileSystemProvider} nutzt weitere Subprovider zur Bereitstellung der tatsächlichen Dateisystem Operationen. Dabei wird bei der Erstellung des \texttt{FileSystemProvider} ein entsprechender Provider angegeben, der zunächst alle Pfade abdeckt. Zusätzlich können dann für gewisse Pfade andere Provider registriert werden. Die Provider sind dann für die Ausführung aller Dateisystem-Operationen verantwortlich die innerhalb dieser Pfade ausgeführt werden. Im Rahmen der prototypischen Implementierung wurde ein In-Memory Provider sowie ein Indexed Database Provider implementiert.
-
-% Bei dem integrierten Dateisystem handelt es sich um ein projektbasiertes Dateisystem. Im Detail bedeutet dies, dass Nutzer Projekte erstellen können, welche innerhalb des Dateisystems unter dem Pfad \texttt{/projects} gespeichert werden. Dieser Pfad nutzt den Indexed Database Provider um die persistente Speicherung der Projekte des Nutzers sicherzustellen. Alle weiteren Funktionen der IDE werden dann im Rahmen dieser Projekte ausgeführt. So werden z.B. für die Kompilierung alle Dateien des aktuell geöffneten Projekts betrachtet. Die URL des aktuell geöffneten Projekts kann über eine entsprechende Funktion von anderen Erweiterungen abgefragt werden. Weiterhin bietet die Erweiterung die Möglichkeit Funktionen zur Ausführung bei einem Projektwechsel zu registrieren. Außerdem erlaubt es die Erweiterung auch anderen Erweiterungen das aktuelle Projekt zu wechseln.
+Der betrachteten Experimentkonfiguration werden keine neuen Laborgeräte hinzugefügt. Die IDEs werden um einen Filesystem Service Consumer erweitert, der die Anbindung von weiteren Dateisystemen ermöglicht.

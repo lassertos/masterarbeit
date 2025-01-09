@@ -1,21 +1,21 @@
 \section{Kollaboration}\label{section:prototypische-implementierung:kollaboration}
 
-\begin{note}
-    \textbf{Notizen:}
-    \begin{itemize}
-        \item Kurze Begründung warum Yjs für die Implementierung ausgewählt wurde
-        \item Beschreibung der Implementierung mit Yjs
-              \begin{itemize}
-                  \item CollaborationProvider
-                  \item CollaborationTypes
-              \end{itemize}
-    \end{itemize}
-\end{note}
+% \begin{note}
+%     \textbf{Notizen:}
+%     \begin{itemize}
+%         \item Kurze Begründung warum Yjs für die Implementierung ausgewählt wurde
+%         \item Beschreibung der Implementierung mit Yjs
+%               \begin{itemize}
+%                   \item CollaborationProvider
+%                   \item CollaborationTypes
+%               \end{itemize}
+%     \end{itemize}
+% \end{note}
 
-Um das in \autoref{section:konzeption:kollaboration} beschriebene Konzept zur Bereitstellung von Echtzeit-Kollaboration innerhalb von Experimenten umzusetzen wurden die entsprechenden CrossLab-Services und eine Erweiterung für die IDE implementiert.
+Um das in \autoref{section:konzeption:kollaboration} beschriebene Konzept zur Bereitstellung von Echtzeit-Kollaboration innerhalb von Experimenten umzusetzen wurde der Collaboration Service und eine Erweiterung für die IDE implementiert.
 
-Die Implementierung der CrossLab-Services ist nach dem in \autoref{section:konzeption:kollaboration} vorgestellten Konzept erfolgt. Als Synchronisationsmethode wurde Yjs \cite{noauthor_yjs_nodate} verwendet, welche auf dem Konzept von \acp{CRDT} basiert. Alle Teilnehmer einer Kollaborationssitzung sind in Yjs gleichberechtig. Das bedeutet, dass alle Nutzer sowohl als Producer als auch als Consumer auftreten. Dementsprechend wurde zunächst nur ein Collaboration Service Prosumer implementiert, der beide Rollen abdeckt. Für die Implementierung der verschiedenen kollaborativen Datentypen wurden die von Yjs angebotenen Datentypen \texttt{Map}, \texttt{Array} und \texttt{Text} verwendet. Dabei können diese direkt auf Objekte, Arrays und Strings abgebildet werden. Für die Implementierung der restlichen kollaborativen Datentypen wurde \texttt{Text} verwendet, wobei der entsprechende Datentyp über ein zusätzliches Attribut festgelegt wird um die Zuordnung zu ermöglichen.
+Die Implementierung des Collaboration Service ist nach dem in \autoref{section:konzeption:kollaboration} vorgestellten Konzept erfolgt. Als Synchronisationsmethode wurde Yjs \cite{noauthor_yjs_nodate} verwendet, welche auf dem Konzept von \acp{CRDT} basiert. Alle Teilnehmer einer Kollaborationssitzung sind in Yjs gleichberechtig. Das bedeutet, dass alle Nutzer sowohl als Producer als auch als Consumer auftreten. Dementsprechend wurde zunächst nur ein Collaboration Service Prosumer implementiert, der beide Rollen abdeckt. Für die Implementierung der verschiedenen kollaborativen Datentypen wurden die von Yjs angebotenen Datentypen \texttt{Map}, \texttt{Array} und \texttt{Text} verwendet. Dabei können diese direkt auf Objekte, Arrays und Strings abgebildet werden. Für die Implementierung der restlichen kollaborativen Datentypen wurde \texttt{Text} verwendet, wobei der entsprechende Datentyp über ein zusätzliches Attribut festgelegt wird um die Zuordnung zu ermöglichen. Die Möglichkeit Attribute an den Datentyp \texttt{Text} anzufügen, welche entsprechend synchronisiert werden, wird bereits unterstützt.
 
-Die entwickelte Erweiterung bietet einen Collaboration Service Prosumer an. Dieser kann von anderen Erweiterungen verwendet werden um entsprechende Räumen beizutreten. Dadurch kann die Implementierung von spezifischen kollaborativen Funktionen durch entsprechende Erweiterungen vorgenommen werden. Aktuell wird nur Yjs als Synchronisationsmethode unterstützt.
+Die entwickelte Erweiterung bietet einen Collaboration Service Prosumer an. Dieser kann von anderen Erweiterungen verwendet werden um entsprechende Räumen beizutreten. Dadurch kann die Implementierung von spezifischen kollaborativen Funktionen durch die entsprechenden Erweiterungen vorgenommen werden. Aktuell wird nur Yjs als Synchronisationsmethode unterstützt.
 
-In der betrachteten Experimentkonfiguration wird zur Veranschaulichung der Kollaboration eine weitere IDE hinzugefügt. Beide IDEs erhalten einen Collaboration Service Prosumer. Weiterhin wird eine Verbindung zwischen diesen hinzugefügt.
+In der betrachteten Experimentkonfiguration wird zur Veranschaulichung der Kollaboration eine weitere IDE hinzugefügt. Beide IDEs erhalten einen Collaboration Service Prosumer. Es wird eine Verbindung zwischen den beiden IDEs über den Collaboration Service hinzugefügt.

@@ -1,34 +1,36 @@
 \section{Debugging}\label{section:prototypische-implementierung:debugging}
 
-\begin{note}
-    \textbf{Notizen:}
-    \begin{itemize}
-        \item Begründung warum gdb für die Implementierung genutzt wurde
-        \item Beschreibung der Anbindung von gdb als Laborgerät
-        \item Erwähnung der verwendeten VSCode APIs
-              \begin{itemize}
-                  \item \dots
-              \end{itemize}
-        \item Beschreibung der Kollaboration
-              \begin{itemize}
-                  \item Behandlung von Breakpoints
-                  \item Behandlung von Start- und Stoppanfragen
-                  \item Behandlung von Neustarts
-                  \item Behandlung von Beenden der Sitzung
-                  \item Behandlung von Initialisierungsnachrichten
-              \end{itemize}
-        \item Eigenheiten der gdb DAP-Implementierung (keine new-events)
-        \item Beschreibung der Einbindung externer Dateien
-        \item Ggf. Beschreibung der Benutzerinterfaces + Screenshots
-    \end{itemize}
-\end{note}
+% \begin{note}
+%     \textbf{Notizen:}
+%     \begin{itemize}
+%         \item Begründung warum gdb für die Implementierung genutzt wurde
+%         \item Beschreibung der Anbindung von gdb als Laborgerät
+%         \item Erwähnung der verwendeten VSCode APIs
+%               \begin{itemize}
+%                   \item \dots
+%               \end{itemize}
+%         \item Beschreibung der Kollaboration
+%               \begin{itemize}
+%                   \item Behandlung von Breakpoints
+%                   \item Behandlung von Start- und Stoppanfragen
+%                   \item Behandlung von Neustarts
+%                   \item Behandlung von Beenden der Sitzung
+%                   \item Behandlung von Initialisierungsnachrichten
+%               \end{itemize}
+%         \item Eigenheiten der gdb DAP-Implementierung (keine new-events)
+%         \item Beschreibung der Einbindung externer Dateien
+%         \item Ggf. Beschreibung der Benutzerinterfaces + Screenshots
+%     \end{itemize}
+% \end{note}
 
-Für die Bereitstellung der Debug-Funktionen wurde in der prototypischen Implementierung der Debugger \ac{GDB} \cite{noauthor_gdb_nodate} verwendet. Dieser erlaubt das Debuggen von Microcontrollern und implementiert zudem Teile des \ac{DAP}. Um \ac{GDB} in Experimenten nutzen zu können wurde ein cloud-instanziierbares Laborgerät entwickelt. Dieses stellt einen Debugging Adapter Service Producer und einen Debugging Target Service Consumer bereit für die Kommunikation mit der IDE sowie der zu debuggenden Steuereinheit.
+Für die Bereitstellung der Debug-Funktionen wurde in der prototypischen Implementierung der Debugger \ac{GDB} \cite{noauthor_gdb_nodate} verwendet. Dieser erlaubt das Debuggen von Microcontrollern und besitzt zudem einen integrierten Debug Adapter. Um \ac{GDB} in Experimenten nutzen zu können wurde ein cloud-instanziierbares Laborgerät entwickelt. Dieses stellt einen Debugging Adapter Service Producer und einen Debugging Target Service Consumer für die Kommunikation mit der IDE sowie der zu debuggenden Steuereinheit bereit.
 
-Wenn ein Nutzer eine Debug-Sitzung startet wird über den Debugging Adapter Service eine entsprechende Nachricht an das Laborgerät des Debuggers gesendet. Diese Nachricht beinhaltet das aktuelle Projekt des Nutzers. Dieses benötigt der Debugger während der Debug-Sitzung, weshalb es für die Dauer der Debug-Sitzung in einem entsprechenden Ordner auf dem Dateisystem hinterlegt wird. Weiterhin wird das Projekt an den Compiler gesendet, wobei für die Ermöglichung des Debuggens spezielle Einstellungen vorgenommen werden müssen. Das Ergebnis der Kompilierung wird dann über den Debugging Target Service an die Steuereinheit gesendet, wodurch gleichzeitig der Steuereinheit der Beginn einer Debug-Sitzung mitgeteilt wird. Weiterhin wird der Debugger selbst gestartet, wobei der tatsächliche Start der Debug-Sitzung erst durch die Nachrichten des \ac{DAP} geschieht. Nachdem alle Vorbereitungen getroffen wurden und eine Antwort von der Steuereinheit empfangen wurde, wird eine Antwort an die IDE gesendet. Die Antwort enthält den Kennzeichner der Debug-Sitzung sowie Einstellungen für diese. Im Falle der prototypischen Implementierung werden hierbei der Kennzeichner der Debug-Sitzung, das Debug-Ziel sowie der Pfad des kompilierten Programms als Einstellungen übergeben. Diese werden dann von der IDE beim Start des \ac{DAP} verwendet.
+Wenn ein Nutzer eine Debug-Sitzung startet wird über den Debugging Adapter Service eine entsprechende Nachricht an das Laborgerät des Debuggers gesendet. Diese Nachricht beinhaltet das aktuelle Projekt des Nutzers. Dieses benötigt der Debugger während der Debug-Sitzung, weshalb es für die Dauer der Debug-Sitzung in einem entsprechenden Ordner auf dem Dateisystem hinterlegt wird. Weiterhin wird das Projekt an den Compiler gesendet, wobei für die Ermöglichung des Debuggens spezielle Einstellungen vorgenommen werden müssen. Das Ergebnis der Kompilierung wird dann über den Debugging Target Service an die Steuereinheit gesendet, wodurch der Steuereinheit gleichzeitig der Beginn einer Debug-Sitzung mitgeteilt wird. Weiterhin wird der Debugger selbst gestartet, wobei der tatsächliche Start der Debug-Sitzung erst durch die Nachrichten des \ac{DAP} geschieht. Nachdem alle Vorbereitungen getroffen wurden und eine Antwort von der Steuereinheit empfangen wurde, wird eine Antwort an die IDE gesendet. Die Antwort enthält den Kennzeichner der Debug-Sitzung sowie Einstellungen für diese. Im Falle der prototypischen Implementierung werden hierbei der Kennzeichner der Debug-Sitzung, das Debug-Ziel sowie der Pfad des kompilierten Programms als Einstellungen übergeben. Diese werden dann von der IDE beim Start des \ac{DAP} verwendet.
 
-Damit das \ac{DAP} korrekt ausgeführt werden kann muss eine Umschreibung der Pfade vorgenommen werden, da die Dateien des Nutzers und des Debuggers in unterschiedlichen Pfaden liegen. Außerdem gibt es Dateien, die nur auf dem Dateisystem des Debuggers vorhanden sind, wie z.B. Bibliotheken. Alle Pfade, die von der IDE gesendet werden beginnen entweder mit \texttt{crosslabfs:/workspace} für Dateien innerhalb eines Projekts oder mit \texttt{crosslab-remote:} für Dateien innerhalb des Dateisystems des Debuggers. Bei Ersteren wird das genannte Präfix durch den lokalen Pfad des Projektes auf dem Dateisystem des Debuggers ersetzt, während bei Zweiteren das Präfix gelöscht wird. Bei Nachrichten vom Debugger an die IDE geschieht die Behandlung der Präfixe auf umgekehrte Art.
+Damit das \ac{DAP} korrekt ausgeführt werden kann muss eine Umschreibung der Pfade vorgenommen werden, da die Dateien des Nutzers und des Debuggers in unterschiedlichen Pfaden liegen. Außerdem gibt es Dateien, die nur auf dem Dateisystem des Debuggers vorhanden sind, wie z.B. Bibliotheken. Alle Pfade, die von der IDE gesendet werden beginnen entweder mit \texttt{crosslabfs:/workspace} für Dateien innerhalb eines Projekts oder mit \texttt{crosslab-remote:} für Dateien innerhalb des Dateisystems des Debuggers. Bei Ersteren wird das genannte Präfix durch den lokalen Pfad des Projektes auf dem Dateisystem des Debuggers ersetzt, während bei Zweiteren das Präfix gelöscht wird. Bei Nachrichten vom Debugger an die IDE geschieht die Behandlung der jeweiligen Präfixe auf umgekehrte Art.
 
-Um das kollaborative Debuggen innerhalb eines Experiments zu unterstützen müssen einige Nachrichten des \ac{DAP} speziell behandelt werden. Dazu gehören unter anderem die Initialisierung und das Beenden der Debug-Sitzung sowie die Behandlung von Breakpoints. \dots \todo{Umschreiben der Pfade} \todo{Behandlung von Start-/Stopp-Antworten}
+Um das kollaborative Debuggen innerhalb eines Experiments zu unterstützen müssen einige Nachrichten des \ac{DAP} speziell behandelt werden. Dazu gehören die Nachrichten für Breakpoints, Stacktraces, das Starten und Stoppen des Programms sowie das Beenden der Debug-Sitzung. Wenn Nutzer einer Debug-Sitzung beitreten schicken sie zunächst nur ihre lokalen Breakpoints über eine \texttt{SetBreakpoints}-Anfrage. Damit nicht die Breakpoints der anderen Nutzer gelöscht werden müssen diese entsprechend zu dieser Nachricht hinzugefügt werden. Dafür werden die Breakpoints aller Nutzer separat verwaltet. Außerdem müssen alle Events gespeichert werden, um diese beitretenden Nutzern schicken zu können, damit diese den aktuellen Zustand der Debug-Sitzung herstellen können. Allgemein werden Events, die vom Debug Adapter ausgegeben werden, an alle Nutzer einer Debug-Sitzung gesendet. Wenn ein Nutzer das Programm startet oder fortsetzt muss ein \texttt{Continued}-Event an die anderen Nutzer gesendet werden. Bei Breakpoints und Stacktraces muss darauf geachtet werden, dass die URLs für Dateien des Debuggers entsprechend angepasst werden, damit die IDE diese öffnen kann. Wenn der Ersteller der Debug-Sitzung diese beendet, so wird sie für alle Nutzer beendet. Sollte ein anderer Nutzer die Debug-Sitzung beenden, so wird sie nur für den Nutzer selbst beendet.
 
-Für die Einbindung in die IDE wurde eine Erweiterung entwickelt. Diese beinhaltet Implementierungen der Schnittstellen \texttt{DebugAdapter}, \texttt{DebugAdapterDescriptorFactory} und \texttt{DebugConfigurationProvider}. Mithilfe dieser kann bereits ein Großteil der Funktionalität implementiert werden. Weiterhin werden auch Bedienelemente zum Starten bzw. Beitreten einer Debug-Sitzung bereitgestellt. Nutzer können eine Debug-Sitzung über eine entsprechende Schaltfläche starten, falls keine aktive Debug-Sitzung bestehen sollte. Ansonsten können Nutzer über eine weitere Schaltfläche einer bestehenden Debug-Sitzung beitreten, falls sie Zugriff auf das dazugehörige Projekt haben. Um das Debuggen von Dateien zu ermöglichen, die nur im Dateisystem des Debuggers vorhanden sind wurde ein \texttt{TextDocumentContentProvider} implementiert. Dieser ermöglicht Lesezugriff auf die Dateien innerhalb des Dateisystems des Debuggers sowie das Setzen von Breakpoints innerhalb dieser.
+Für die Einbindung in die IDE wurde eine entsprechende Erweiterung entwickelt. Diese fügt einen Debugging Adapter Service Consumer hinzu und beinhaltet Implementierungen der Schnittstellen \texttt{DebugAdapter}, \texttt{DebugAdapterDescriptorFactory} und \texttt{DebugConfigurationProvider}. Mithilfe dieser Schnittstellen kann bereits ein Großteil der Funktionalität implementiert werden. Weiterhin werden auch Bedienelemente zum Starten bzw. Beitreten einer Debug-Sitzung bereitgestellt. Nutzer können eine Debug-Sitzung über eine entsprechende Schaltfläche starten, falls keine aktive Debug-Sitzung bestehen sollte. Ansonsten können Nutzer über eine weitere Schaltfläche einer bestehenden Debug-Sitzung beitreten, falls sie Zugriff auf das dazugehörige Projekt haben. Um das Debuggen von Dateien zu ermöglichen, die nur im Dateisystem des Debuggers vorhanden sind wurde ein \texttt{TextDocumentContentProvider} implementiert. Dieser ermöglicht Lesezugriff auf die Dateien innerhalb des Dateisystems des Debuggers sowie das Setzen von Breakpoints innerhalb dieser.
+
+Das betrachtete Experiment wird um das neue Laborgerät für die Bereitstellung von GDB erweitert. Dieses wird über den Debugging Adapter Service mit den IDEs verbunden. Außerdem wird die Steuereinheit um einen Debugging Target Service Producer erweitert. Der Debugger wird über den Debugging Target Service mit der Steuereinheit verbunden.
