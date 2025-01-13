@@ -7,6 +7,7 @@ export const debuggingTargetProtocol = {
     "debugging:start:response",
     "debugging:end:request",
     "debugging:end:response",
+    "debugging:message",
   ],
   messages: {
     "debugging:start:request": z.object({
@@ -26,16 +27,33 @@ export const debuggingTargetProtocol = {
       success: z.boolean(),
       message: z.optional(z.string()),
     }),
+    "debugging:message": z.unknown(),
   },
   roles: ["client", "target"],
   roleMessages: {
     client: {
-      incoming: ["debugging:start:response", "debugging:end:response"],
-      outgoing: ["debugging:start:request", "debugging:end:request"],
+      incoming: [
+        "debugging:start:response",
+        "debugging:end:response",
+        "debugging:message",
+      ],
+      outgoing: [
+        "debugging:start:request",
+        "debugging:end:request",
+        "debugging:message",
+      ],
     },
     target: {
-      incoming: ["debugging:start:request", "debugging:end:request"],
-      outgoing: ["debugging:start:response", "debugging:end:response"],
+      incoming: [
+        "debugging:start:request",
+        "debugging:end:request",
+        "debugging:message",
+      ],
+      outgoing: [
+        "debugging:start:response",
+        "debugging:end:response",
+        "debugging:message",
+      ],
     },
   },
 } as const satisfies MessagingProtocol;

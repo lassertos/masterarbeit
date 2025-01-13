@@ -16,6 +16,7 @@ import { OutgoingMessage } from "@crosslab-ide/abstract-messaging-channel";
 interface DebuggingTargetServiceProducerEvents {
   "debugging:start": (requestId: string, program: Uint8Array) => void;
   "debugging:end": (requestId: string) => void;
+  "debugging:message": (message: unknown) => void;
 }
 
 export class DebuggingTargetServiceProducer
@@ -68,6 +69,9 @@ export class DebuggingTargetServiceProducer
           break;
         case "debugging:end:request":
           this.emit("debugging:end", message.content.requestId);
+          break;
+        case "debugging:message":
+          this.emit("debugging:message", message.content);
           break;
       }
     });

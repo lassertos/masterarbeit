@@ -10,7 +10,6 @@ import fsPromises from "fs/promises";
 import { DebuggingTargetServiceProducer } from "@crosslab-ide/crosslab-debugging-target-service";
 import { getFreePort } from "./util.mjs";
 import net from "net";
-import { MessagingServiceProsumer } from "@crosslab-ide/messaging-service";
 import { TestingServiceProducer } from "@crosslab-ide/crosslab-testing-service";
 import { ProgrammingServiceProducer } from "@crosslab-ide/crosslab-programming-service";
 
@@ -22,7 +21,6 @@ export class SimavrInstance {
   private _gpioService: ElectricalConnectionService;
   private _programmingServiceProducer: ProgrammingServiceProducer;
   private _debuggingTargetServiceProducer: DebuggingTargetServiceProducer;
-  private _messagingService: MessagingServiceProsumer;
   private _testingServiceProducer: TestingServiceProducer;
   private _currentProgram?: Uint8Array;
 
@@ -92,12 +90,6 @@ export class SimavrInstance {
       }
     });
 
-    this._messagingService = new MessagingServiceProsumer(
-      "messaging",
-      undefined,
-      undefined
-    );
-
     this._debuggingTargetServiceProducer = new DebuggingTargetServiceProducer(
       "debugging-target"
     );
@@ -120,11 +112,14 @@ export class SimavrInstance {
           console.log("Simulation started");
           const socket = net.connect(port, undefined, () => {
             console.log("Socket connected");
-            this._messagingService.on("message", (message) => {
-              if (message.content instanceof Uint8Array) {
-                socket.write(message.content);
+            this._debuggingTargetServiceProducer.on(
+              "debugging:message",
+              (message) => {
+                if (message instanceof Uint8Array) {
+                  socket.write(message);
+                }
               }
-            });
+            );
             this._debuggingTargetServiceProducer.send({
               type: "debugging:start:response",
               content: {
@@ -136,7 +131,7 @@ export class SimavrInstance {
           });
           socket.on("data", async (data) => {
             console.log("Socket received data:", data);
-            await this._messagingService.send({
+            await this._debuggingTargetServiceProducer.send({
               type: "debugging:message",
               content: data,
             });
@@ -345,7 +340,6 @@ export class SimavrInstance {
     this._deviceHandler.addService(this._gpioService);
     this._deviceHandler.addService(this._debuggingTargetServiceProducer);
     this._deviceHandler.addService(this._programmingServiceProducer);
-    this._deviceHandler.addService(this._messagingService);
     this._deviceHandler.addService(this._testingServiceProducer);
 
     this._deviceHandler.on("experimentStatusChanged", (event) => {

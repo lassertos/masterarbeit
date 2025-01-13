@@ -11,7 +11,6 @@ import fs from "fs/promises";
 import path from "path";
 import { spawn } from "child_process";
 import net from "net";
-import { MessagingServiceProsumer } from "@crosslab-ide/messaging-service";
 import { randomUUID } from "crypto";
 import { DebugAdapterProtocolHandler } from "./debugAdapterProtocolHandler.mjs";
 
@@ -22,7 +21,6 @@ export class GdbDebuggingInstance {
   private _compilationServiceConsumer: CompilationService__Consumer<
     typeof resultFormats
   >;
-  private _messagingService: MessagingServiceProsumer;
   private _instanceUrl: string;
   private _deviceToken: string;
   private _sessions: Map<string, Session> = new Map();
@@ -43,11 +41,6 @@ export class GdbDebuggingInstance {
     this._compilationServiceConsumer = new CompilationService__Consumer(
       "compilation",
       resultFormats
-    );
-    this._messagingService = new MessagingServiceProsumer(
-      "messaging",
-      undefined,
-      undefined
     );
 
     this._debuggingAdapterServiceProducer.on(
@@ -131,23 +124,25 @@ export class GdbDebuggingInstance {
           socket.on("error", (error) => {
             console.error(error);
           });
-          this._messagingService.on("message", (message) => {
-            if (
-              message.content instanceof Uint8Array &&
-              (socket.readyState === "open" ||
-                socket.readyState === "writeOnly")
-            ) {
-              socket.write(message.content, (error) => {
-                console.error(error);
-              });
+          this._debuggingTargetServiceConsumer.on(
+            "debugging:message",
+            (message) => {
+              if (
+                message instanceof Uint8Array &&
+                (socket.readyState === "open" ||
+                  socket.readyState === "writeOnly")
+              ) {
+                socket.write(message, (error) => {
+                  console.error(error);
+                });
+              }
             }
-          });
+          );
           socket.on("data", async (data) => {
             console.log("Socket received data:", data);
-            await this._messagingService.send({
-              type: "debugging:message",
-              content: data,
-            });
+            await this._debuggingTargetServiceConsumer.sendDebuggingMessage(
+              data
+            );
           });
         });
 
@@ -310,7 +305,6 @@ export class GdbDebuggingInstance {
 
     this._deviceHandler.addService(this._debuggingAdapterServiceProducer);
     this._deviceHandler.addService(this._compilationServiceConsumer);
-    this._deviceHandler.addService(this._messagingService);
     this._deviceHandler.addService(this._debuggingTargetServiceConsumer);
   }
 

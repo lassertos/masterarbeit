@@ -17,7 +17,6 @@
     "@crosslab-ide/crosslab-debugging-adapter-service": "file:../services/adapter",
     "@crosslab-ide/crosslab-debugging-target-service": "file:../services/target",
     "@crosslab-ide/filesystem-schemas": "file:../../shared/filesystem-schemas",
-    "@crosslab-ide/messaging-service": "file:../../shared/messaging-service",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@crosslab-ide/soa-service-message": "file:../../shared/message-service-js",
     "@types/express": "^4.17.21",

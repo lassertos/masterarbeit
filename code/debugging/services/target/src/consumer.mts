@@ -13,8 +13,16 @@ import {
 import { isProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
 import { v4 as uuidv4 } from "uuid";
 import { PromiseManager } from "@crosslab-ide/promise-manager";
+import { TypedEmitter } from "tiny-typed-emitter";
 
-export class DebuggingTargetServiceConsumer implements Service {
+interface DebuggingTargetServiceConsumerEvents {
+  "debugging:message": (message: unknown) => void;
+}
+
+export class DebuggingTargetServiceConsumer
+  extends TypedEmitter<DebuggingTargetServiceConsumerEvents>
+  implements Service
+{
   private _messagingChannel?: CrossLabMessagingChannel<
     DebuggingTargetProtocol,
     "client"
@@ -26,6 +34,7 @@ export class DebuggingTargetServiceConsumer implements Service {
   serviceDirection: ServiceDirection = "consumer";
 
   constructor(serviceId: string) {
+    super();
     this.serviceId = serviceId;
   }
 
@@ -49,9 +58,14 @@ export class DebuggingTargetServiceConsumer implements Service {
       debuggingTargetProtocol,
       "client"
     );
+
     this._messagingChannel.on("message", (message) => {
+      if (message.type === "debugging:message") {
+        return this.emit("debugging:message", message.content);
+      }
       this._promiseManager.resolve(message.content.requestId, message);
     });
+
     if (connection.tiebreaker) {
       connection.transmit(serviceConfig, "data", channel);
     } else {
@@ -132,5 +146,12 @@ export class DebuggingTargetServiceConsumer implements Service {
         }`
       );
     }
+  }
+
+  async sendDebuggingMessage(message: unknown) {
+    await this._messagingChannel?.send({
+      type: "debugging:message",
+      content: message,
+    });
   }
 }
