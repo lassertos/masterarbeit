@@ -1,8 +1,4 @@
-import {
-  DebuggingAdapterServiceConsumer,
-  Directory,
-  isDebugAdapterProtocolType,
-} from "@crosslab-ide/crosslab-debugging-adapter-service";
+import { DebuggingAdapterServiceConsumer } from "@crosslab-ide/crosslab-debugging-adapter-service";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
 import * as vscode from "vscode";
 import { DebugAdapterDescriptorFactory } from "./debugAdapterDescriptorFactory.mjs";
@@ -10,6 +6,7 @@ import { FileSystemService__Consumer } from "@crosslab-ide/crosslab-filesystem-s
 import { DebugConfigurationProvider } from "./debugConfigurationProvider.mjs";
 import { CollaborationServiceProsumer } from "@crosslab-ide/crosslab-collaboration-service";
 import path from "path";
+import { Directory } from "@crosslab-ide/filesystem-schemas";
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log(

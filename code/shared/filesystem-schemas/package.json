@@ -1,0 +1,17 @@
+{
+  "name": "@crosslab-ide/filesystem-schemas",
+  "version": "0.0.1",
+  "description": "Schemas for files and directories.",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT",
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

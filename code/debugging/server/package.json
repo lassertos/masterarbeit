@@ -10,12 +10,13 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.7.8",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@crosslab-ide/crosslab-compilation-service": "file:../../compilation/service",
     "@crosslab-ide/crosslab-debugging-adapter-service": "file:../services/adapter",
     "@crosslab-ide/crosslab-debugging-target-service": "file:../services/target",
+    "@crosslab-ide/filesystem-schemas": "file:../../shared/filesystem-schemas",
     "@crosslab-ide/messaging-service": "file:../../shared/messaging-service",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@crosslab-ide/soa-service-message": "file:../../shared/message-service-js",

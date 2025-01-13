@@ -5,7 +5,6 @@ import {
   GPIO,
 } from "@crosslab-ide/soa-service-electrical";
 import { Simulation } from "@crosslab-ide/simavr-node-addon";
-import { FileService__Consumer } from "@crosslab-ide/soa-service-file";
 import fs from "fs";
 import fsPromises from "fs/promises";
 import { DebuggingTargetServiceProducer } from "@crosslab-ide/crosslab-debugging-target-service";
@@ -13,6 +12,7 @@ import { getFreePort } from "./util.mjs";
 import net from "net";
 import { MessagingServiceProsumer } from "@crosslab-ide/messaging-service";
 import { TestingServiceProducer } from "@crosslab-ide/crosslab-testing-service";
+import { ProgrammingServiceProducer } from "@crosslab-ide/crosslab-programming-service";
 
 export class SimavrInstance {
   private _deviceHandler: DeviceHandler;
@@ -20,7 +20,7 @@ export class SimavrInstance {
   private _instanceUrl: string;
   private _deviceToken: string;
   private _gpioService: ElectricalConnectionService;
-  private _fileServiceConsumer: FileService__Consumer;
+  private _programmingServiceProducer: ProgrammingServiceProducer;
   private _debuggingTargetServiceProducer: DebuggingTargetServiceProducer;
   private _messagingService: MessagingServiceProsumer;
   private _testingServiceProducer: TestingServiceProducer;
@@ -188,13 +188,28 @@ export class SimavrInstance {
       }
     });
 
-    this._fileServiceConsumer = new FileService__Consumer("program");
+    this._programmingServiceProducer = new ProgrammingServiceProducer(
+      "programming"
+    );
 
-    this._fileServiceConsumer.on("file", async (event) => {
-      console.log("received file:", event);
-      await this._program(event.file);
-      this._simulation.start();
-    });
+    this._programmingServiceProducer.on(
+      "program:request",
+      async (consumerId, requestId, program) => {
+        console.log("received program:", program);
+        if (program.type !== "file") {
+          return await this._programmingServiceProducer.send(consumerId, {
+            type: "program:response",
+            content: {
+              requestId,
+              success: false,
+              message: "Expected an elf-file but got a directory!",
+            },
+          });
+        }
+        await this._program(program.content);
+        this._simulation.start();
+      }
+    );
 
     this._testingServiceProducer = new TestingServiceProducer("testing");
 
@@ -329,7 +344,7 @@ export class SimavrInstance {
 
     this._deviceHandler.addService(this._gpioService);
     this._deviceHandler.addService(this._debuggingTargetServiceProducer);
-    this._deviceHandler.addService(this._fileServiceConsumer);
+    this._deviceHandler.addService(this._programmingServiceProducer);
     this._deviceHandler.addService(this._messagingService);
     this._deviceHandler.addService(this._testingServiceProducer);
 

@@ -13,15 +13,15 @@ import {
 import {
   buildCompilationProtocol,
   CompilationProtocol,
-  Directory,
   IdArray,
   ResultFormat,
   UniqueResultFormatArray,
-} from "@crosslab-ide/compilation-messaging-protocol";
+} from "./protocol.mjs";
 import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
-import { PromiseManager } from "./promiseManager.mjs";
+import { PromiseManager } from "@crosslab-ide/promise-manager";
 import { v4 as uuidv4 } from "uuid";
 import { TypedEmitter } from "tiny-typed-emitter";
+import { Directory } from "@crosslab-ide/filesystem-schemas";
 
 interface CompilationService__ConsumerEvents {
   "new-producer": (producerId: string) => void;

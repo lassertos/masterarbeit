@@ -19,9 +19,9 @@ import { CrossLabFileSystemSubProvider } from "./providers/subproviders/index.mj
 import { CollaborationServiceProsumer } from "@crosslab-ide/crosslab-collaboration-service";
 import { ProjectsBinding } from "./projectsBinding.mjs";
 import { isProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
-import { fileSystemProtocol } from "@crosslab-ide/filesystem-messaging-protocol";
+import { fileSystemProtocol } from "@crosslab-ide/crosslab-filesystem-service";
 import path from "path";
-import { convertToCollaborationDirectory } from "./collaborationTypes.mjs";
+import { convertToCollaborationDirectory } from "@crosslab-ide/filesystem-schemas";
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log(

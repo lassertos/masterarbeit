@@ -17,7 +17,7 @@ import {
   CompilationProtocol,
   ResultFormat,
   UniqueResultFormatArray,
-} from "@crosslab-ide/compilation-messaging-protocol";
+} from "./protocol.mjs";
 import { v4 as uuidv4 } from "uuid";
 
 interface CompilationService__ProducerEvents<R extends ResultFormat[] = []> {

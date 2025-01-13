@@ -38,7 +38,7 @@ export class YjsCollaborationProvider extends CollaborationProvider {
         this.emit("update-message", {
           type: "yjs:sync:update",
           content: {
-            message: update,
+            message: update as Uint8Array<ArrayBuffer>,
           },
         } satisfies ProtocolMessage<typeof yjsCollaborationProtocol, "yjs:sync:update">);
       }
@@ -108,7 +108,9 @@ export class YjsCollaborationProvider extends CollaborationProvider {
     syncProtocol.writeSyncStep1(encoder, this._document);
     return {
       type: "yjs:sync:step1",
-      content: { message: encoding.toUint8Array(encoder) },
+      content: {
+        message: encoding.toUint8Array(encoder) as Uint8Array<ArrayBuffer>,
+      },
     };
   }
 
@@ -240,7 +242,7 @@ export class YjsCollaborationProvider extends CollaborationProvider {
     return {
       type: "yjs:sync:step2",
       content: {
-        message: encoding.toUint8Array(encoder),
+        message: encoding.toUint8Array(encoder) as Uint8Array<ArrayBuffer>,
       },
     };
   }

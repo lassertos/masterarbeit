@@ -1,7 +1,4 @@
-import {
-  DirectorySchema,
-  FileSchema,
-} from "@crosslab-ide/filesystem-messaging-protocol";
+import { DirectorySchema, FileSchema } from "@crosslab-ide/filesystem-schemas";
 import { z } from "zod";
 
 const TemplatesArraySchema = z.array(

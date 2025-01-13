@@ -1,7 +1,5 @@
-import {
-  DebuggingAdapterServiceConsumer,
-  Directory,
-} from "@crosslab-ide/crosslab-debugging-adapter-service";
+import { DebuggingAdapterServiceConsumer } from "@crosslab-ide/crosslab-debugging-adapter-service";
+import { Directory } from "@crosslab-ide/filesystem-schemas";
 import vscode from "vscode";
 
 export class DebugConfigurationProvider

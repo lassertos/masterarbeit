@@ -1,0 +1,24 @@
+{
+  "name": "@crosslab-ide/crosslab-programming-service",
+  "version": "0.0.1",
+  "description": "A crosslab service for programming laboratory devices (e.g. microcontrollers).",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT",
+  "dependencies": {
+    "@crosslab-ide/abstract-messaging-channel": "file:../shared/abstract-messaging-channel",
+    "@crosslab-ide/crosslab-messaging-channel": "file:../shared/crosslab-messaging-channel",
+    "@crosslab-ide/filesystem-schemas": "file:../shared/filesystem-schemas",
+    "@crosslab-ide/promise-manager": "file:../shared/promise-manager",
+    "@crosslab-ide/soa-client": "file:../shared/soa-client-js",
+    "tiny-typed-emitter": "^2.1.0",
+    "uuid": "^11.0.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

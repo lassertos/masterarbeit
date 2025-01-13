@@ -13,7 +13,7 @@ import {
   isProtocolMessage,
 } from "@crosslab-ide/abstract-messaging-channel";
 import { v4 as uuidv4 } from "uuid";
-import { PromiseManager } from "./promiseManager.mjs";
+import { PromiseManager } from "@crosslab-ide/promise-manager";
 import { z } from "zod";
 import {
   functionDescriptionSchema,

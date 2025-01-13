@@ -11,6 +11,8 @@
   "dependencies": {
     "@crosslab-ide/abstract-messaging-channel": "file:../../../shared/abstract-messaging-channel",
     "@crosslab-ide/crosslab-messaging-channel": "file:../../../shared/crosslab-messaging-channel",
+    "@crosslab-ide/filesystem-schemas": "file:../../../shared/filesystem-schemas",
+    "@crosslab-ide/promise-manager": "file:../../../shared/promise-manager",
     "@crosslab-ide/soa-client": "file:../../../shared/soa-client-js",
     "tiny-typed-emitter": "^2.1.0",
     "uuid": "^11.0.2",
@@ -18,6 +20,6 @@
   },
   "devDependencies": {
     "@types/uuid": "^10.0.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.3"
   }
 }

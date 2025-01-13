@@ -2,15 +2,13 @@ import { DeviceHandler } from "@crosslab-ide/soa-client";
 import { CompilationService__Producer } from "@crosslab-ide/crosslab-compilation-service";
 import { configuration } from "./configuration.mjs";
 import { ProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
-import {
-  CompilationProtocol,
-  Directory,
-} from "@crosslab-ide/compilation-messaging-protocol";
+import { CompilationProtocol } from "@crosslab-ide/crosslab-compilation-service";
 import fs from "fs";
 import path from "path";
 import os from "os";
 import { execSync } from "child_process";
 import { arduinoCliResultFormats, ArduinoCliResultFormats } from "./types.mjs";
+import { Directory } from "@crosslab-ide/filesystem-schemas";
 
 export class ArduinoCliCompilationInstance {
   private _deviceHandler: DeviceHandler;
@@ -95,22 +93,22 @@ export class ArduinoCliCompilationInstance {
       const files = {
         "sketch.ino.elf": fs.readFileSync(
           path.join(buildDirectoryPath, `${directory.name}.ino.elf`)
-        ),
+        ) as Uint8Array<ArrayBuffer>,
         "sketch.ino.hex": fs.readFileSync(
           path.join(buildDirectoryPath, `${directory.name}.ino.hex`)
-        ),
+        ) as Uint8Array<ArrayBuffer>,
         "sketch.ino.with_bootloader.bin": fs.readFileSync(
           path.join(
             buildDirectoryPath,
             `${directory.name}.ino.with_bootloader.bin`
           )
-        ),
+        ) as Uint8Array<ArrayBuffer>,
         "sketch.ino.with_bootloader.hex": fs.readFileSync(
           path.join(
             buildDirectoryPath,
             `${directory.name}.ino.with_bootloader.hex`
           )
-        ),
+        ) as Uint8Array<ArrayBuffer>,
       };
 
       switch (request.format) {

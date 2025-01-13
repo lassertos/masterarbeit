@@ -14,17 +14,15 @@ import {
   Directory,
   DirectoryWithoutName,
   FileWithoutName,
-} from "@crosslab-ide/filesystem-messaging-protocol";
-import { CrossLabFileSystemProvider } from "./providers/fileSystemProvider.mjs";
-import { ProjectViewDataProvider } from "./providers/projectViewDataProvider.mjs";
-import {
   convertToCollaborationDirectory,
   convertToCollaborationFile,
   convertToDirectoryWithoutName,
   convertToFileWithoutName,
   isCollaborationDirectoryWithoutName,
   isCollaborationFileWithoutName,
-} from "./collaborationTypes.mjs";
+} from "@crosslab-ide/filesystem-schemas";
+import { CrossLabFileSystemProvider } from "./providers/fileSystemProvider.mjs";
+import { ProjectViewDataProvider } from "./providers/projectViewDataProvider.mjs";
 import { hsvToHex } from "./hsl.mjs";
 
 const awarenessStateSchema = z.object({

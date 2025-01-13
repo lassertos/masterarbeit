@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams } from "child_process";
-import { ResultFormat } from "../../../compilation/libraries/compilation-messaging-protocol/dist/index.mjs";
+import { ResultFormat } from "@crosslab-ide/crosslab-compilation-service";
 import { DebugAdapterProtocolHandler } from "./debugAdapterProtocolHandler.mjs";
 
 export const resultFormats = [

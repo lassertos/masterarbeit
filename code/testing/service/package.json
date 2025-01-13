@@ -9,11 +9,12 @@
   "author": "Pierre Helbing",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@crosslab-ide/abstract-messaging-channel": "file:../../shared/abstract-messaging-channel",
     "@crosslab-ide/crosslab-messaging-channel": "file:../../shared/crosslab-messaging-channel",
+    "@crosslab-ide/promise-manager": "file:../../shared/promise-manager",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "@types/uuid": "^10.0.0",
     "ajv": "^8.17.1",

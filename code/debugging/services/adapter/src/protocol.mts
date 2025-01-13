@@ -1,6 +1,6 @@
 import { MessagingProtocol } from "@crosslab-ide/abstract-messaging-channel";
 import { z } from "zod";
-import { DirectorySchema } from "./types.mjs";
+import { DirectorySchema } from "@crosslab-ide/filesystem-schemas";
 import { DebugAdapterProtocolSchemas } from "./dap-zod-schemas.js";
 
 type DebuggingAdapterProtocolMessageType =

@@ -13,14 +13,14 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^22.5.4",
-    "typescript": "^5.6.2"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
-    "@crosslab-ide/soa-client": "file:../../../shared/soa-client-js",
     "@crosslab-ide/abstract-messaging-channel": "file:../../../shared/abstract-messaging-channel",
-    "@crosslab-ide/compilation-messaging-protocol": "file:../../libraries/compilation-messaging-protocol",
     "@crosslab-ide/crosslab-compilation-service": "file:../../service",
     "@crosslab-ide/crosslab-messaging-channel": "file:../../../shared/crosslab-messaging-channel",
+    "@crosslab-ide/filesystem-schemas": "file:../../../shared/filesystem-schemas",
+    "@crosslab-ide/soa-client": "file:../../../shared/soa-client-js",
     "express": "^4.21.0",
     "zod": "^3.23.8"
   }

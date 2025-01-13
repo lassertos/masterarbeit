@@ -15,7 +15,7 @@ import {
   IncomingMessage,
   OutgoingMessage,
 } from "@crosslab-ide/abstract-messaging-channel";
-import { Directory } from "./types.mjs";
+import { Directory } from "@crosslab-ide/filesystem-schemas";
 import { v4 as uuidv4 } from "uuid";
 import { DebugAdapterProtocol } from "./dap-types.js";
 

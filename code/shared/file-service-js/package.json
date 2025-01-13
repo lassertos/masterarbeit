@@ -18,7 +18,7 @@
     "@typescript-eslint/parser": "^6.6.0",
     "eslint": "^8.48.0",
     "prettier": "^3.0.3",
-    "typescript": "^5.2.2"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@crosslab-ide/soa-client": "file:../soa-client-js",

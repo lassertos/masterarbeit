@@ -33,6 +33,32 @@ crosslab-messaging-channel:
         - crosslab-messaging-channel:build
         - soa-client-js:publish
 
+promise-manager:
+  path: code/shared/promise-manager
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+    publish:
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - promise-manager:build
+
+filesystem-schemas:
+  path: code/shared/filesystem-schemas
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+    publish:
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - filesystem-schemas:build
+
 soa-client-js:
   path: code/shared/soa-client-js
   jobs:
@@ -144,46 +170,6 @@ message-service-js:
         - message-service-js:build
         - soa-client-js:publish
 
-compilation-messaging-protocol:
-  path: code/compilation/libraries/compilation-messaging-protocol
-  jobs:
-    build:
-      commands:
-        prepare: npm ci
-        execute: npm run build
-      dependencies:
-        - abstract-messaging-channel:publish
-    publish:
-      helper-functions:
-        before:
-          - update-package-lock
-        after:
-          - revert-package-lock
-      commands:
-        execute: npm unpublish -f; npm publish
-      dependencies:
-        - compilation-messaging-protocol:build
-
-filesystem-messaging-protocol:
-  path: code/filesystem/libraries/filesystem-messaging-protocol
-  jobs:
-    build:
-      commands:
-        prepare: npm ci
-        execute: npm run build
-      dependencies:
-        - abstract-messaging-channel:publish
-    publish:
-      helper-functions:
-        before:
-          - update-package-lock
-        after:
-          - revert-package-lock
-      commands:
-        execute: npm unpublish -f; npm publish
-      dependencies:
-        - filesystem-messaging-protocol:build
-
 crosslab-compilation-service:
   path: code/compilation/service
   jobs:
@@ -195,7 +181,8 @@ crosslab-compilation-service:
         - abstract-messaging-channel:publish
         - soa-client-js:publish
         - crosslab-messaging-channel:publish
-        - compilation-messaging-protocol:publish
+        - promise-manager:publish
+        - filesystem-schemas:publish
     publish:
       helper-functions:
         before:
@@ -206,6 +193,28 @@ crosslab-compilation-service:
         execute: npm unpublish -f; npm publish
       dependencies:
         - crosslab-compilation-service:build
+
+crosslab-programming-service:
+  path: code/programming
+  jobs:
+    build:
+      commands:
+        prepare: npm ci
+        execute: npm run build
+      dependencies:
+        - promise-manager:publish
+        - filesystem-schemas:publish
+    publish:
+      helper-functions:
+        before:
+          - update-package-lock
+        after:
+          - revert-package-lock
+      commands:
+        execute: npm unpublish -f; npm publish
+      dependencies:
+        - crosslab-programming-service:build
+    
 
 crosslab-lsp-service:
   path: code/lsp/service
@@ -218,6 +227,7 @@ crosslab-lsp-service:
         - abstract-messaging-channel:publish
         - soa-client-js:publish
         - crosslab-messaging-channel:publish
+        - promise-manager:publish
     publish:
       helper-functions:
         before:
@@ -240,6 +250,8 @@ crosslab-debugging-adapter-service:
         - abstract-messaging-channel:publish
         - soa-client-js:publish
         - crosslab-messaging-channel:publish
+        - promise-manager:publish
+        - filesystem-schemas:publish
     publish:
       helper-functions:
         before:
@@ -263,6 +275,7 @@ crosslab-debugging-target-service:
         - abstract-messaging-channel:publish
         - soa-client-js:publish
         - crosslab-messaging-channel:publish
+        - promise-manager:publish
     publish:
       helper-functions:
         before:
@@ -285,7 +298,8 @@ crosslab-filesystem-service:
         - abstract-messaging-channel:publish
         - soa-client-js:publish
         - crosslab-messaging-channel:publish
-        - filesystem-messaging-protocol:publish
+        - promise-manager:publish
+        - filesystem-schemas:publish
     publish:
       helper-functions:
         before:
@@ -308,6 +322,7 @@ crosslab-testing-service:
         - abstract-messaging-channel:publish
         - soa-client-js:publish
         - crosslab-messaging-channel:publish
+        - promise-manager:publish
     publish:
       helper-functions:
         before:
@@ -441,7 +456,7 @@ simavr-server:
         - electrical-connection-service-js:publish
         - crosslab-debugging-target-service:publish
         - simavr-node-addon:publish
-        - file-service-js:publish
+        - crosslab-programming-service:publish
         - crosslab-testing-service:publish
         - messaging-service:publish
     build-docker:
@@ -513,8 +528,9 @@ crosslab-filesystem-extension:
       dependencies:
         - soa-client-js:build
         - crosslab-filesystem-service:build
-        - filesystem-messaging-protocol:build
         - editor-settings:build
+        - promise-manager:publish
+        - filesystem-schemas:publish
 
 crosslab-compilation-extension:
   path: code/compilation/extension
@@ -524,11 +540,10 @@ crosslab-compilation-extension:
         prepare: npm ci
         execute: npm run package-web
       dependencies:
-        - compilation-messaging-protocol:build
-        - filesystem-messaging-protocol:build
         - crosslab-compilation-service:build
         - crosslab-filesystem-service:build
         - crosslab-collaboration-service:build
+        - crosslab-programming-service:build
         - soa-client-js:build
 
 crosslab-debugging-extension:
@@ -542,6 +557,7 @@ crosslab-debugging-extension:
         - crosslab-debugging-adapter-service:build
         - electrical-connection-service-js:build
         - crosslab-collaboration-service:build
+        - filesystem-schemas:publish
 
 crosslab-editor:
   path: code/editor

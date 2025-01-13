@@ -2,8 +2,8 @@ import * as vscode from "vscode";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
 import { CompilationService__Consumer } from "@crosslab-ide/crosslab-compilation-service";
 import { FileSystemService__Consumer } from "@crosslab-ide/crosslab-filesystem-service";
-import { FileService__Producer } from "@crosslab-ide/soa-service-file";
 import { CollaborationServiceProsumer } from "@crosslab-ide/crosslab-collaboration-service";
+import { ProgrammingServiceConsumer } from "@crosslab-ide/crosslab-programming-service";
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log(
@@ -60,7 +60,15 @@ export async function activate(context: vscode.ExtensionContext) {
   const compilationService__Consumer = new CompilationService__Consumer(
     "compilation"
   );
-  const fileService__Producer = new FileService__Producer("compilation:file");
+  const programmingService__Consumer = new ProgrammingServiceConsumer(
+    "programming"
+  );
+
+  const programmingTargetId = new Promise<string>((resolve) =>
+    programmingService__Consumer.on("new-producer", (producerId) => {
+      resolve(producerId);
+    })
+  );
 
   const outputchannel = vscode.window.createOutputChannel("compilation");
 
@@ -127,7 +135,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     if (result.success && result.result.type === "file" && upload) {
       outputchannel.appendLine("Uploading result!");
-      await fileService__Producer.sendFile("elf", result.result.content);
+      await programmingService__Consumer.program(
+        await programmingTargetId,
+        result.result
+      );
       outputchannel.appendLine("Uploaded result!");
     }
 
@@ -161,7 +172,7 @@ export async function activate(context: vscode.ExtensionContext) {
       console.log("adding compilation services!");
       deviceHandler.addService(fileSystemService__Consumer);
       deviceHandler.addService(compilationService__Consumer);
-      deviceHandler.addService(fileService__Producer);
+      deviceHandler.addService(programmingService__Consumer);
       console.log("added compilation services!");
     },
   };

@@ -17,7 +17,7 @@ import {
   ProtocolMessage,
 } from "@crosslab-ide/abstract-messaging-channel";
 import { TypedEmitter } from "tiny-typed-emitter";
-import { PromiseManager } from "./promiseManager.mjs";
+import { PromiseManager } from "@crosslab-ide/promise-manager";
 
 export interface LanguageServerConsumerEvents {
   "new-producer": (

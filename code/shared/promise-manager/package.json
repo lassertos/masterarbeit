@@ -1,0 +1,14 @@
+{
+  "name": "@crosslab-ide/promise-manager",
+  "version": "0.0.1",
+  "description": "A promise manager.",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Pierre Helbing",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

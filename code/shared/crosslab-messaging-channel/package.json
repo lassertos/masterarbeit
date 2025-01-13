@@ -10,7 +10,7 @@
   "author": "Pierre Helbing",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^5.6.2"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@crosslab-ide/abstract-messaging-channel": "file:../abstract-messaging-channel",

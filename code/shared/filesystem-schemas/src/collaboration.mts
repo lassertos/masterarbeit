@@ -1,12 +1,12 @@
-import {
-  Directory,
-  DirectoryWithoutName,
-  File,
-  FileWithoutName,
-} from "@crosslab-ide/filesystem-messaging-protocol";
-import { z } from "zod";
-
 // declare schemas and types for files without a name
+
+import { z } from "zod";
+import {
+  FileWithoutName,
+  DirectoryWithoutName,
+  Directory,
+  File,
+} from "./normal.mjs";
 
 export const CollaborationFileWithoutNameSchema = z.object({
   type: z.literal("file"),
@@ -146,14 +146,14 @@ export function convertToFileWithoutName(
 ): FileWithoutName {
   return {
     ...file,
-    content: new TextEncoder().encode(file.content),
+    content: new TextEncoder().encode(file.content) as Uint8Array<ArrayBuffer>,
   };
 }
 
 export function convertToFile(file: CollaborationFile): File {
   return {
     ...file,
-    content: new TextEncoder().encode(file.content),
+    content: new TextEncoder().encode(file.content) as Uint8Array<ArrayBuffer>,
   };
 }
 

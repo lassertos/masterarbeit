@@ -15,6 +15,6 @@
     "tiny-typed-emitter": "^2.1.0"
   },
   "devDependencies": {
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.3"
   }
 }

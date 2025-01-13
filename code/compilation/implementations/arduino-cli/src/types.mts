@@ -1,4 +1,4 @@
-import { ResultFormat } from "@crosslab-ide/compilation-messaging-protocol";
+import { ResultFormat } from "@crosslab-ide/crosslab-compilation-service";
 
 export const arduinoCliResultFormats = [
   {

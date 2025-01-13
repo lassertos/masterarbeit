@@ -16,8 +16,8 @@ import {
   OutgoingMessage,
 } from "@crosslab-ide/abstract-messaging-channel";
 import { TypedEmitter } from "tiny-typed-emitter";
-import { Directory } from "./types.mjs";
-import { PromiseManager } from "./promiseManager.mjs";
+import { Directory } from "@crosslab-ide/filesystem-schemas";
+import { PromiseManager } from "@crosslab-ide/promise-manager";
 import { v4 as uuidv4 } from "uuid";
 
 interface DebuggingAdapterServiceConsumerEvents {

@@ -6,12 +6,7 @@ import {
   ServiceDirection,
 } from "@crosslab-ide/soa-client";
 import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
-import {
-  Directory,
-  File,
-  fileSystemProtocol,
-  FileSystemProtocol,
-} from "@crosslab-ide/filesystem-messaging-protocol";
+import { fileSystemProtocol, FileSystemProtocol } from "./protocol.mjs";
 import {
   IncomingMessage,
   isProtocolMessage,
@@ -19,7 +14,8 @@ import {
 } from "@crosslab-ide/abstract-messaging-channel";
 import { v4 as uuidv4 } from "uuid";
 import { TypedEmitter } from "tiny-typed-emitter";
-import { PromiseManager } from "./promiseManager.mjs";
+import { PromiseManager } from "@crosslab-ide/promise-manager";
+import { Directory, File } from "@crosslab-ide/filesystem-schemas";
 
 interface FileSystemWatcherEvents {
   changed: (
@@ -224,11 +220,6 @@ export class FileSystemService__Consumer
 
     const requestId = uuidv4();
     const promise = this._promiseManager.add(requestId);
-    console.log(
-      this.serviceId,
-      "ids:",
-      JSON.stringify(this._promiseManager.getIds())
-    );
 
     console.log("sending readDirectory request!", {
       type: "readDirectory:request",

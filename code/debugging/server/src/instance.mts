@@ -6,7 +6,7 @@ import {
 import { DebuggingTargetServiceConsumer } from "@crosslab-ide/crosslab-debugging-target-service";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
 import { resultFormats, Session } from "./types.mjs";
-import { Directory } from "@crosslab-ide/crosslab-debugging-adapter-service";
+import { Directory } from "@crosslab-ide/filesystem-schemas";
 import fs from "fs/promises";
 import path from "path";
 import { spawn } from "child_process";
@@ -106,7 +106,8 @@ export class GdbDebuggingInstance {
           );
         }
 
-        const compiledProgram = compilationResult.result.content;
+        const compiledProgram = compilationResult.result
+          .content as Uint8Array<ArrayBuffer>;
 
         // create temporary directory for the debug session
         const tmpDirPath = await fs.mkdtemp("/tmp/debug-session-");

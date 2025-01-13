@@ -169,6 +169,9 @@ async function createClient(
     ...info.configuration,
     uriConverters: {
       code2Protocol: (value) => {
+        if (value.path.startsWith(projectUri.path)) {
+          console.log("LSP: path starts with project path!", value.path);
+        }
         return value
           .with({
             scheme: "file",

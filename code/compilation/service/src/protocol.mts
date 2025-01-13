@@ -1,19 +1,12 @@
 import { z } from "zod";
-
-// declare schemas and types for files without a name
-
-const FileWithoutNameSchema = z.object({
-  type: z.literal("file"),
-  content: z.instanceof(Uint8Array),
-});
-type FileWithoutName = z.infer<typeof FileWithoutNameSchema>;
-
-// declare schemas and types for files with a name
-
-const FileSchema = FileWithoutNameSchema.extend({
-  name: z.string(),
-});
-type File = z.infer<typeof FileSchema>;
+import {
+  FileWithoutNameSchema,
+  FileSchema,
+  DirectoryWithoutNameBaseSchema,
+  DirectorySchema,
+  Directory,
+  File,
+} from "@crosslab-ide/filesystem-schemas";
 
 // declare schemas and types for file result formats without a name
 
@@ -32,32 +25,6 @@ const FileResultFormatSchema = FileSchema.omit({ content: true }).extend({
   description: z.optional(z.string()),
 });
 type FileResultFormat = z.infer<typeof FileResultFormatSchema>;
-
-// declare schemas and types for directories without a name
-
-const DirectoryWithoutNameBaseSchema = z.object({
-  type: z.literal("directory"),
-});
-type DirectoryWithoutName = z.infer<typeof DirectoryWithoutNameBaseSchema> & {
-  content: Record<string, FileWithoutName | DirectoryWithoutName>;
-};
-const DirectoryWithoutNameSchema: z.Schema<DirectoryWithoutName> =
-  DirectoryWithoutNameBaseSchema.extend({
-    content: z.lazy(() =>
-      z.record(z.union([DirectoryWithoutNameSchema, FileWithoutNameSchema]))
-    ),
-  });
-
-// declare schemas and types for directories with a name
-
-const DirectorySchema = z.object({
-  type: z.literal("directory"),
-  name: z.string(),
-  content: z.record(
-    z.union([DirectoryWithoutNameSchema, FileWithoutNameSchema])
-  ),
-});
-export type Directory = z.infer<typeof DirectorySchema>;
 
 // declare schemas and types for directory result formats without a name
 

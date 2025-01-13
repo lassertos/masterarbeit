@@ -12,7 +12,7 @@ import {
 } from "./protocol.mjs";
 import { isProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
 import { v4 as uuidv4 } from "uuid";
-import { PromiseManager } from "./promiseManager.mjs";
+import { PromiseManager } from "@crosslab-ide/promise-manager";
 
 export class DebuggingTargetServiceConsumer implements Service {
   private _messagingChannel?: CrossLabMessagingChannel<
@@ -59,7 +59,7 @@ export class DebuggingTargetServiceConsumer implements Service {
     }
   }
 
-  async startDebugging(program: Uint8Array) {
+  async startDebugging(program: Uint8Array<ArrayBuffer>) {
     if (!this._messagingChannel) {
       throw new Error("No messaging channel has been set up!");
     }

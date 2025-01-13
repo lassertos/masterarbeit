@@ -7,10 +7,7 @@ import {
 } from "@crosslab-ide/soa-client";
 import { CrossLabMessagingChannel } from "@crosslab-ide/crosslab-messaging-channel";
 import { TypedEmitter } from "tiny-typed-emitter";
-import {
-  fileSystemProtocol,
-  FileSystemProtocol,
-} from "@crosslab-ide/filesystem-messaging-protocol";
+import { fileSystemProtocol, FileSystemProtocol } from "./protocol.mjs";
 import {
   IncomingMessage,
   OutgoingMessage,

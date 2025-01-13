@@ -1,7 +1,4 @@
-import {
-  Directory,
-  FileSystemProtocol,
-} from "@crosslab-ide/filesystem-messaging-protocol";
+import { FileSystemProtocol } from "@crosslab-ide/crosslab-filesystem-service";
 import {
   IncomingMessage,
   ProtocolMessage,
@@ -9,6 +6,7 @@ import {
 import vscode from "vscode";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { Directory } from "@crosslab-ide/filesystem-schemas";
 
 const requestResponseMapping = {
   "createDirectory:request": "createDirectory:response",
@@ -192,6 +190,8 @@ export class FileSystemRequestHandler {
       )
     );
     this._fileSystemWatchers.set(watcherId, fileSystemWatcher);
+
+    // TODO: handle filesystem events
 
     return {
       type: "watch:response",
