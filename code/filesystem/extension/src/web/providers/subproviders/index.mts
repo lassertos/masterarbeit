@@ -2,7 +2,7 @@ import vscode from "vscode";
 
 export abstract class CrossLabFileSystemSubProvider {
   abstract initialize?: () => Promise<void> | undefined;
-  abstract exists(uri: vscode.Uri): boolean;
+  abstract exists(uri: vscode.Uri): boolean | Thenable<boolean>;
   abstract stat(uri: vscode.Uri): vscode.FileStat | Thenable<vscode.FileStat>;
   abstract readDirectory(
     uri: vscode.Uri

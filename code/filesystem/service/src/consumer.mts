@@ -212,6 +212,25 @@ export class FileSystemService__Consumer
     this._parseResponse(response, "move:response");
   }
 
+  async copy(producerId: string, path: string, newPath: string) {
+    const messagingChannel = this._producers.get(producerId);
+    if (!messagingChannel) {
+      throw new Error("No messaging channel has been set up!");
+    }
+
+    const requestId = uuidv4();
+    const promise = this._promiseManager.add(requestId);
+
+    await messagingChannel.send({
+      type: "copy:request",
+      content: { requestId, path, newPath },
+    });
+
+    const response = await promise;
+
+    this._parseResponse(response, "copy:response");
+  }
+
   async readDirectory(producerId: string, path: string): Promise<Directory> {
     const messagingChannel = this._producers.get(producerId);
     if (!messagingChannel) {
@@ -291,7 +310,7 @@ export class FileSystemService__Consumer
     return fileSystemWatcher;
   }
 
-  async writeFile(producerId: string, path: string, content: string) {
+  async writeFile(producerId: string, path: string, content: Uint8Array) {
     const messagingChannel = this._producers.get(producerId);
     if (!messagingChannel) {
       throw new Error("No messaging channel has been set up!");
@@ -302,12 +321,54 @@ export class FileSystemService__Consumer
 
     await messagingChannel.send({
       type: "writeFile:request",
-      content: { requestId, path, content },
+      content: { requestId, path, content: content as Uint8Array<ArrayBuffer> },
     });
 
     const response = await promise;
 
     this._parseResponse(response, "writeFile:response");
+  }
+
+  async exists(producerId: string, path: string) {
+    const messagingChannel = this._producers.get(producerId);
+    if (!messagingChannel) {
+      throw new Error("No messaging channel has been set up!");
+    }
+
+    const requestId = uuidv4();
+    const promise = this._promiseManager.add(requestId);
+
+    await messagingChannel.send({
+      type: "exists:request",
+      content: { requestId, path },
+    });
+
+    const response = await promise;
+
+    this._parseResponse(response, "exists:response");
+
+    return response.content.exists;
+  }
+
+  async stat(producerId: string, path: string) {
+    const messagingChannel = this._producers.get(producerId);
+    if (!messagingChannel) {
+      throw new Error("No messaging channel has been set up!");
+    }
+
+    const requestId = uuidv4();
+    const promise = this._promiseManager.add(requestId);
+
+    await messagingChannel.send({
+      type: "stat:request",
+      content: { requestId, path },
+    });
+
+    const response = await promise;
+
+    this._parseResponse(response, "stat:response");
+
+    return response.content.stat;
   }
 
   private _parseResponse<

@@ -4,12 +4,12 @@ import * as vscode from "vscode";
 
 import { LanguageClient } from "vscode-languageclient/browser.js";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
-import path from "path";
 import {
   LanguageServerConsumer,
   LanguageServerMessagingProtocol,
 } from "@crosslab-ide/crosslab-lsp-service";
 import { ProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
+import { readDirectory, readEntry } from "./helper.mjs";
 
 const clientMap: Map<
   string,
@@ -40,10 +40,39 @@ export async function activate(context: ExtensionContext) {
     ? fileSystemExtension.exports
     : await fileSystemExtension.activate();
 
-  languageServerConsumer.on("new-producer", async (producerId, info) => {
+  languageServerConsumer.on("new-producer", async (producerId) => {
     console.log("lsp: new producer", producerId);
     const projectUri = fileSystemApi.getCurrentProject();
-    await createClient(context, projectUri, producerId, info);
+    const info = await languageServerConsumer.initialize(
+      producerId,
+      await readDirectory(projectUri),
+      projectUri.toString()
+    );
+    const [client] = await createClient(context, projectUri, producerId, info);
+
+    languageServerConsumer.on("message", (pId, message) => {
+      if (pId !== producerId) {
+        return;
+      }
+      console.log(
+        "lsp: message",
+        producerId,
+        message,
+        Array.from(clientMap.entries())
+      );
+      const clientInfo = clientMap.get(producerId);
+      if (!clientInfo) {
+        throw new Error(
+          `Could not find information for client with id "${producerId}"!"`
+        );
+      }
+
+      if (message.type === "lsp:message") {
+        clientInfo.messagePort.postMessage(message.content);
+      }
+    });
+
+    await client.start();
 
     const remoteProvider = new (class
       implements vscode.TextDocumentContentProvider
@@ -74,36 +103,24 @@ export async function activate(context: ExtensionContext) {
     );
   });
 
-  languageServerConsumer.on("message", (producerId, message) => {
-    console.log(
-      "lsp: message",
-      producerId,
-      message,
-      Array.from(clientMap.entries())
-    );
-    const clientInfo = clientMap.get(producerId);
-    if (!clientInfo) {
-      throw new Error(
-        `Could not find information for client with id "${producerId}"!"`
-      );
-    }
-
-    if (message.type === "lsp:message") {
-      clientInfo.messagePort.postMessage(message.content);
-    }
-  });
-
-  fileSystemApi.onProjectChanged(async (project: vscode.Uri) => {
+  fileSystemApi.onProjectChanged(async (projectUri: vscode.Uri) => {
     for (const [producerId, { client, info }] of clientMap) {
-      await languageServerConsumer.delete(
-        producerId,
-        path.join(info.sourcesPath, path.basename(project.path))
-      );
       await stopClient(client);
-      const { content: newInfo } = await languageServerConsumer.initialize(
-        producerId
+      const directory = await readDirectory(projectUri);
+      console.log("DEBUGGING: initializing lsp");
+      const newInfo = await languageServerConsumer.initialize(
+        producerId,
+        directory,
+        projectUri.toString(true)
       );
-      await createClient(context, project, producerId, newInfo);
+      console.log("DEBUGGING: initialized lsp");
+      const [newClient] = await createClient(
+        context,
+        projectUri,
+        producerId,
+        newInfo
+      );
+      await newClient.start();
     }
   });
 
@@ -143,14 +160,11 @@ async function createClient(
   const worker = new Worker(serverMain.toString(true));
   const { port1, port2 } = new MessageChannel();
 
-  const projectName = path.basename(projectUri.path);
-
   worker.postMessage(
     {
       type: "init",
       data: {
-        path: info.sourcesPath,
-        projectName,
+        rootUri: projectUri.toString(),
       },
     },
     [port2]
@@ -167,45 +181,6 @@ async function createClient(
 
   const clientOptions: LanguageClientOptions = {
     ...info.configuration,
-    uriConverters: {
-      code2Protocol: (value) => {
-        if (value.path.startsWith(projectUri.path)) {
-          console.log("LSP: path starts with project path!", value.path);
-        }
-        return value
-          .with({
-            scheme: "file",
-            path: value.path.startsWith(projectUri.path)
-              ? value.path.replace(
-                  projectUri.path,
-                  `${info.sourcesPath}/${projectName}`
-                )
-              : value.path.replace(
-                  "/workspace",
-                  `${info.sourcesPath}/${projectName}`
-                ),
-          })
-          .toString(true);
-      },
-      protocol2Code: (value) => {
-        const uri = vscode.Uri.parse(value);
-
-        if (uri.path.startsWith(info.sourcesPath)) {
-          return uri.with({
-            scheme: "crosslabfs",
-            path: uri.path.replace(
-              `${info.sourcesPath}/${projectName}`,
-              "/workspace"
-            ),
-          });
-        }
-
-        return uri.with({
-          scheme: "crosslab-remote",
-          path: uri.path,
-        });
-      },
-    },
   };
 
   const client = new LanguageClient(
@@ -220,85 +195,28 @@ async function createClient(
   clientMap.set(producerId, { client, messagePort: port1, info });
 
   fileSystemWatcher.onDidCreate(async (uri) => {
-    const isDirectory =
-      (await vscode.workspace.fs.stat(uri)).type === vscode.FileType.Directory;
-    if (!uri.path.startsWith(projectUri.path + "/")) return;
+    await languageServerConsumer.sendFilesystemEvent(producerId, {
+      type: "created",
+      path: uri.path,
+      entry: await readEntry(uri),
+    });
+  });
 
-    if (isDirectory) {
-      await languageServerConsumer.createDirectory(
-        producerId,
-        uri.path.replace(
-          projectUri.path,
-          path.join(info.sourcesPath, projectName)
-        )
-      );
-    } else {
-      await languageServerConsumer.writeFile(
-        producerId,
-        uri.path.replace(
-          projectUri.path,
-          path.join(info.sourcesPath, projectName)
-        ),
-        new TextDecoder().decode(await vscode.workspace.fs.readFile(uri))
-      );
-    }
+  fileSystemWatcher.onDidChange(async (uri) => {
+    await languageServerConsumer.sendFilesystemEvent(producerId, {
+      type: "changed",
+      path: uri.path,
+      entry: await readEntry(uri),
+    });
   });
 
   fileSystemWatcher.onDidDelete(async (uri) => {
     if (!uri.path.startsWith(projectUri.path + "/")) return;
-    await languageServerConsumer.delete(
-      producerId,
-      uri.path.replace(
-        projectUri.path,
-        path.join(info.sourcesPath, projectName)
-      )
-    );
+    await languageServerConsumer.sendFilesystemEvent(producerId, {
+      type: "deleted",
+      path: uri.path,
+    });
   });
 
-  await client.start();
-
-  await setupDirectory(
-    vscode.Uri.from({ scheme: "crosslabfs", path: "/workspace" }),
-    path.join(info.sourcesPath, projectName),
-    producerId
-  );
-
   return [client, port1];
-}
-
-async function setupDirectory(
-  directoryUri: vscode.Uri,
-  pathReplacement: string,
-  producerId: string
-) {
-  await languageServerConsumer.createDirectory(
-    producerId,
-    directoryUri.path.replace("/workspace", pathReplacement)
-  );
-  const entries = await vscode.workspace.fs.readDirectory(directoryUri);
-  for (const entry of entries) {
-    const entryUri = directoryUri.with({
-      path: path.join(directoryUri.path, entry[0]),
-    });
-    switch (entry[1]) {
-      case vscode.FileType.Unknown:
-        break;
-      case vscode.FileType.File:
-        await languageServerConsumer.writeFile(
-          producerId,
-          entryUri.path.replace("/workspace", pathReplacement),
-          new TextDecoder().decode(await vscode.workspace.fs.readFile(entryUri))
-        );
-        break;
-      case vscode.FileType.Directory:
-        await setupDirectory(
-          directoryUri.with({ path: path.join(directoryUri.path, entry[0]) }),
-          pathReplacement,
-          producerId
-        );
-        break;
-      case vscode.FileType.SymbolicLink:
-        break;
-    }
-  }
 }

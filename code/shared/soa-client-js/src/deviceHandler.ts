@@ -180,7 +180,9 @@ export class DeviceHandler extends TypedEmitter<DeviceHandlerEvents> {
     for (const serviceConfig of serviceConfigs) {
       const service = this.services.get(serviceConfig.serviceId);
       if (service === undefined) {
-        throw Error("No Service for the service config was found");
+        throw Error(
+          `No Service for the service config was found: "${serviceConfig.serviceId}"`
+        );
       }
       service.setupConnection(connection, serviceConfig);
     }

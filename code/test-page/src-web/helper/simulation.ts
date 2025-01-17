@@ -80,6 +80,12 @@ export default async () => {
         },
         {
           serviceDirection: "producer",
+          serviceId: "programming",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/programming",
+          supportedConnectionTypes: ["websocket"],
+        },
+        {
+          serviceDirection: "producer",
           serviceId: "debugging-target",
           serviceType:
             "https://api.goldi-labs.de/serviceTypes/debugging-target",

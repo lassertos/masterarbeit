@@ -9,28 +9,31 @@ import {
 
 console.log("running server lsp-crosslab");
 
-new Promise<[string, string, MessagePort]>(
+new Promise<[string, MessagePort]>(
   (resolve) =>
     (self.onmessage = (event) => {
       if (event.data.type === "init") {
         if (event.ports.length > 0) {
-          resolve([
-            event.data.data.path,
-            event.data.data.projectName,
-            event.ports[0],
-          ]);
+          resolve([event.data.data.rootUri, event.ports[0]]);
         }
         self.onmessage = null;
       }
     })
-).then(([path, projectName, port]) => {
+).then(([rootUri, port]) => {
   const messageReader = new BrowserMessageReader(self);
   const messageWriter = new BrowserMessageWriter(self);
 
   port.onmessage = (event) => {
-    const message = JSON.parse(event.data.toString());
-    console.log(`incoming:`, message);
-    messageWriter.write(message);
+    const message = event.data.toString();
+    const parsedMessage = JSON.parse(event.data.toString());
+    console.log(`incoming:`, parsedMessage);
+    messageWriter.write(
+      JSON.parse(
+        message
+          .replace(new RegExp(rootUri, "g"), "crosslabfs:/workspace")
+          .replace(/file:\/\//, "crosslab-remote:")
+      )
+    );
   };
 
   const connection = createConnection(messageReader, messageWriter, {
@@ -45,7 +48,7 @@ new Promise<[string, string, MessagePort]>(
   async function handleMessage(message: Message) {
     console.log(message);
     if ("method" in message && message.method === "initialize") {
-      (message as any).params.rootUri = `file://${path}/${projectName}`;
+      (message as any).params.rootUri = rootUri;
       (
         message as any
       ).params.capabilities.workspace.semanticTokens.refreshSupport = false;
@@ -60,7 +63,11 @@ new Promise<[string, string, MessagePort]>(
     }
     const messageString = JSON.stringify(message);
     console.log("outgoing:", messageString);
-    port.postMessage(JSON.stringify(message));
+    port.postMessage(
+      messageString
+        .replace(/crosslabfs:\/workspace/g, rootUri)
+        .replace(/crosslab-remote:/, "file://")
+    );
   }
 
   // Track open, change and close text document events

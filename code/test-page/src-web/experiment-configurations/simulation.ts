@@ -315,21 +315,6 @@ export default (deviceUrls: {
           ],
         },
         {
-          serviceType: "https://api.goldi-labs.de/serviceTypes/messaging",
-          participants: [
-            {
-              role: "debugger",
-              config: {},
-              serviceId: "messaging",
-            },
-            {
-              role: "simulation",
-              config: {},
-              serviceId: "messaging",
-            },
-          ],
-        },
-        {
           serviceType:
             "https://api.goldi-labs.de/serviceTypes/debugging-target",
           participants: [
@@ -371,15 +356,15 @@ export default (deviceUrls: {
             {
               role: "code-editor",
               config: {},
-              serviceId: "filesystem",
+              serviceId: "filesystem:producer",
             },
           ],
         },
         {
-          serviceType: "https://api.goldi-labs.de/serviceTypes/file",
+          serviceType: "https://api.goldi-labs.de/serviceTypes/programming",
           participants: [
-            { role: "code-editor", config: {}, serviceId: "compilation:file" },
-            { role: "simulation", config: {}, serviceId: "program" },
+            { role: "code-editor", config: {}, serviceId: "programming" },
+            { role: "simulation", config: {}, serviceId: "programming" },
           ],
         },
         {
@@ -393,7 +378,7 @@ export default (deviceUrls: {
             {
               role: "code-editor",
               config: {},
-              serviceId: "filesystem",
+              serviceId: "filesystem:producer",
             },
           ],
         },

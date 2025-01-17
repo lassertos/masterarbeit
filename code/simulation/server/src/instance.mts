@@ -203,6 +203,13 @@ export class SimavrInstance {
         }
         await this._program(program.content);
         this._simulation.start();
+        await this._programmingServiceProducer.send(consumerId, {
+          type: "program:response",
+          content: {
+            requestId,
+            success: true,
+          },
+        });
       }
     );
 

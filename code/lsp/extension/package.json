@@ -54,6 +54,7 @@
   "dependencies": {
     "@crosslab-ide/abstract-messaging-channel": "file:../../shared/abstract-messaging-channel",
     "@crosslab-ide/crosslab-lsp-service": "file:../service",
+    "@crosslab-ide/filesystem-schemas": "file:../../shared/filesystem-schemas",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
     "esbuild-plugin-polyfill-node": "^0.3.0",
     "vscode-languageclient": "^9.0.1",

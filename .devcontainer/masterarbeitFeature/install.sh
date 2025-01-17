@@ -108,3 +108,6 @@ cd ~ && rm -rf /tmp/avr-gcc-build
 # install arduino-cli
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=/usr/local/bin sh
 runuser -l vscode -c 'arduino-cli core install arduino:avr'
+
+# biblatex
+sudo apt-get install texlive-bibtex-extra biber

@@ -8,12 +8,18 @@ import {
 import { z } from "zod";
 
 type FileSystemProtocolMessageType =
+  | "exists:request"
+  | "exists:response"
+  | "stat:request"
+  | "stat:response"
   | "createDirectory:request"
   | "createDirectory:response"
   | "delete:request"
   | "delete:response"
   | "move:request"
   | "move:response"
+  | "copy:request"
+  | "copy:response"
   | "readDirectory:request"
   | "readDirectory:response"
   | "readFile:request"
@@ -29,12 +35,18 @@ type FileSystemProtocolRole = "producer" | "consumer";
 
 export const fileSystemProtocol = {
   messageTypes: [
+    "exists:request",
+    "exists:response",
+    "stat:request",
+    "stat:response",
     "createDirectory:request",
     "createDirectory:response",
     "delete:request",
     "delete:response",
     "move:request",
     "move:response",
+    "copy:request",
+    "copy:response",
     "readDirectory:request",
     "readDirectory:response",
     "readFile:request",
@@ -48,6 +60,43 @@ export const fileSystemProtocol = {
     "writeFile:response",
   ],
   messages: {
+    "exists:request": z.object({
+      requestId: z.string(),
+      path: z.string(),
+    }),
+    "exists:response": z.union([
+      z.object({
+        requestId: z.string(),
+        success: z.literal(true),
+        exists: z.boolean(),
+      }),
+      z.object({
+        requestId: z.string(),
+        success: z.literal(false),
+        message: z.optional(z.string()),
+      }),
+    ]),
+    "stat:request": z.object({
+      requestId: z.string(),
+      path: z.string(),
+    }),
+    "stat:response": z.union([
+      z.object({
+        requestId: z.string(),
+        success: z.literal(true),
+        stat: z.object({
+          type: z.union([z.literal("file"), z.literal("directory")]),
+          ctime: z.number(),
+          mtime: z.number(),
+          size: z.number(),
+        }),
+      }),
+      z.object({
+        requestId: z.string(),
+        success: z.literal(false),
+        message: z.optional(z.string()),
+      }),
+    ]),
     "createDirectory:request": z.object({
       requestId: z.string(),
       path: z.string(),
@@ -85,6 +134,22 @@ export const fileSystemProtocol = {
       newPath: z.string(),
     }),
     "move:response": z.union([
+      z.object({
+        requestId: z.string(),
+        success: z.literal(true),
+      }),
+      z.object({
+        requestId: z.string(),
+        success: z.literal(false),
+        message: z.optional(z.string()),
+      }),
+    ]),
+    "copy:request": z.object({
+      requestId: z.string(),
+      path: z.string(),
+      newPath: z.string(),
+    }),
+    "copy:response": z.union([
       z.object({
         requestId: z.string(),
         success: z.literal(true),
@@ -191,7 +256,7 @@ export const fileSystemProtocol = {
     "writeFile:request": z.object({
       requestId: z.string(),
       path: z.string(),
-      content: z.string(),
+      content: z.instanceof(Uint8Array),
     }),
     "writeFile:response": z.union([
       z.object({
@@ -209,9 +274,12 @@ export const fileSystemProtocol = {
   roleMessages: {
     consumer: {
       incoming: [
+        "exists:response",
+        "stat:response",
         "createDirectory:response",
         "delete:response",
         "move:response",
+        "copy:response",
         "readDirectory:response",
         "readFile:response",
         "unwatch:response",
@@ -220,9 +288,12 @@ export const fileSystemProtocol = {
         "writeFile:response",
       ],
       outgoing: [
+        "exists:request",
+        "stat:request",
         "createDirectory:request",
         "delete:request",
         "move:request",
+        "copy:request",
         "readDirectory:request",
         "readFile:request",
         "unwatch:request",
@@ -232,9 +303,12 @@ export const fileSystemProtocol = {
     },
     producer: {
       incoming: [
+        "exists:request",
+        "stat:request",
         "createDirectory:request",
         "delete:request",
         "move:request",
+        "copy:request",
         "readDirectory:request",
         "readFile:request",
         "unwatch:request",
@@ -242,9 +316,12 @@ export const fileSystemProtocol = {
         "writeFile:request",
       ],
       outgoing: [
+        "exists:response",
+        "stat:response",
         "createDirectory:response",
         "delete:response",
         "move:response",
+        "copy:response",
         "readDirectory:response",
         "readFile:response",
         "unwatch:response",

@@ -75,6 +75,8 @@ export class ProgrammingServiceProducer
     }
 
     this._consumers.set(consumerId, messagingChannel);
+
+    this.emit("new-consumer", consumerId);
   }
 
   async send(

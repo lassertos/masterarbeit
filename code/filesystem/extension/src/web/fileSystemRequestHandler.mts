@@ -17,6 +17,9 @@ const requestResponseMapping = {
   "unwatch:request": "unwatch:response",
   "watch:request": "watch:response",
   "writeFile:request": "writeFile:response",
+  "exists:request": "exists:response",
+  "stat:request": "stat:response",
+  "copy:request": "copy:response",
 } as const;
 
 export class FileSystemRequestHandler {
@@ -48,6 +51,12 @@ export class FileSystemRequestHandler {
           return await this._handleWatchRequest(request);
         case "writeFile:request":
           return await this._handleWriteFileRequest(request);
+        case "exists:request":
+          return await this._handleExistsRequest(request);
+        case "stat:request":
+          return await this._handleStatRequest(request);
+        case "copy:request":
+          return await this._handleCopyRequest(request);
       }
     } catch (error) {
       return {
@@ -217,6 +226,79 @@ export class FileSystemRequestHandler {
     return {
       type: "writeFile:response",
       content: { requestId: request.content.requestId, success: true },
+    };
+  }
+
+  private async _handleExistsRequest(
+    request: ProtocolMessage<FileSystemProtocol, "exists:request">
+  ): Promise<ProtocolMessage<FileSystemProtocol, "exists:response">> {
+    try {
+      await vscode.workspace.fs.stat(
+        vscode.Uri.from({
+          scheme: "crosslabfs",
+          path: request.content.path,
+        })
+      );
+      return {
+        type: "exists:response",
+        content: {
+          requestId: request.content.requestId,
+          success: true,
+          exists: true,
+        },
+      };
+    } catch {
+      return {
+        type: "exists:response",
+        content: {
+          requestId: request.content.requestId,
+          success: true,
+          exists: false,
+        },
+      };
+    }
+  }
+
+  private async _handleStatRequest(
+    request: ProtocolMessage<FileSystemProtocol, "stat:request">
+  ): Promise<ProtocolMessage<FileSystemProtocol, "stat:response">> {
+    const stat = await vscode.workspace.fs.stat(
+      vscode.Uri.from({
+        scheme: "crosslabfs",
+        path: request.content.path,
+      })
+    );
+
+    return {
+      type: "stat:response",
+      content: {
+        requestId: request.content.requestId,
+        success: true,
+        stat: {
+          ...stat,
+          type: stat.type === vscode.FileType.Directory ? "directory" : "file",
+        },
+      },
+    };
+  }
+
+  private async _handleCopyRequest(
+    request: ProtocolMessage<FileSystemProtocol, "copy:request">
+  ): Promise<ProtocolMessage<FileSystemProtocol, "copy:response">> {
+    await vscode.workspace.fs.copy(
+      vscode.Uri.from({
+        scheme: "crosslabfs",
+        path: request.content.path,
+      }),
+      vscode.Uri.from({ scheme: "crosslabfs", path: request.content.newPath })
+    );
+
+    return {
+      type: "copy:response",
+      content: {
+        requestId: request.content.requestId,
+        success: true,
+      },
     };
   }
 

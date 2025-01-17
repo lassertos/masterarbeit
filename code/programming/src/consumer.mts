@@ -11,7 +11,10 @@ import { v4 as uuidv4 } from "uuid";
 import { ProgrammingProtocol, programmingProtocol } from "./protocol.mjs";
 import { PromiseManager } from "@crosslab-ide/promise-manager";
 import { Directory, File } from "@crosslab-ide/filesystem-schemas";
-import { ProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
+import {
+  isProtocolMessage,
+  ProtocolMessage,
+} from "@crosslab-ide/abstract-messaging-channel";
 
 interface ProgrammingServiceConsumerEvents {
   "new-producer": (producerId: string) => void;
@@ -67,6 +70,8 @@ export class ProgrammingServiceConsumer
     }
 
     this._producers.set(producerId, messagingChannel);
+
+    this.emit("new-producer", producerId);
   }
 
   async program(producerId: string, program: File | Directory) {
@@ -88,6 +93,10 @@ export class ProgrammingServiceConsumer
       ProgrammingProtocol,
       "program:response"
     >;
+
+    if (!isProtocolMessage(programmingProtocol, "program:response", response)) {
+      throw new Error(`Expected response of type "program:response"!`);
+    }
 
     return response.content;
   }

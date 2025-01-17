@@ -98,7 +98,7 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
     console.log("executing writeFile!", uri, content, options);
     const updatedUri = this.updateUri(uri);
     const [provider, providerUri] = this._getProviderAndUri(uri);
-    const existed = provider.exists(providerUri);
+    const existed = await provider.exists(providerUri);
     const oldData = existed
       ? new TextDecoder().decode(await provider.readFile(providerUri))
       : "";
@@ -128,7 +128,8 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
 
     if (!existed) {
       this._fireSoon({ type: vscode.FileChangeType.Created, uri: updatedUri });
-    } else if (oldData !== newData) {
+    }
+    if (oldData !== newData) {
       this._fireSoon({
         type: vscode.FileChangeType.Changed,
         uri: updatedUri,
@@ -144,7 +145,7 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
     console.log("executing delete!", uri, options);
     const updatedUri = this.updateUri(uri);
     const [provider, providerUri] = this._getProviderAndUri(uri);
-    if (!provider.exists(providerUri)) {
+    if (!(await provider.exists(providerUri))) {
       throw vscode.FileSystemError.FileNotFound(
         "the following file was not found:" + updatedUri.toString()
       );
@@ -157,7 +158,7 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
         type: vscode.FileChangeType.Changed,
         uri: updatedUri.with({ path: path.posix.dirname(updatedUri.path) }),
       },
-      { uri: updatedUri, type: vscode.FileChangeType.Deleted }
+      { type: vscode.FileChangeType.Deleted, uri: updatedUri }
     );
   }
 
@@ -172,13 +173,13 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
     const [oldProvider, oldProviderUri] = this._getProviderAndUri(oldUri);
     const [newProvider, newProviderUri] = this._getProviderAndUri(newUri);
 
-    const existed = newProvider.exists(newProviderUri);
+    const existed = await newProvider.exists(newProviderUri);
 
-    const sourceExists = oldProvider.exists(oldProviderUri);
-    const destinationParentExists = newProvider.exists(
+    const sourceExists = await oldProvider.exists(oldProviderUri);
+    const destinationParentExists = await newProvider.exists(
       newProviderUri.with({ path: path.dirname(newProviderUri.path) })
     );
-    const destinationExists = newProvider.exists(newProviderUri);
+    const destinationExists = await newProvider.exists(newProviderUri);
 
     if (!sourceExists) {
       throw vscode.FileSystemError.FileNotFound(updatedOldUri);
@@ -246,15 +247,15 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
     const [destinationProvider, destinationProviderUri] =
       this._getProviderAndUri(destination);
 
-    const existed = destinationProvider.exists(destinationProviderUri);
+    const existed = await destinationProvider.exists(destinationProviderUri);
 
-    const sourceExists = sourceProvider.exists(sourceProviderUri);
-    const destinationParentExists = destinationProvider.exists(
+    const sourceExists = await sourceProvider.exists(sourceProviderUri);
+    const destinationParentExists = await destinationProvider.exists(
       destinationProviderUri.with({
         path: path.dirname(destinationProviderUri.path),
       })
     );
-    const destinationExists = destinationProvider.exists(
+    const destinationExists = await destinationProvider.exists(
       destinationProviderUri
     );
 
@@ -319,6 +320,8 @@ export class CrossLabFileSystemProvider implements vscode.FileSystemProvider {
     if (fileType !== vscode.FileType.Directory) {
       throw new Error(`Unexpected file type "${fileType}"!`);
     }
+
+    await this.createDirectory(destination);
 
     for (const [name, type] of await this.readDirectory(source)) {
       await this._copy(

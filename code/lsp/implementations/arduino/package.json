@@ -9,6 +9,7 @@
     "express": "^4.21.1",
     "queue": "^7.0.0",
     "tiny-typed-emitter": "^2.1.0",
+    "vscode-uri": "^3.0.8",
     "ws": "^8.18.0"
   },
   "devDependencies": {

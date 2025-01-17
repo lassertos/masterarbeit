@@ -2,14 +2,26 @@ import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import fs from "fs";
 import Queue from "queue";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
-import { LanguageServerProducer } from "@crosslab-ide/crosslab-lsp-service";
+import {
+  LanguageServerMessagingProtocol,
+  LanguageServerProducer,
+} from "@crosslab-ide/crosslab-lsp-service";
 import { configuration } from "./configuration.mjs";
 import path from "path";
+import { ProtocolMessage } from "../../../../shared/abstract-messaging-channel/dist/types.mjs";
+import {
+  DirectoryWithoutName,
+  FileWithoutName,
+} from "../../../../shared/filesystem-schemas/dist/normal.mjs";
+import { URI } from "vscode-uri";
 
 type InstanceData = {
   buffer: string;
   arduinoLanguageServerProcess?: ChildProcessWithoutNullStreams;
-  srcPath?: string;
+  localSrcUri?: URI;
+  localSrcPath?: string;
+  remoteSrcUri?: URI;
+  remoteSrcPath?: string;
   rootPath?: string;
   tmpDirPath?: string;
   buildPath?: string;
@@ -18,6 +30,7 @@ type InstanceData = {
   logPath: string;
   queue: Queue;
   openedDocuments: Set<string>;
+  consumerId: string;
 };
 
 export class ArduinoCliLanguageServerInstance {
@@ -36,7 +49,8 @@ export class ArduinoCliLanguageServerInstance {
     this._languageServerProducer = new LanguageServerProducer("lsp");
 
     this._languageServerProducer.on("new-consumer", async (consumerId) => {
-      this._consumers.set(consumerId, {
+      const consumerInstanceData: InstanceData = {
+        consumerId,
         buffer: "",
         logPath: fs.mkdtempSync("/tmp/arduino"),
         queue: new Queue({
@@ -44,211 +58,77 @@ export class ArduinoCliLanguageServerInstance {
           autostart: true,
         }),
         openedDocuments: new Set(),
-      });
-    });
+      };
+      this._consumers.set(consumerId, consumerInstanceData);
 
-    this._languageServerProducer.on("message", async (consumerId, message) => {
-      const consumerInstanceData = this._consumers.get(consumerId);
+      this._languageServerProducer.on("message", async (cId, message) => {
+        if (cId !== consumerId) return;
 
-      if (!consumerInstanceData) {
-        console.error(
-          `Could not find instance data for consumer with id "${consumerId}"!`
-        );
-        return;
-      }
-
-      if (message.type === "lsp:initialization:request") {
-        if (
-          consumerInstanceData.arduinoLanguageServerProcess &&
-          typeof consumerInstanceData.arduinoLanguageServerProcess.exitCode !==
-            "number"
-        ) {
-          consumerInstanceData.arduinoLanguageServerProcess.once("exit", () => {
-            consumerInstanceData.tmpDirPath = undefined;
-            consumerInstanceData.srcPath = undefined;
-            consumerInstanceData.rootPath = undefined;
-            consumerInstanceData.buildPath = undefined;
-            consumerInstanceData.fullBuildPath = undefined;
-            consumerInstanceData.buildSketchRootPath = undefined;
-            this._startLanguageServer(consumerId);
-          });
-          return;
-        }
-        this._startLanguageServer(consumerId);
-      } else if (message.type === "lsp:message") {
-        const parsedMessage = JSON.parse(message.content);
-        if (parsedMessage.method === "initialize") {
-          consumerInstanceData.rootPath = parsedMessage.params.rootUri.replace(
-            "file://",
-            ""
-          ) as string;
-          const sketchPath = path.join(
-            consumerInstanceData.rootPath,
-            `${path.basename(consumerInstanceData.rootPath)}.ino`
+        if (message.type === "lsp:initialization:request") {
+          consumerInstanceData.remoteSrcUri = URI.parse(
+            message.content.sourceUri
           );
-          if (!fs.existsSync(consumerInstanceData.rootPath)) {
-            fs.mkdirSync(consumerInstanceData.rootPath, { recursive: true });
+          consumerInstanceData.remoteSrcPath =
+            consumerInstanceData.remoteSrcUri.path;
+          if (
+            consumerInstanceData.arduinoLanguageServerProcess &&
+            typeof consumerInstanceData.arduinoLanguageServerProcess
+              .exitCode !== "number"
+          ) {
+            consumerInstanceData.arduinoLanguageServerProcess.once(
+              "exit",
+              () => {
+                this._startLanguageServer(
+                  consumerInstanceData,
+                  message.content.sourceDirectory
+                );
+              }
+            );
+            return;
           }
-          if (!fs.existsSync(sketchPath)) {
-            fs.writeFileSync(sketchPath, "");
+          this._startLanguageServer(
+            consumerInstanceData,
+            message.content.sourceDirectory
+          );
+        } else if (message.type === "lsp:message") {
+          const parsedMessage = JSON.parse(message.content);
+          if (parsedMessage.method === "initialize") {
+            consumerInstanceData.rootPath =
+              parsedMessage.params.rootUri.replace("file://", "") as string;
+            const sketchPath = path.join(
+              consumerInstanceData.rootPath,
+              `${path.basename(consumerInstanceData.rootPath)}.ino`
+            );
+            if (!fs.existsSync(consumerInstanceData.rootPath)) {
+              fs.mkdirSync(consumerInstanceData.rootPath, { recursive: true });
+            }
+            if (!fs.existsSync(sketchPath)) {
+              fs.writeFileSync(sketchPath, "");
+            }
           }
-        }
-        return consumerInstanceData.queue.push(async () => {
-          await this._receiveMessage(consumerId, message.content, false);
-        });
-      } else if (message.type === "lsp:filesystem:write-file:request") {
-        if (
-          !message.content.path.startsWith(consumerInstanceData.srcPath + "/")
-        ) {
-          return await this._languageServerProducer.send(consumerId, {
-            type: "lsp:filesystem:write-file:response",
-            content: {
-              requestId: message.content.requestId,
-              success: false,
-            },
+          consumerInstanceData.queue.push(async () => {
+            await this._receiveMessage(
+              consumerInstanceData,
+              message.content,
+              false
+            );
           });
+          if (parsedMessage.method === "initialized") {
+            consumerInstanceData.queue.push(async () => {
+              console.log("opening documents!");
+              await this._openDocuments(
+                consumerInstanceData,
+                consumerInstanceData.localSrcPath!
+              );
+            });
+          }
+          return;
+        } else if (message.type === "lsp:filesystem:read:request") {
+          this._handleFilesystemReadRequest(consumerInstanceData, message);
+        } else {
+          this._handleFilesystemEvent(consumerInstanceData, message);
         }
-        fs.writeFileSync(message.content.path, message.content.content);
-        await this._receiveMessage(
-          consumerId,
-          JSON.stringify({
-            jsonrpc: "2.0",
-            method: "textDocument/didOpen",
-            params: {
-              textDocument: {
-                uri: `file://${message.content.path}`,
-                languageId: "cpp",
-                version: 1,
-                text: message.content.content,
-              },
-            },
-          }),
-          true
-        );
-        await this._receiveMessage(
-          consumerId,
-          JSON.stringify({
-            jsonrpc: "2.0",
-            method: "textDocument/didSave",
-            params: {
-              textDocument: {
-                uri: `file://${message.content.path}`,
-              },
-              text: message.content.content,
-            },
-          }),
-          true
-        );
-        await this._languageServerProducer.send(consumerId, {
-          type: "lsp:filesystem:write-file:response",
-          content: {
-            requestId: message.content.requestId,
-            success: true,
-          },
-        });
-      } else if (message.type === "lsp:filesystem:create-directory:request") {
-        if (
-          !message.content.path.startsWith(consumerInstanceData.srcPath + "/")
-        ) {
-          return await this._languageServerProducer.send(consumerId, {
-            type: "lsp:filesystem:create-directory:response",
-            content: {
-              requestId: message.content.requestId,
-              success: false,
-            },
-          });
-        }
-        if (!fs.existsSync(message.content.path)) {
-          fs.mkdirSync(message.content.path);
-        }
-        await this._languageServerProducer.send(consumerId, {
-          type: "lsp:filesystem:create-directory:response",
-          content: {
-            requestId: message.content.requestId,
-            success: true,
-          },
-        });
-      } else if (message.type === "lsp:filesystem:delete:request") {
-        if (
-          !message.content.path.startsWith(consumerInstanceData.srcPath + "/")
-        ) {
-          return await this._languageServerProducer.send(consumerId, {
-            type: "lsp:filesystem:delete:response",
-            content: {
-              requestId: message.content.requestId,
-              success: false,
-            },
-          });
-        }
-        fs.rmSync(message.content.path, { force: true, recursive: true });
-        await this._receiveMessage(
-          consumerId,
-          JSON.stringify({
-            jsonrpc: "2.0",
-            method: "textDocument/didClose",
-            params: {
-              textDocument: {
-                uri: `file://${message.content.path}`,
-              },
-            },
-          }),
-          true
-        );
-        await this._languageServerProducer.send(consumerId, {
-          type: "lsp:filesystem:delete:response",
-          content: {
-            requestId: message.content.requestId,
-            success: true,
-          },
-        });
-      } else if (message.type === "lsp:filesystem:read:request") {
-        if (!fs.existsSync(message.content.path)) {
-          return await this._languageServerProducer.send(consumerId, {
-            type: "lsp:filesystem:read:response",
-            content: {
-              requestId: message.content.requestId,
-              success: false,
-            },
-          });
-        }
-        const stat = fs.statSync(message.content.path);
-        if (!stat.isFile()) {
-          return await this._languageServerProducer.send(consumerId, {
-            type: "lsp:filesystem:read:response",
-            content: {
-              requestId: message.content.requestId,
-              success: false,
-            },
-          });
-        }
-        const content = fs.readFileSync(message.content.path, {
-          encoding: "utf-8",
-        });
-        await this._receiveMessage(
-          consumerId,
-          JSON.stringify({
-            jsonrpc: "2.0",
-            method: "textDocument/didOpen",
-            params: {
-              textDocument: {
-                uri: `file://${message.content.path}`,
-                languageId: "cpp",
-                version: 1,
-                text: content,
-              },
-            },
-          }),
-          true
-        );
-        await this._languageServerProducer.send(consumerId, {
-          type: "lsp:filesystem:read:response",
-          content: {
-            requestId: message.content.requestId,
-            success: true,
-            content,
-          },
-        });
-      }
+      });
     });
 
     this._deviceHandler.addService(this._languageServerProducer);
@@ -273,16 +153,17 @@ export class ArduinoCliLanguageServerInstance {
     });
   }
 
-  private _startLanguageServer(consumerId: string) {
-    const consumerInstanceData = this._consumers.get(consumerId);
-
-    if (!consumerInstanceData) {
-      console.error(
-        `Could not find instance data for consumer with id "${consumerId}"!`
-      );
-      return;
-    }
-
+  private _startLanguageServer(
+    consumerInstanceData: InstanceData,
+    sourceDirectory: DirectoryWithoutName
+  ) {
+    consumerInstanceData.tmpDirPath = undefined;
+    consumerInstanceData.localSrcPath = undefined;
+    consumerInstanceData.localSrcUri = undefined;
+    consumerInstanceData.rootPath = undefined;
+    consumerInstanceData.buildPath = undefined;
+    consumerInstanceData.fullBuildPath = undefined;
+    consumerInstanceData.buildSketchRootPath = undefined;
     consumerInstanceData.openedDocuments.clear();
     consumerInstanceData.arduinoLanguageServerProcess = spawn(
       "arduino-language-server",
@@ -317,7 +198,7 @@ export class ArduinoCliLanguageServerInstance {
       "data",
       (data) => {
         console.log(`data: ${data}`);
-        this._addToBuffer(consumerId, data);
+        this._addToBuffer(consumerInstanceData, data);
       }
     );
 
@@ -340,17 +221,28 @@ export class ArduinoCliLanguageServerInstance {
           ?.at(1);
 
         if (consumerInstanceData.tmpDirPath && !hadTmpDir) {
-          consumerInstanceData.srcPath = `${consumerInstanceData.tmpDirPath}/src`;
-          fs.mkdirSync(consumerInstanceData.srcPath);
-          await this._languageServerProducer.send(consumerId, {
-            type: "lsp:initialization:response",
-            content: {
-              sourcesPath: consumerInstanceData.srcPath,
-              configuration: {
-                documentSelector: [{ language: "cpp" }, { language: "c" }],
+          consumerInstanceData.localSrcPath = `${
+            consumerInstanceData.tmpDirPath
+          }/src/${consumerInstanceData.remoteSrcPath?.split("/").at(-1)}`;
+          consumerInstanceData.localSrcUri = URI.parse(
+            `file://${consumerInstanceData.localSrcPath}`
+          );
+          fs.mkdirSync(consumerInstanceData.localSrcPath, { recursive: true });
+          this._recreateDirectory(
+            consumerInstanceData.localSrcPath,
+            sourceDirectory
+          );
+          await this._languageServerProducer.send(
+            consumerInstanceData.consumerId,
+            {
+              type: "lsp:initialization:response",
+              content: {
+                configuration: {
+                  documentSelector: [{ language: "cpp" }, { language: "c" }],
+                },
               },
-            },
-          });
+            }
+          );
         }
       }
     );
@@ -360,32 +252,85 @@ export class ArduinoCliLanguageServerInstance {
     });
   }
 
-  private _addToBuffer(consumerId: string, data: string) {
-    const consumerInstanceData = this._consumers.get(consumerId);
+  private async _openDocuments(
+    consumerInstanceData: InstanceData,
+    directoryPath: string
+  ) {
+    console.log("DEBUGGING:", directoryPath);
+    for (const entryName of fs.readdirSync(directoryPath)) {
+      const entryPath = path.join(directoryPath, entryName);
+      console.log("DEBUGGING:", entryPath);
+      const stat = fs.statSync(entryPath);
 
-    if (!consumerInstanceData) {
-      console.error(
-        `Could not find instance data for consumer with id "${consumerId}"!`
-      );
-      return;
+      if (stat.isFile()) {
+        console.log("DEBUGGING:", entryPath, "is file");
+        console.log("DEBUGGING: opening", entryPath);
+        const content = fs.readFileSync(entryPath);
+        await this._receiveMessage(
+          consumerInstanceData,
+          JSON.stringify({
+            jsonrpc: "2.0",
+            method: "textDocument/didOpen",
+            params: {
+              textDocument: {
+                uri: `file://${entryPath}`,
+                languageId: "cpp",
+                version: 1,
+                text: new TextDecoder().decode(content),
+              },
+            },
+          }),
+          true
+        );
+        console.log("DEBUGGING: saving", entryPath);
+        await this._receiveMessage(
+          consumerInstanceData,
+          JSON.stringify({
+            jsonrpc: "2.0",
+            method: "textDocument/didSave",
+            params: {
+              textDocument: {
+                uri: `file://${entryPath}`,
+              },
+              text: new TextDecoder().decode(content),
+            },
+          }),
+          true
+        );
+      } else {
+        console.log("DEBUGGING:", entryPath, "is directory");
+        await this._openDocuments(consumerInstanceData, entryPath);
+      }
+    }
+  }
+
+  private _recreateDirectory(
+    directoryPath: string,
+    directory: DirectoryWithoutName
+  ) {
+    if (!fs.existsSync(directoryPath)) {
+      fs.mkdirSync(directoryPath);
     }
 
+    for (const entryName in directory.content) {
+      const entry = directory.content[entryName];
+      const entryPath = path.join(directoryPath, entryName);
+      if (entry.type === "file") {
+        fs.writeFileSync(entryPath, entry.content);
+      } else {
+        this._recreateDirectory(entryPath, entry);
+      }
+    }
+  }
+
+  private _addToBuffer(consumerInstanceData: InstanceData, data: string) {
     consumerInstanceData.buffer = consumerInstanceData.buffer
       ? consumerInstanceData.buffer + data
       : data;
-    this._checkBuffer(consumerId);
+    this._checkBuffer(consumerInstanceData);
   }
 
-  private _checkBuffer(consumerId: string) {
-    const consumerInstanceData = this._consumers.get(consumerId);
-
-    if (!consumerInstanceData) {
-      console.error(
-        `Could not find instance data for consumer with id "${consumerId}"!`
-      );
-      return;
-    }
-
+  private _checkBuffer(consumerInstanceData: InstanceData) {
     if (!consumerInstanceData.buffer) return;
     if (consumerInstanceData.buffer.length === 0) return;
 
@@ -403,33 +348,36 @@ export class ArduinoCliLanguageServerInstance {
     if (bytes.length < contentLength) return;
 
     const message = new TextDecoder().decode(bytes);
+    const rewrittenMessage = this._rewriteOutgoingUris(
+      consumerInstanceData,
+      message
+    );
 
-    this._languageServerProducer.send(consumerId, {
+    console.log("sending message:", message);
+    console.log("sending rewritten message:", rewrittenMessage);
+
+    this._languageServerProducer.send(consumerInstanceData.consumerId, {
       type: "lsp:message",
-      content: message,
+      content: rewrittenMessage,
     });
     consumerInstanceData.buffer = new TextDecoder().decode(
       byteArray.slice(contentLength)
     );
-    this._checkBuffer(consumerId);
+    this._checkBuffer(consumerInstanceData);
   }
 
   private async _receiveMessage(
-    consumerId: string,
+    consumerInstanceData: InstanceData,
     message: string,
     isLocal: boolean
   ) {
-    const consumerInstanceData = this._consumers.get(consumerId);
-
-    if (!consumerInstanceData) {
-      console.error(
-        `Could not find instance data for consumer with id "${consumerId}"!`
-      );
-      return;
-    }
-
     console.log("receiving message:", message);
-    const parsedMessage = JSON.parse(message);
+    const rewrittenMessage = this._rewriteIncomingUris(
+      consumerInstanceData,
+      message
+    );
+    console.log("receiving rewritten message:", rewrittenMessage);
+    const parsedMessage = JSON.parse(rewrittenMessage);
 
     // ignore remote open and close messages
     if (
@@ -487,10 +435,258 @@ export class ArduinoCliLanguageServerInstance {
       });
     }
 
-    const encodedMessage = new TextEncoder().encode(message);
+    const encodedMessage = new TextEncoder().encode(rewrittenMessage);
     consumerInstanceData.arduinoLanguageServerProcess?.stdin?.write(
       `Content-Length: ${encodedMessage.length}\r\n\r\n`
     );
-    consumerInstanceData.arduinoLanguageServerProcess?.stdin?.write(message);
+    consumerInstanceData.arduinoLanguageServerProcess?.stdin?.write(
+      rewrittenMessage
+    );
+  }
+
+  private async _handleFilesystemEvent(
+    consumerInstanceData: InstanceData,
+    event:
+      | ProtocolMessage<
+          LanguageServerMessagingProtocol,
+          "lsp:filesystem:event:created"
+        >
+      | ProtocolMessage<
+          LanguageServerMessagingProtocol,
+          "lsp:filesystem:event:changed"
+        >
+      | ProtocolMessage<
+          LanguageServerMessagingProtocol,
+          "lsp:filesystem:event:deleted"
+        >
+  ) {
+    if (
+      !consumerInstanceData.localSrcPath ||
+      !consumerInstanceData.remoteSrcPath
+    ) {
+      console.error(
+        `Local or remote src path is not set for consumer with id "${consumerInstanceData.consumerId}"!`
+      );
+      return;
+    }
+
+    const path = event.content.path.replace(
+      consumerInstanceData.remoteSrcPath,
+      consumerInstanceData.localSrcPath
+    );
+
+    switch (event.type) {
+      case "lsp:filesystem:event:created":
+        return await this._handleFilesystemCreatedEvent(
+          consumerInstanceData,
+          path,
+          event.content.entry
+        );
+      case "lsp:filesystem:event:changed":
+        return await this._handleFilesystemChangedEvent(
+          consumerInstanceData,
+          path,
+          event.content.entry
+        );
+      case "lsp:filesystem:event:deleted":
+        return await this._handleFilesystemDeletedEvent(
+          consumerInstanceData,
+          path
+        );
+    }
+  }
+
+  private async _handleFilesystemCreatedEvent(
+    consumerInstanceData: InstanceData,
+    path: string,
+    entry: FileWithoutName | DirectoryWithoutName
+  ) {
+    if (entry.type === "file") {
+      fs.writeFileSync(path, entry.content);
+      await this._receiveMessage(
+        consumerInstanceData,
+        JSON.stringify({
+          jsonrpc: "2.0",
+          method: "textDocument/didOpen",
+          params: {
+            textDocument: {
+              uri: `file://${path}`,
+              languageId: "cpp",
+              version: 1,
+              text: new TextDecoder().decode(entry.content),
+            },
+          },
+        }),
+        true
+      );
+      await this._receiveMessage(
+        consumerInstanceData,
+        JSON.stringify({
+          jsonrpc: "2.0",
+          method: "textDocument/didSave",
+          params: {
+            textDocument: {
+              uri: `file://${path}`,
+            },
+            text: new TextDecoder().decode(entry.content),
+          },
+        }),
+        true
+      );
+    } else if (!fs.existsSync(path)) {
+      fs.mkdirSync(path);
+    }
+  }
+
+  private async _handleFilesystemChangedEvent(
+    consumerInstanceData: InstanceData,
+    path: string,
+    entry: FileWithoutName | DirectoryWithoutName
+  ) {
+    if (entry.type === "directory") {
+      return;
+    }
+
+    fs.writeFileSync(path, entry.content);
+
+    await this._receiveMessage(
+      consumerInstanceData,
+      JSON.stringify({
+        jsonrpc: "2.0",
+        method: "textDocument/didSave",
+        params: {
+          textDocument: {
+            uri: `file://${path}`,
+          },
+          text: new TextDecoder().decode(entry.content),
+        },
+      }),
+      true
+    );
+  }
+
+  private async _handleFilesystemDeletedEvent(
+    consumerInstanceData: InstanceData,
+    path: string
+  ) {
+    fs.rmSync(path, { force: true, recursive: true });
+    await this._receiveMessage(
+      consumerInstanceData,
+      JSON.stringify({
+        jsonrpc: "2.0",
+        method: "textDocument/didClose",
+        params: {
+          textDocument: {
+            uri: `file://${path}`,
+          },
+        },
+      }),
+      true
+    );
+  }
+
+  private async _handleFilesystemReadRequest(
+    consumerInstanceData: InstanceData,
+    request: ProtocolMessage<
+      LanguageServerMessagingProtocol,
+      "lsp:filesystem:read:request"
+    >
+  ) {
+    if (!fs.existsSync(request.content.path)) {
+      return await this._languageServerProducer.send(
+        consumerInstanceData.consumerId,
+        {
+          type: "lsp:filesystem:read:response",
+          content: {
+            requestId: request.content.requestId,
+            success: false,
+          },
+        }
+      );
+    }
+    const stat = fs.statSync(request.content.path);
+    if (!stat.isFile()) {
+      return await this._languageServerProducer.send(
+        consumerInstanceData.consumerId,
+        {
+          type: "lsp:filesystem:read:response",
+          content: {
+            requestId: request.content.requestId,
+            success: false,
+          },
+        }
+      );
+    }
+    const content = fs.readFileSync(request.content.path, {
+      encoding: "utf-8",
+    });
+    await this._receiveMessage(
+      consumerInstanceData,
+      JSON.stringify({
+        jsonrpc: "2.0",
+        method: "textDocument/didOpen",
+        params: {
+          textDocument: {
+            uri: `file://${request.content.path}`,
+            languageId: "cpp",
+            version: 1,
+            text: content,
+          },
+        },
+      }),
+      true
+    );
+    await this._languageServerProducer.send(consumerInstanceData.consumerId, {
+      type: "lsp:filesystem:read:response",
+      content: {
+        requestId: request.content.requestId,
+        success: true,
+        content,
+      },
+    });
+  }
+
+  private _rewriteIncomingUris(
+    consumerInstanceData: InstanceData,
+    message: string
+  ): string {
+    console.log("local:", consumerInstanceData.localSrcUri?.toString());
+    console.log("remote:", consumerInstanceData.remoteSrcUri?.toString());
+    if (
+      !consumerInstanceData.localSrcUri ||
+      !consumerInstanceData.remoteSrcUri
+    ) {
+      console.error(
+        `Local or remote src uri is not set for consumer with id "${consumerInstanceData.consumerId}"!`
+      );
+      return message;
+    }
+
+    return message.replaceAll(
+      consumerInstanceData.remoteSrcUri.toString(),
+      consumerInstanceData.localSrcUri.toString()
+    );
+  }
+
+  private _rewriteOutgoingUris(
+    consumerInstanceData: InstanceData,
+    message: string
+  ): string {
+    console.log("local:", consumerInstanceData.localSrcUri?.toString());
+    console.log("remote:", consumerInstanceData.remoteSrcUri?.toString());
+    if (
+      !consumerInstanceData.localSrcUri ||
+      !consumerInstanceData.remoteSrcUri
+    ) {
+      console.error(
+        `Local or remote src uri is not set for consumer with id "${consumerInstanceData.consumerId}"!`
+      );
+      return message;
+    }
+
+    return message.replaceAll(
+      consumerInstanceData.localSrcUri.toString(),
+      consumerInstanceData.remoteSrcUri.toString()
+    );
   }
 }

@@ -3,7 +3,10 @@ import { CrossLabFileSystemProvider } from "./providers/fileSystemProvider.mjs";
 import { CrossLabFileSearchProvider } from "./providers/fileSearchProvider.mjs";
 import { CrossLabTextSearchProvider } from "./providers/textSearchProvider.mjs";
 import { DeviceHandler } from "@crosslab-ide/soa-client";
-import { FileSystemService__Producer } from "@crosslab-ide/crosslab-filesystem-service";
+import {
+  FileSystemService__Consumer,
+  FileSystemService__Producer,
+} from "@crosslab-ide/crosslab-filesystem-service";
 import { FileSystemRequestHandler } from "./fileSystemRequestHandler.mjs";
 import { ProjectViewDataProvider } from "./providers/projectViewDataProvider.mjs";
 import {
@@ -22,6 +25,7 @@ import { isProtocolMessage } from "@crosslab-ide/abstract-messaging-channel";
 import { fileSystemProtocol } from "@crosslab-ide/crosslab-filesystem-service";
 import path from "path";
 import { convertToCollaborationDirectory } from "@crosslab-ide/filesystem-schemas";
+import { FilesystemServiceFileSystemProvider } from "./providers/subproviders/filesystemService.mjs";
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log(
@@ -169,7 +173,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // create filesystem service producer and its corresponding requestHandler
   const fileSystemServiceProducer = new FileSystemService__Producer(
-    "filesystem"
+    "filesystem:producer"
   );
   const fileSystemRequestHandler = new FileSystemRequestHandler();
 
@@ -338,10 +342,33 @@ export async function activate(context: vscode.ExtensionContext) {
     );
   }
 
+  // create and handle filesystem service consumer
+  const filesystemServiceConsumer = new FileSystemService__Consumer(
+    "filesystem:consumer"
+  );
+  filesystemServiceConsumer.on("new-producer", (producerId) => {
+    const path = `/${producerId}`;
+    fileSystemProvider.addMount(
+      path,
+      new FilesystemServiceFileSystemProvider(
+        filesystemServiceConsumer,
+        producerId
+      )
+    );
+    projectViewDataProvider.addProjectRootFolder(
+      `CrossLab Filesystem: ${producerId}`,
+      vscode.Uri.from({
+        scheme: "crosslabfs",
+        path,
+      })
+    );
+  });
+
   return {
     addServices: (deviceHandler: DeviceHandler) => {
       console.log("adding filesystem service producer!");
       deviceHandler.addService(fileSystemServiceProducer);
+      deviceHandler.addService(filesystemServiceConsumer);
       console.log("added filesystem service producer!");
     },
     onProjectChanged: (
