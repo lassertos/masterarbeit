@@ -26,6 +26,32 @@ import { fileSystemProtocol } from "@crosslab-ide/crosslab-filesystem-service";
 import path from "path";
 import { convertToCollaborationDirectory } from "@crosslab-ide/filesystem-schemas";
 import { FilesystemServiceFileSystemProvider } from "./providers/subproviders/filesystemService.mjs";
+import {
+  isTemplate,
+  TemplateDirectoryWithoutName,
+  TemplateFileWithoutName,
+  TemplateManager,
+} from "./templates.mjs";
+
+async function createTemplateEntry(
+  uri: vscode.Uri,
+  entry: TemplateDirectoryWithoutName | TemplateFileWithoutName
+) {
+  if (entry.type === "file") {
+    return await vscode.workspace.fs.writeFile(
+      uri,
+      new TextEncoder().encode(entry.content)
+    );
+  }
+
+  await vscode.workspace.fs.createDirectory(uri);
+  for (const directoryEntryName in entry.content) {
+    await createTemplateEntry(
+      uri.with({ path: path.join(uri.path, directoryEntryName) }),
+      entry.content[directoryEntryName]
+    );
+  }
+}
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log(
@@ -48,6 +74,8 @@ export async function activate(context: vscode.ExtensionContext) {
     "Local Projects",
     vscode.Uri.from({ scheme: "crosslabfs", path: "/projects" })
   );
+
+  const templateManager = new TemplateManager();
 
   context.subscriptions.push(
     vscode.workspace.registerFileSystemProvider(
@@ -75,6 +103,24 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("projects.view.createProject", async () => {
+      const templatesInfo = templateManager.getTemplatesInfo();
+
+      const chosenTemplateInfo =
+        templatesInfo.length > 0
+          ? await vscode.window.showQuickPick(
+              [
+                ...templateManager.getTemplatesInfo().map((templateInfo) => {
+                  return {
+                    label: templateInfo.name,
+                    id: templateInfo.id,
+                  } satisfies vscode.QuickPickItem & { id: string };
+                }),
+                { label: "none", id: undefined },
+              ],
+              { canPickMany: false }
+            )
+          : undefined;
+
       const name = await vscode.window.showInputBox({
         prompt: "Please enter a name for your new project!",
         title: "Project Creation",
@@ -83,12 +129,28 @@ export async function activate(context: vscode.ExtensionContext) {
       if (!name) {
         return;
       }
+      templateManager.registerTemplateVariable("projectName", name);
+
+      const template =
+        chosenTemplateInfo !== undefined && chosenTemplateInfo.id !== undefined
+          ? templateManager.loadTemplate(chosenTemplateInfo.id)
+          : undefined;
 
       const projectUri = vscode.Uri.from({
         scheme: "crosslabfs",
         path: `/projects/${name}`,
       });
       await vscode.workspace.fs.createDirectory(projectUri);
+
+      if (template) {
+        for (const entryName in template.content) {
+          const entryUri = projectUri.with({
+            path: path.join(projectUri.path, entryName),
+          });
+          await createTemplateEntry(entryUri, template.content[entryName]);
+        }
+      }
+
       projectViewDataProvider.refresh();
 
       const settingsDatabase = await openSettingsDatabase();
@@ -369,6 +431,16 @@ export async function activate(context: vscode.ExtensionContext) {
       console.log("adding filesystem service producer!");
       deviceHandler.addService(fileSystemServiceProducer);
       deviceHandler.addService(filesystemServiceConsumer);
+      deviceHandler.on("configuration", (configuration) => {
+        const templates = configuration.templates;
+        if (Array.isArray(templates)) {
+          for (const template of templates) {
+            if (isTemplate(template)) {
+              templateManager.registerTemplate(template);
+            }
+          }
+        }
+      });
       console.log("added filesystem service producer!");
     },
     onProjectChanged: (

@@ -41,6 +41,18 @@ export default (deviceUrls: {
         {
           name: "code-editor",
           configuration: {
+            templates: [
+              {
+                name: "Arduino Sketch",
+                content: {
+                  "{{projectName}}.ino": {
+                    type: "file",
+                    content:
+                      "// perform setup actions in this function\nvoid setup() {\n\t\n}\n\n// write the main loop in this function\nvoid loop() {\n\t\n}",
+                  },
+                },
+              },
+            ],
             tests: [
               {
                 name: "Should drive in a circle",

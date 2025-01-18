@@ -12,12 +12,10 @@ import {
   IncomingMessage,
   OutgoingMessage,
 } from "@crosslab-ide/abstract-messaging-channel";
-import { isTemplatesArray, TemplatesArray } from "./types.mjs";
 import { v4 as uuidv4 } from "uuid";
 
 interface FileSystemService__ProducerEvents {
   "new-consumer": (consumerId: string) => void;
-  templates: (templates: TemplatesArray) => void;
   request: (
     consumerId: string,
     request: IncomingMessage<FileSystemProtocol, "producer">
@@ -57,11 +55,6 @@ export class FileSystemService__Producer
     // TODO: add checkConfig function
     console.log("setting up filesystem service producer!");
     const consumerId = uuidv4();
-    if ("templates" in serviceConfig) {
-      if (isTemplatesArray(serviceConfig.templates)) {
-        this.emit("templates", serviceConfig.templates);
-      }
-    }
     const channel = new DataChannel();
     const messagingChannel = new CrossLabMessagingChannel(
       channel,
