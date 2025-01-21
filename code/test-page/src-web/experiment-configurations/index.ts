@@ -5,6 +5,7 @@ import filesystemOnly from "./filesystem-only.js";
 import simulation from "./simulation.js";
 import collaborationDebugging from "./collaboration-debugging.js";
 import collaborationComplete from "./collaboration-complete.js";
+import languageServer from "./language-server.js";
 
 const urls = await Promise.all([
   getDeviceUrl("code-editor"),
@@ -26,6 +27,7 @@ const deviceUrls = {
 
 export const templates = [
   filesystemOnly(deviceUrls),
+  languageServer(deviceUrls),
   collaborationMinimal(deviceUrls),
   collaborationCompilation(deviceUrls),
   collaborationDebugging(deviceUrls),

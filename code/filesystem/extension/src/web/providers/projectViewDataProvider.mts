@@ -82,14 +82,14 @@ export class ProjectViewDataProvider
       return [];
     }
 
-    console.log(
-      "project view data provider:",
-      projectRootFolder,
-      await vscode.workspace.fs.readDirectory(
-        vscode.Uri.from({ scheme: "crosslabfs", path: "/shared" })
-      ),
-      await vscode.workspace.fs.readDirectory(projectRootFolder)
-    );
+    // console.log(
+    //   "project view data provider:",
+    //   projectRootFolder,
+    //   await vscode.workspace.fs.readDirectory(
+    //     vscode.Uri.from({ scheme: "crosslabfs", path: "/shared" })
+    //   ),
+    //   await vscode.workspace.fs.readDirectory(projectRootFolder)
+    // );
 
     const result = (await vscode.workspace.fs.readDirectory(projectRootFolder))
       .filter((entry) => entry[1] === vscode.FileType.Directory)

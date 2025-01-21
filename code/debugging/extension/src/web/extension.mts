@@ -20,7 +20,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   const collaborationApi = collaborationExtension?.isActive
     ? collaborationExtension.exports
-    : await collaborationExtension?.activate();
+    : undefined;
   const collaborationServiceProsumer = collaborationApi?.getProsumer() as
     | CollaborationServiceProsumer
     | undefined;
@@ -340,9 +340,8 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   return {
-    addServices: (deviceHandler: DeviceHandler) => {
-      deviceHandler.addService(fileSystemServiceConsumer);
-      deviceHandler.addService(debuggingAdapterServiceConsumer);
+    loadCrosslabServices: (_configuration: { [k: string]: unknown }) => {
+      return [fileSystemServiceConsumer, debuggingAdapterServiceConsumer];
     },
   };
 }

@@ -61,6 +61,12 @@ export async function activate(context: vscode.ExtensionContext) {
   const fileSystemProvider = new CrossLabFileSystemProvider(
     new MemoryFileSystemProvider()
   );
+  await fileSystemProvider.createDirectory(
+    vscode.Uri.from({
+      scheme: "crosslabfs",
+      path: "/workspace",
+    })
+  );
   const projectsProvider = new IndexedDBFileSystemProvider();
   await projectsProvider.initialize();
   fileSystemProvider.addMount("/projects", projectsProvider);
@@ -293,10 +299,8 @@ export async function activate(context: vscode.ExtensionContext) {
     (extension) =>
       extension.id === "crosslab.@crosslab-ide/crosslab-collaboration-extension"
   );
-  if (collaborationExtension) {
-    const collaborationApi = collaborationExtension.isActive
-      ? collaborationExtension.exports
-      : await collaborationExtension.activate();
+  if (collaborationExtension && collaborationExtension.isActive) {
+    const collaborationApi = collaborationExtension.exports;
     const collaborationServiceProsumer =
       collaborationApi.getProsumer() as CollaborationServiceProsumer;
     const sharedFileSystemProvider = new MemoryFileSystemProvider();
@@ -427,21 +431,16 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   return {
-    addServices: (deviceHandler: DeviceHandler) => {
-      console.log("adding filesystem service producer!");
-      deviceHandler.addService(fileSystemServiceProducer);
-      deviceHandler.addService(filesystemServiceConsumer);
-      deviceHandler.on("configuration", (configuration) => {
-        const templates = configuration.templates;
-        if (Array.isArray(templates)) {
-          for (const template of templates) {
-            if (isTemplate(template)) {
-              templateManager.registerTemplate(template);
-            }
+    loadCrosslabServices: (configuration: { [k: string]: unknown }) => {
+      const templates = configuration.templates;
+      if (Array.isArray(templates)) {
+        for (const template of templates) {
+          if (isTemplate(template)) {
+            templateManager.registerTemplate(template);
           }
         }
-      });
-      console.log("added filesystem service producer!");
+      }
+      return [fileSystemServiceProducer, filesystemServiceConsumer];
     },
     onProjectChanged: (
       handler: (project: vscode.Uri) => Promise<void> | void

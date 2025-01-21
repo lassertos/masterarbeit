@@ -39,6 +39,19 @@ export class DeviceHandler extends TypedEmitter<DeviceHandlerEvents> {
   connections = new Map<string, PeerConnection>();
   services = new Map<string, Service>();
   supportedConnectionTypes: string[] = ["webrtc"];
+  private isReady: Promise<void>;
+  private isReadyResolver?: () => void;
+
+  constructor(ready = true) {
+    super();
+    this.isReady = new Promise<void>((resolve) => {
+      if (ready) {
+        resolve();
+      } else {
+        this.isReadyResolver = resolve;
+      }
+    });
+  }
 
   async connect(connectOptions: {
     endpoint: string;
@@ -115,6 +128,12 @@ export class DeviceHandler extends TypedEmitter<DeviceHandlerEvents> {
     };
   }
 
+  setReady() {
+    if (!this.isReadyResolver) return;
+
+    this.isReadyResolver();
+  }
+
   addService(service: Service) {
     this.services.set(service.serviceId, service);
     console.log(
@@ -124,9 +143,10 @@ export class DeviceHandler extends TypedEmitter<DeviceHandlerEvents> {
     );
   }
 
-  private handleCreatePeerConnectionMessage(
+  private async handleCreatePeerConnectionMessage(
     message: CreatePeerConnectionMessage
   ) {
+    await this.isReady;
     console.log("soa-client: handling create peerconnection message", message);
     if (this.connections.has(message.connectionUrl)) {
       throw Error(

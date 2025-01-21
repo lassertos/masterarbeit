@@ -49,9 +49,6 @@
         "command": "projects.view.unshareProject",
         "title": "Share Project",
         "icon": "$(x)"
-      },
-      {
-        "command": "filesExplorer.copy"
       }
     ],
     "menus": {

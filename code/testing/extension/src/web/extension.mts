@@ -19,7 +19,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   const collaborationApi = collaborationExtension?.isActive
     ? collaborationExtension?.exports
-    : await collaborationExtension?.activate();
+    : undefined;
   const collaborationServiceProsumer = collaborationApi?.getProsumer() as
     | CollaborationServiceProsumer
     | undefined;
@@ -181,48 +181,42 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   return {
-    addServices(deviceHandler: DeviceHandler) {
-      console.log("adding testing service!");
-      deviceHandler.addService(testingServiceConsumer);
-      deviceHandler.once("configuration", (configuration) => {
-        console.log("attempting to read tests from device configuration!");
-        console.log("configuration:", configuration);
+    loadCrosslabServices: (configuration: { [k: string]: unknown }) => {
+      console.log("attempting to read tests from device configuration!");
+      console.log("configuration:", configuration);
 
-        console.log(
-          `checking if device configuration contains property "tests"`
+      console.log(`checking if device configuration contains property "tests"`);
+      if (!("tests" in configuration)) {
+        return;
+      }
+
+      console.log(
+        `checking if property "tests" of device configuration is an array`
+      );
+      if (!Array.isArray(configuration.tests)) {
+        console.error(
+          `Property "tests" of device configuration is not an array!`
         );
-        if (!("tests" in configuration)) {
-          return;
-        }
+        return;
+      }
 
-        console.log(
-          `checking if property "tests" of device configuration is an array`
+      console.log(
+        `checking if property "tests" of device configuration only contains items of type Test`
+      );
+      if (configuration.tests.some((test) => !isTest(test))) {
+        console.error(
+          `Property "tests" of device configuration contains invalid items!`
         );
-        if (!Array.isArray(configuration.tests)) {
-          console.error(
-            `Property "tests" of device configuration is not an array!`
-          );
-          return;
-        }
+        return;
+      }
 
-        console.log(
-          `checking if property "tests" of device configuration only contains items of type Test`
-        );
-        if (configuration.tests.some((test) => !isTest(test))) {
-          console.error(
-            `Property "tests" of device configuration contains invalid items!`
-          );
-          return;
-        }
-
-        console.log("parsing tests");
-        for (const test of configuration.tests) {
-          const testWithId = testingServiceConsumer.addTest(test);
-          parseTest(testWithId);
-        }
-        console.log("successfully read tests from device configuration!");
-      });
-      console.log("successfully added testing service!");
+      console.log("parsing tests");
+      for (const test of configuration.tests) {
+        const testWithId = testingServiceConsumer.addTest(test);
+        parseTest(testWithId);
+      }
+      console.log("successfully read tests from device configuration!");
+      return [testingServiceConsumer];
     },
   };
 }

@@ -46,6 +46,8 @@ export class ExperimentView extends LitElement {
   @state()
   devicesRendered: boolean = false;
 
+  iframes: HTMLIFrameElement[] = [];
+
   protected firstUpdated(_changedProperties: PropertyValues): void {
     this.updateComplete.then(() =>
       setTimeout(() => {
@@ -73,9 +75,26 @@ export class ExperimentView extends LitElement {
             const url = new URL(instantiatedDevice.codeUrl);
             url.searchParams.set("instanceUrl", instantiatedDevice.url);
             url.searchParams.set("deviceToken", instantiatedDevice.token);
-            return html`
-              <iframe src="${url.toString()}" id="device-${index}"></iframe>
-            `;
+            if (!this.iframes[index]) {
+              const iframe = document.createElement("iframe");
+              iframe.src = url.toString();
+              iframe.id = `device-${index}`;
+              iframe.addEventListener("load", () => {
+                iframe.contentWindow?.postMessage(
+                  {
+                    role: this.experiment.devices[index].role,
+                    experimentUrl: this.experiment.url,
+                    ...this.experiment.roles.find(
+                      (role) =>
+                        role.name === this.experiment.devices[index].role
+                    )?.configuration,
+                  },
+                  "*"
+                );
+              });
+              this.iframes.push(iframe);
+            }
+            return html` ${this.iframes[index]} `;
           }
         )}
         <div id="footer">

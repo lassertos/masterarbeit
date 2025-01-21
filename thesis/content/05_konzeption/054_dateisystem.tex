@@ -18,7 +18,7 @@ Für den client-seitigen Lösungsansatz bietet sich eine Speicherung der Dateien
 
 Der server-seitige Lösungsansatz basiert darauf jedem Nutzer einen entsprechenden Speicherbereich zuzuteilen, in welchem seine Dateien gespeichert werden. Dies kann entweder über das Dateisystem des Servers oder über eine Datenbank geschehen. Der Vorteil dieser Art der Datenspeicherung liegt darin, dass sie unabhängig vom verwendeten Gerät und Browser ist. Allerdings werden für die Speicherung der Nutzerdaten entsprechender Speicherplatz auf dem Server benötigt wodurch höhere Kosten und ein höherer Verwaltungsaufwand entstehen können. Zudem muss sichergestellt werden, dass das System nicht ausgenutzt werden kann.
 
-Nach \autoref{requirement:Weitere Dateisysteme} soll die IDE die Anbindung weiterer Dateisysteme unterstützen. Laut Unteranforderung (a) soll daher ein entsprechender CrossLab-Service für die Bereitstellung und Nutzung von Dateisystemen entwickelt werden. Diese sollen dann nach Unteranforderung (b) von der IDE für die Anbindung weiterer Dateisysteme verwendet werden. Dementsprechend wird im Folgenden der \textit{Filesystem Service} beschrieben. In \autoref{figure:klassendiagramm-dateisystem-service} ist ein Klassendiagramm für den Filesystem Service dargestellt. Aus diesem können die bereitgestellten Operationen eines Dateisystems abgelesen werden. So müssen Dateisysteme die Erstellung von Ordnern und Dateien, das Lesen, Verschieben und Löschen dieser sowie das Schreiben von Dateien unterstützen. Weiterhin soll die Registrierung sogenannter \textit{Watcher} ermöglicht werden. Diese können von einem Filesystem Service Consumer für bestimmte Pfade registriert werden um über Änderungen innerhalb dieser informiert zu werden. Der Filesystem Service Consumer besitzt Funktionen um die einzelnen Operationen auszuführen, während der Filesystem Service Producer die Möglichkeit bietet auf eingehende Anfragen zu reagieren und entsprechende Antworten an den Filesystem Service Consumer zu senden.
+Nach \autoref{requirement:Weitere Dateisysteme} soll die IDE die Anbindung weiterer Dateisysteme unterstützen. Laut Unteranforderung (a) soll daher ein entsprechender CrossLab-Service für die Bereitstellung und Nutzung von Dateisystemen entwickelt werden. Dieser soll dann nach Unteranforderung (b) von der IDE für die Anbindung weiterer Dateisysteme verwendet werden. Dementsprechend wird im Folgenden der \textit{Filesystem Service} beschrieben. In \autoref{figure:klassendiagramm-dateisystem-service} ist ein Klassendiagramm für den Filesystem Service dargestellt. Aus diesem können die bereitgestellten Operationen eines Dateisystems abgelesen werden. So müssen Dateisysteme die Erstellung von Ordnern und Dateien, das Lesen, Verschieben und Löschen dieser sowie das Schreiben von Dateien unterstützen. Zusätzlich soll auch die Existenz von Dateien und Ordnern überprüft sowie deren Eigenschaften abgefragt werden können. Weiterhin soll die Registrierung sogenannter \textit{Watcher} ermöglicht werden. Diese können von einem Filesystem Service Consumer für bestimmte Pfade registriert werden um über Änderungen innerhalb dieser informiert zu werden. Der Filesystem Service Consumer besitzt Funktionen um die einzelnen Operationen auszuführen, während der Filesystem Service Producer die Möglichkeit bietet auf eingehende Anfragen zu reagieren und entsprechende Antworten an den Filesystem Service Consumer zu senden.
 
 \begin{figure}[tbp]
     \centering
@@ -27,6 +27,9 @@ Nach \autoref{requirement:Weitere Dateisysteme} soll die IDE die Anbindung weite
             \operation{+ onCreateDirectory()}
             \operation{+ onDelete()}
             \operation{+ onMove()}
+            \operation{+ onCopy()}
+            \operation{+ onExists()}
+            \operation{+ onStat()}
             \operation{+ onReadDirectory()}
             \operation{+ onReadFile()}
             \operation{+ onWriteFile()}
@@ -37,6 +40,9 @@ Nach \autoref{requirement:Weitere Dateisysteme} soll die IDE die Anbindung weite
             \operation{+ createDirectory()}
             \operation{+ delete()}
             \operation{+ move()}
+            \operation{+ copy()}
+            \operation{+ exists()}
+            \operation{+ stat()}
             \operation{+ readDirectory()}
             \operation{+ readFile()}
             \operation{+ writeFile()}

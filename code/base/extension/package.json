@@ -33,6 +33,11 @@
           "type": "string",
           "default": "",
           "description": "The device token for the instance the provided DeviceHandler should connect to."
+        },
+        "crosslab.configuration": {
+          "type": "object",
+          "default": {},
+          "description": "The configuration options for the code editor in the current experiment."
         }
       }
     }
@@ -68,8 +73,8 @@
   },
   "dependencies": {
     "@cross-lab-project/api-client": "0.2.8",
-    "@crosslab-ide/editor-settings": "file:../../shared/editor-settings",
     "@crosslab-ide/soa-client": "file:../../shared/soa-client-js",
-    "esbuild-plugin-polyfill-node": "^0.3.0"
+    "esbuild-plugin-polyfill-node": "^0.3.0",
+    "zod": "^3.23.8"
   }
 }

@@ -1,31 +1,43 @@
 import { DeviceHandler } from "@crosslab-ide/soa-client";
 import { APIClient } from "@cross-lab-project/api-client";
 import * as vscode from "vscode";
-import {
-  openSettingsDatabase,
-  readSetting,
-  writeSetting,
-} from "@crosslab-ide/editor-settings";
+import { z } from "zod";
+
+const configurationSchema = z.object({
+  extensions: z.optional(z.array(z.string())),
+});
+function isConfiguration(
+  input: unknown
+): input is z.infer<typeof configurationSchema> {
+  return configurationSchema.safeParse(input).success;
+}
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log(
     'Congratulations, your extension "crosslab-base-extension" is now active in the web extension host!'
   );
 
-  const deviceHandler = new DeviceHandler();
-  deviceHandler.supportedConnectionTypes = ["websocket", "local"];
-
-  const disposable = vscode.commands.registerCommand(
-    "crosslab-base-extension.helloWorld",
-    () => {
-      vscode.window.showInformationMessage(
-        "Hello World from crosslab-base-extension in a web extension host!"
+  const timeout = setTimeout(() => startExtension(context, disposable), 10000);
+  const disposable = vscode.workspace.onDidChangeConfiguration(
+    async (event) => {
+      console.log(
+        "crosslab settings changed:",
+        event.affectsConfiguration("crosslab")
       );
+      if (!event.affectsConfiguration("crosslab")) return;
+
+      clearTimeout(timeout);
+      startExtension(context, disposable);
     }
   );
+}
 
-  context.subscriptions.push(disposable);
-  const extensions = vscode.extensions.all;
+async function startExtension(
+  context: vscode.ExtensionContext,
+  disposable: vscode.Disposable
+) {
+  console.log("starting base extension!");
+  disposable.dispose();
 
   const statusBarItem = vscode.window.createStatusBarItem(
     "experiment-status",
@@ -33,58 +45,26 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(statusBarItem);
 
-  console.log("extensionUri:", context.extensionUri);
+  const deviceHandler = new DeviceHandler(false);
+  deviceHandler.supportedConnectionTypes = ["websocket", "local"];
 
-  const settingsDatabase = await openSettingsDatabase();
-  // const configuration = vscode.workspace.getConfiguration();
-  const instanceUrl = new URLSearchParams(context.extensionUri.query).get(
-    "instanceUrl"
-  );
-  const deviceToken = new URLSearchParams(context.extensionUri.query).get(
-    "deviceToken"
-  );
-  console.log("instanceUrl:", instanceUrl);
-  console.log("deviceToken:", deviceToken);
+  const crosslabConfiguration = vscode.workspace.getConfiguration("crosslab");
+  const instanceUrl = crosslabConfiguration.get("instanceUrl");
+  const deviceToken = crosslabConfiguration.get("deviceToken");
 
-  if (typeof instanceUrl !== "string") {
-    throw new Error(
-      `expected configuration option "crosslab.instanceUrl" to be of type "string" but got type "${typeof instanceUrl}"`
-    );
+  if (!instanceUrl || typeof instanceUrl !== "string") {
+    throw new Error("Parameter instanceUrl was not set!");
   }
 
-  if (typeof deviceToken !== "string") {
-    throw new Error(
-      `expected configuration option "crosslab.deviceToken" to be of type "string" but got type "${typeof deviceToken}"`
-    );
+  if (!deviceToken || typeof deviceToken !== "string") {
+    throw new Error("Parameter deviceToken was not set!");
   }
-
-  await writeSetting(settingsDatabase, "crosslab.instanceUrl", instanceUrl);
-  await writeSetting(settingsDatabase, "crosslab.deviceToken", deviceToken);
 
   deviceHandler.on("experimentStatusChanged", (statusUpdate) => {
     statusBarItem.text = `CrossLab Experiment: ${statusUpdate.status}`;
   });
   statusBarItem.text = "CrossLab Experiment: initializing";
   statusBarItem.show();
-
-  for (const extension of extensions) {
-    if (
-      extension.id.startsWith("crosslab") &&
-      extension.id !== context.extension.id
-    ) {
-      const api = extension.isActive
-        ? extension.exports
-        : await extension.activate();
-      if (api && api.addServices) {
-        api.addServices(deviceHandler);
-      }
-    }
-  }
-
-  console.log("crosslab services initialized successfully!");
-  console.log(deviceHandler.getServiceMeta());
-
-  statusBarItem.text = "CrossLab Experiment: waiting";
 
   if (instanceUrl && deviceToken) {
     const baseUrl = instanceUrl.slice(0, instanceUrl.indexOf("/devices"));
@@ -107,6 +87,50 @@ export async function activate(context: vscode.ExtensionContext) {
       console.error("connection failed:", error);
     }
   }
+
+  const configuration = await new Promise<{ [k: string]: unknown }>(
+    (resolve) => {
+      deviceHandler.on("configuration", (configuration) => {
+        console.log(
+          "BASE: received IDE configuration for experiment",
+          configuration
+        );
+        resolve(configuration);
+      });
+    }
+  );
+
+  if (!isConfiguration(configuration)) {
+    throw new Error("Configuration of IDE is malformed!");
+  }
+
+  const extensions = vscode.extensions.all;
+  const extensionsToLoad = configuration.extensions;
+
+  for (const extension of extensions) {
+    if (
+      extension.id.startsWith("crosslab") &&
+      extension.id !== context.extension.id &&
+      (!extensionsToLoad || extensionsToLoad.includes(extension.id))
+    ) {
+      const api = extension.isActive
+        ? extension.exports
+        : await extension.activate();
+      if (api && api.loadCrosslabServices) {
+        const services = api.loadCrosslabServices(
+          structuredClone(configuration)
+        );
+        for (const service of services) {
+          deviceHandler.addService(service);
+        }
+      }
+    }
+  }
+
+  console.log("crosslab services initialized successfully!");
+  console.log(deviceHandler.getServiceMeta());
+
+  deviceHandler.setReady();
 }
 
 export function deactivate() {}

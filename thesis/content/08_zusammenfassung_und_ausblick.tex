@@ -1,9 +1,48 @@
 \chapter{Zusammenfassung und Ausblick}\label{section:zusammenfassung-und-ausblick}
 
-\begin{note}
-    \textbf{Notizen:}
-    \begin{itemize}
-        \item Zusammenfassung der vorherigen Kapitel
-        \item Ausblick (Weiterentwicklung, Evaluation, ...)
-    \end{itemize}
-\end{note}
+% \begin{note}
+%     \textbf{Notizen:}
+%     \begin{itemize}
+%         \item Zusammenfassung der vorherigen Kapitel
+%         \item Ausblick (Weiterentwicklung, Evaluation, ...)
+%     \end{itemize}
+% \end{note}
+
+Im Verlauf dieser Arbeit wurde die Konzeption und Implementierung einer CrossLab-kompatiblen IDE beschrieben. Dafür wurde in \autoref{section:stand-der-technik} zunächst der aktuelle Stand der Technik ermittelt. Dafür wurde zunächst eine Literaturrecherche durchgeführt um die folgenden Forschungsfragen zu beantworten:
+
+\begin{enumerate}
+    \item Welche Implementierungen von online IDEs gibt es?
+    \item Welchen Architekturmustern folgen online IDEs?
+    \item Welche Vorteile haben online IDEs?
+    \item Welche Nachteile haben online IDEs?
+    \item Welche Anforderungen werden an online IDEs gestellt?
+\end{enumerate}
+
+Zusätzlich wurden auch weitere Entwicklungen abseits der betrachteten Literatur betrachtet. Auf Basis der gewonnenen Erkenntnisse wurden in \autoref{section:anforderungsanalyse} Anforderungen für die zu entwickelnde IDE erhoben. Darauf aufbauend wurden in \autoref{section:konzeption} Konzepte für die einzelnen Funktionen der IDE entwickelt. Dabei wurde zunächst ein Konzept für die Herstellung der CrossLab-Kompatibilität der IDE vorgestellt. In den nachfolgenden Kapiteln wurden CrossLab-Services für die verschiedenen Funktionen der IDE konzipiert. Diese umfassen die folgenden Services:
+
+\begin{itemize}
+    \item \textbf{Collaboration Service} \\ Dieser Service ermöglicht die Echtzeit-Kollaboration zwischen Nutzern innerhalb eines Experiments. Darunter z.B. das Teilen von Projekten und Debug-Sitzungen.
+          \newpage
+    \item \textbf{Filesystem Service} \\ Dieser Service ermöglicht die Bereitstellung und Nutzung von Dateisystemen.
+    \item \textbf{Compilation Service} \\ Dieser Service ermöglicht die Bereitstellung und Nutzung von Compilern.
+    \item \textbf{Programming Service} \\ Dieser Service ermöglicht die Programmierung von Steuereinheiten.
+    \item \textbf{Debugging Adapter und Debugging Target Service} \\ Diese Services ermöglichen die Bereitstellung und Nutzung von Debuggern. Dabei ist der Debugging Adapter Service für die Kommunikation zwischen der IDE und einem Debug Adapter zuständig, während der Debugging Target Service die Kommunikation zwischen dem Debugger und der Steuereinheit ermöglicht.
+    \item \textbf{Testing Service} \\ Dieser Service ermöglicht die Erstellung und Ausführung von Testfällen.
+    \item \textbf{Language Server Service} \\ Dieser Service ermöglicht die Bereitstellung und Nutzung von Language Servern.
+\end{itemize}
+
+In \autoref{section:prototypische-implementierung} wurde die prototypische Implementierung der IDE vorgestellt. Diese wurde auf Basis des Code Editors \ac{VSCode} mithilfe der VSCode Extension API vorgenommen. Die IDE selbst ist als ein edge-instanziierbares Laborgerät implementiert. Es wurden die folgenden Erweiterungen für die IDE implementiert:
+
+\begin{itemize}
+    \item \textbf{Basis Erweiterung} \\ Diese Erweiterung ist verantwortlich für die Verwaltung der CrossLab-Services der IDE und für die Anmeldung der IDE als Laborgerät bei der entsprechenden CrossLab-Instanz.
+    \item \textbf{Collaboration Erweiterung} \\ Diese Erweiterung fügt einen Collaboration Service Prosumer zur IDE hinzu. Dieser kann von anderen Erweiterungen verwendet werden, um kollaborative Funktionen anzubieten.
+    \item \textbf{Filesystem Erweiterung} \\ Diese Erweiterung beinhaltet das integrierte Dateisystem der IDE. Zusätzlich fügt sie einen Filesystem Service Consumer sowie einen Filesystem Service Producer hinzu. Der Consumer kann für die Anbindung weiterer Dateisysteme verwendet werden, während der Producer anderen Laborgeräten den Zugriff auf das integrierte Dateisystem ermöglicht. Zusätzlich wird das Teilen von Projekten zwischen Nutzern innerhalb eines Experiments unterstützt.
+    \item \textbf{Compilation Erweiterung} \\ Diese Erweiterung fügt einen Compilation Service Consumer sowie einen Programming Service Consumer zur IDE hinzu. Diese werden für die Anbindung von Compilern sowie für die Programmierung von Steuereinheiten verwendet.
+    \item \textbf{Debugging Erweiterung} \\ Diese Erweiterung fügt einen Debugging Adapter Service Consumer zur IDE hinzu. Dieser wird für die Anbindung von Debuggern verwendet. Zusätzlich wird das Teilen von Debug-Sitzungen zwischen Nutzern innerhalb eines Experiments unterstützt.
+    \item \textbf{Testing Erweiterung} \\ Diese Erweiterung fügt einen Testing Service Consumer zur IDE hinzu. Dieser wird für die Ausführung von Testfällen innerhalb eines Experiments verwendet.
+    \item \textbf{Language Server Erweiterung} \\ Diese Erweiterung fügt einen Language Server Service Consumer zur IDE hinzu. Dieser wird für die Anbindung von Language Servern verwendet.
+\end{itemize}
+
+Zusätzlich zu den CrossLab-Services und Erweiterungen wurden auch neue Laborgeräte implementiert. Darunter cloud-instanziierbare Laborgeräte zur Bereitstellung des \ac{Arduino CLI}, des \ac{GDB}, des Arduino Language Servers und einer simulierten Microcontroller Steuereinheit. Weiterhin wurde ein edge-instanziierbares steuerbares Laborgerät implementiert.
+
+Schließlich wurden in \autoref{section:diskussion} die Ergebnisse dieser Arbeit betrachtet und diskutiert. Dabei wurden verschiedene alternative Lösungsansätze, Erweiterungsmöglichkeiten und offene Aufgaben betrachtet. So könnten z.B. gewisse Nutzerdaten für Analysezwecke gesammelt werden. Dadurch könnten u.a. Lehrende erkennen für welche Aufgaben die Lernenden am meisten Zeit aufwenden und können diese falls benötigt entsprechend anpassen. Weiterhin sollte die Komplexität der konzipierten und implementierten Lösungen im Hinblick auf deren Implementierung und Anwendung verringert werden. So sollten entsprechende Bibliotheken und Werkzeuge entwickelt werden um die Implementierung neuer Laborgeräte und die Konfiguration von Experimenten zu vereinfachen. Als Beispiel könnte ein Experimentkonfigurator konzipiert werden. Dieser könnte Laborgeräte und ihre angebotenen Services visualisieren und deren Verbindung zu einem Experiment ermöglichen. Weiterhin sollten weitere Laborgeräte implementiert werden, um eine größere Anzahl verschiedener Experimente unterstützen zu können. Somit kann auch der Einstieg für z.B. Lehrende erleichtert werden. Außerdem sollte auch die Sicherheit der Lösungen genauer betrachtet werden. Dies lag nicht im Fokus dieser Arbeit, ist aber für eine finale Version von hoher Bedeutung. Schließlich steht auch die Evaluation der konzipierten und implementierten Lösungen noch aus. Dabei könnte z.B. der Ressourcenverbrauch analysiert und mit alternativen Lösungen verglichen werden. Zudem könnte ein Vergleich mit WIDE erfolgen, um zu erfahren, wie die neuen Funktionen der IDE von den Studierenden angenommen werden. Außerdem kann für weitere Entwicklungen WebAssembly in Betracht gezogen werden, um Funktionen der IDE wie z.B. die Kompilierung der Programme direkt im Browser des Nutzers durchführen zu können. Dadurch können ggf. die benötigten Serverressourcen weiter reduziert werden.

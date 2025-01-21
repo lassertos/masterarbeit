@@ -12,10 +12,8 @@ export async function activate(_context: vscode.ExtensionContext) {
   );
 
   return {
-    addServices(deviceHandler: DeviceHandler) {
-      console.log("Adding collaboration services!");
-      deviceHandler.addService(collaborationServiceProsumer);
-      console.log("Successfully added collaboration services!");
+    loadCrosslabServices: (_configuration: { [k: string]: unknown }) => {
+      return [collaborationServiceProsumer];
     },
     getProsumer() {
       return collaborationServiceProsumer;

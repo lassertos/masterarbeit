@@ -1,4 +1,5 @@
 import { ExperimentServiceTypes } from "@cross-lab-project/api-client";
+import { arduinoSketchTemplateVPSPU } from "../templates/arduino.js";
 
 export default (deviceUrls: {
   "code-editor": string;
@@ -47,8 +48,7 @@ export default (deviceUrls: {
                 content: {
                   "{{projectName}}.ino": {
                     type: "file",
-                    content:
-                      "// perform setup actions in this function\nvoid setup() {\n\t\n}\n\n// write the main loop in this function\nvoid loop() {\n\t\n}",
+                    content: arduinoSketchTemplateVPSPU,
                   },
                 },
               },

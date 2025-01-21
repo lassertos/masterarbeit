@@ -125,10 +125,8 @@ export async function activate(context: ExtensionContext) {
   });
 
   return {
-    addServices: (deviceHandler: DeviceHandler) => {
-      console.log("adding lsp service!");
-      deviceHandler.addService(languageServerConsumer);
-      console.log("added lsp service!");
+    loadCrosslabServices: (_configuration: { [k: string]: unknown }) => {
+      return [languageServerConsumer];
     },
   };
 }

@@ -1,0 +1,163 @@
+\section{Erfüllung der Anforderungen}\label{section:diskussion:erfüllung-der-anforderungen}
+
+In diesem Abschnitt wird die Erfüllung der in \autoref{section:anforderungsanalyse:anforderungen} gestellten Anforderungen betrachtet. Dafür werden im Folgenden die einzelnen Anforderungen betrachtet. Dabei wird der Grad der Erfüllung sowie eine kurze Begründung dessen angegeben.
+
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Ausführung im Browser} \hfill Ausführung im Browser \hfill Erfüllt \\
+    \\
+    Die IDE kann im Browser des Nutzers ausgeführt werden.                                  \\
+    \bottomrule                                                                             \\
+\end{tabularx}
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Erweiterbarkeit} \hfill Erweiterbarkeit \hfill Erfüllt \\
+    \\
+    Die IDE kann mithilfe der VSCode Extension API erweitert werden.
+    \\
+    \bottomrule
+\end{tabularx}
+\vfill
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Keine Kosten für Nutzer} \hfill Keine Kosten für Nutzer \hfill Erfüllt
+    \\
+    \\
+    Die IDE besitzt neben den benötigten Serverresourcen keine weiteren Kosten. Es wurde quelloffene und frei nutzbare Software für die Implementierung verwendet.
+    \\
+    \bottomrule
+\end{tabularx}
+\vfill
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Eigenständig nutzbar} \hfill Eigenständig nutzbar \hfill Erfüllt
+    \\
+    \\
+    Die IDE kann als einziges Laborgerät in einem Experiment verwendet werden. Dabei wird die Editierung von Quellcode und das integrierte Dateisystem unterstützt.
+    \\
+    \bottomrule
+\end{tabularx}
+\vfill
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Nur CrossLab-Nutzerkonto nötig} \hfill Nur CrossLab-Nutzerkonto nötig \hfill Erfüllt
+    \\
+    \\
+    Die IDE benötigt zur Verwendung nur das zur Ausführung von Experimenten benötigte CrossLab-Nutzerkonto.
+    \\
+    \bottomrule
+\end{tabularx}
+\vfill
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Integriertes Dateisystem} \hfill Integriertes Dateisystem \hfill Erfüllt
+    \\
+    \\
+    Die IDE besitzt ein integriertes Dateisystem, welches die Erstellung, Bearbeitung, Verschiebung, Löschun und persistente Speicherung von Dateien und Ordnern unterstützt. Weiterhin kann das integrierte Dateisystem auch in der eigenständigen Ausführung verwendet werden.
+    \\
+    \bottomrule
+\end{tabularx}
+\vfill
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Weitere Dateisysteme} \hfill Weitere Dateisysteme \hfill Erfüllt
+    \\
+    \\
+    Es wurde der Filesystem Service für die Bereitstellung und Nutzung von Dateisystemen entwickelt. Dieser wird von der IDE für die Bereitstellung des integrierten Dateisystems sowie für die Anbindung weiterer Dateisysteme verwendet.
+    \\
+    \bottomrule
+\end{tabularx}
+\vfill
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Kollaboration} \hfill Kollaboration \hfill Erfüllt
+    \\
+    \\
+    Es wurde der Collaboration Service für die Synchronisation von geteilten Daten und den Austausch von Zustandsinformationen entwickelt. Dieser wird von der IDE zur Bereitstellung der Echtzeit-Kollaboration verwendet.
+    \\
+    \bottomrule
+\end{tabularx}
+\vfill
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Teilen von Ordnern} \hfill Teilen von Ordnern \hfill Teilweise erfüllt
+    \\
+    \\
+    Nutzer können ihre Projekte innerhalb eines Experiments mit anderen teilnehmenden Nutzern teilen. Änderungen innerhalb der geteilten Projekte werden zwischen den Nutzern synchronisiert. Geteilte Projekte können nur von ihrem Besitzer gelöscht, verschoben oder umbenannt werden. Zudem kann das Teilen von Projekten auch von dem Besitzer beendet werden. Das Teilen der Projekte erfolgt über den bereits vorhandenen Collaboration Service der IDE.
+    \\
+    \bottomrule
+\end{tabularx}
+\vfill
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Kompilierung} \hfill Kompilierung \hfill Erfüllt
+    \\
+    \\
+    Es wurde der Compilation Service für die Bereitstellung und Nutzung von Compilern entwickelt. Dieser wird von der IDE für die Anbindung und Nutzung von Compilern verwendet.
+    \\
+    \bottomrule
+\end{tabularx}
+\vfill
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Programmierung von Steuereinheiten} \hfill Programmierung von Steuereinheiten  \hfill Erfüllt                                                    \\
+    \\
+    Es wurde der Programming Service für die Programmierung von Steuereinheiten entwickelt. Dieser wird von der IDE für die Programmierung von Steuereinheiten verwendet. \\
+    \bottomrule
+\end{tabularx}
+\vfill
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Debuggen} \hfill Debuggen \hfill Erfüllt
+    \\
+    \\
+    Es wurde der Debugging Adapter Service für die Bereitstellung und Nutzung von Debuggern entwickelt. Dieser wird von der IDE für die Anbindung und Nutzung von Debuggern verwendet. Außerdem wurde der Debugging Target Service für die Kommunikation zwischen Debuggern und Steuereinheiten entwickelt.
+    \\
+    \bottomrule
+\end{tabularx}
+\vfill
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Teilen von Debug-Sitzungen} \hfill Teilen von Debug-Sitzungen \hfill Teilweise erfüllt
+    \\
+    \\
+    Nutzer können gemeinsam an einer Debug-Sitzung teilnehmen, wenn sie Zugriff auf das zu debuggende Programm besitzen. Die Breakpoints der Nutzer werden zwischen diesen synchronisiert. Nur der Ersteller einer Debug-Sitzung kann diese beenden. Für das Teilen von Debug-Sitzungen wird der bereits vorhandene Collaboration Service der IDE verwendet. Während der prototypischen Implementierung wurden nur Experimente mit einer Steuereinheit betrachtet, dementsprechend wurde nur eine aktive Debug-Sitzung innerhalb eines Experiments erlaubt.
+    \\
+    \bottomrule \\
+\end{tabularx}
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Testen} \hfill Testen \hfill Erfüllt
+    \\
+    \\
+    Es wurde der Testing Service für die Erstellung und Ausführung von Testfällen innerhalb eines Experiments entwickelt. Der Testing Service Producer ermöglicht die Bereitstellung von Funktionen zur Verwendung in Testfällen. Der Testing Service Consumer ermöglicht die Ausführung von Testfällen. Die Erstellung von Testfällen kann während der Konfiguration eines Experiments erfolgen. Die IDE verwendet den Testing Service für die Ausführung von Testfällen innerhalb eines Experiments.
+    \\
+    \bottomrule \\
+\end{tabularx}
+\begin{tabularx}{\textwidth}{X}
+    \toprule
+    \autoref{requirement:Language Server} \hfill Language Server \hfill Erfüllt
+    \\
+    \\
+    Es wurde der Language Server Service für die Bereitstellung und Nutzung von Language Servern entwickelt. Dieser wird von der IDE für die Anbindung und Nutzung von Language Servern verwendet.
+    \\
+    \bottomrule
+\end{tabularx}
+
+% \begin{itemize}
+%     \item \autoref{requirement:Ausführung im Browser} (Ausführung im Browser): \hfill Erfüllt \\ Die IDE kann im Browser des Nutzers ausgeführt werden.
+%     \item \autoref{requirement:Erweiterbarkeit} (Erweiterbarkeit): Erfüllt \\ Die IDE kann mithilfe der VSCode Extension API erweitert werden.
+%     \item \autoref{requirement:Keine Kosten für Nutzer} (Keine Kosten für Nutzer): Erfüllt \\ Die IDE besitzt neben den benötigten Serverresourcen keine weiteren assoziierten Kosten. Es wurde quelloffene und frei nutzbare Software für die Implementierung verwendet.
+%     \item \autoref{requirement:Eigenständig nutzbar} (Eigenständig nutzbar): Erfüllt \\ Die IDE kann als einziges Laborgerät in einem Experiment verwendet werden. Dabei wird die Editierung von Quellcode und das integrierte Dateisystem unterstützt.
+%     \item \autoref{requirement:Nur CrossLab-Nutzerkonto nötig} (Nur CrossLab-Nutzerkonto nötig): Erfüllt \\ Die IDE benötigt zur Verwendung nur das zur Ausführung von Experimenten benötigte CrossLab-Nutzerkonto.
+%     \item \autoref{requirement:Integriertes Dateisystem} (Integriertes Dateisystem): Erfüllt \\ Die IDE besitzt ein integriertes Dateisystem, welches die Erstellung, Bearbeitung, Verschiebung, Löschun und persistente Speicherung von Dateien und Ordnern unterstützt. Weiterhin kann das integrierte Dateisystem auch in der eigenständigen Ausführung verwendet werden.
+%     \item \autoref{requirement:Weitere Dateisysteme} (Weitere Dateisysteme): Erfüllt \\ Es wurde ein CrossLab-Service für die Bereitstellung und Nutzung von Dateisystemen entwickelt (Filesystem Service). Dieser wird von der IDE für die Bereitstellung des integrierten Dateisystems sowie für die Anbindung weiterer Dateisysteme verwendet.
+%     \item \autoref{requirement:Kollaboration} (Kollaboration): Erfüllt \\ Es wurde ein CrossLab-Service für die Synchronisation von geteilten Daten und den Austausch von Zustandsinformationen entwickelt (Collaboration Service). Dieser wird von der IDE zur Bereitstellung der Echtzeit-Kollaboration verwendet.
+%     \item \autoref{requirement:Teilen von Ordnern} (Teilen von Ordnern): Teilweise erfüllt \\ Nutzer können ihre Projekte innerhalb eines Experiments mit anderen teilnehmenden Nutzern teilen. Änderungen innerhalb der geteilten Projekte werden zwischen den Nutzern synchronisiert. Geteilte Projekte können nur von ihrem Besitzer gelöscht, verschoben oder umbenannt werden. Zudem kann das Teilen von Projekten auch von dem Besitzer beendet werden. Das Teilen der Projekte erfolgt über den bereits vorhandenen Collaboration Service der IDE.
+%     \item \autoref{requirement:Kompilierung} (Kompilierung): Erfüllt \\ Es wurde ein CrossLab-Service für die Bereitstellung und Nutzung von Compilern entwickelt (Compilation Service). Dieser wird von der IDE für die Anbindung und Nutzung von Compilern verwendet.
+%     \item \autoref{requirement:Programmierung von Steuereinheiten} (Programmierung von Steuereinheiten): Erfüllt \\ Es wurde ein CrossLab-Service für die Programmierung von Steuereinheiten entwickelt (Programming Service). Dieser wird von der IDE für die Programmierung von Steuereinheiten verwendet.
+%     \item \autoref{requirement:Debuggen} (Debuggen): Erfüllt \\ Es wurde ein CrossLab-Service für die Bereitstellung und Nutzung von Debuggern entwickelt (Debugging Adapter Service). Dieser wird von der IDE für die Anbindung und Nutzung von Debuggern verwendet. Außerdem wurde ein CrossLab-Service für die Kommunikation zwischen Debuggern und Steuereinheiten entwickelt (Debugging Target Service).
+%     \item \autoref{requirement:Teilen von Debug-Sitzungen} (Teilen von Debug-Sitzungen): Teilweise erfüllt \\ Nutzer können gemeinsam an einer Debug-Sitzung teilnehmen, wenn sie Zugriff auf das zu debuggende Programm besitzen. Die Breakpoints der Nutzer werden zwischen diesen synchronisiert. Nur der Ersteller einer Debug-Sitzung kann diese beenden. Für das Teilen von Debug-Sitzungen wird der bereits vorhandene Collaboration Service der IDE verwendet. Während der prototypischen Implementierung wurden nur Experimente mit einer Steuereinheit betrachtet, dementsprechend wurde nur eine aktive Debug-Sitzung innerhalb eines Experiments erlaubt.
+%     \item \autoref{requirement:Testen} (Testen): Erfüllt \\ Es wurde ein CrossLab-Service für die Erstellung und Ausführung von Testfällen innerhalb eines Experiments entwickelt (Testing Service). Der Testing Service Producer ermöglicht die Bereitstellung von Funktionen zur Verwendung in Testfällen. Der Testing Service Consumer ermöglicht die Ausführung von Testfällen. Die Erstellung von Testfällen kann während der Konfiguration eines Experiments erfolgen. Die IDE verwendet den Testing Service für die Ausführung von Testfällen innerhalb eines Experiments.
+%     \item \autoref{requirement:Language Server} (Language Server): Erfüllt \\ Es wurde ein CrossLab-Service für die Bereitstellung und Nutzung von Language Servern entwickelt (Language Server Service). Dieser wird von der IDE für die Anbindung und Nutzung von Language Servern verwendet.
+% \end{itemize}
