@@ -47,3 +47,10 @@ In \autoref{figure:klassendiagramm-compilation-service} ist ein Klassendiagramm 
 In \autoref{figure:klassendiagramm-programming-service} ist ein Klassendiagramm für den Programming Service angegeben. Dabei besitzt der Programming Service Consumer nur die Funktion \texttt{program()}, die es ermöglicht, eine Programmieranfrage zu starten. Diese muss entweder eine Datei, z.B. das Ergebnis einer Kompilierung, oder einen Ordner mit dem entsprechenden Programm enthalten. Dabei könnte der Programming Service Producer über seine Servicebeschreibung angeben, welche Formate unterstützt werden. Der Programming Service Producer löst bei einer eingehenden Programmieranfrage ein entsprechendes \texttt{Program}-Event aus. Dieses kann durch entsprechende Event Handler abgefangen und zur Programmierung der Steuereinheit verwendet werden.
 
 Die betrachtete Experimentkonfiguration wird zunächst um ein weiteres Laborgerät erweitert. Dieses stellt einen Compiler über einen entsprechenden Compilation Service Producer bereit. Die IDE wird um einen Compilation Service Consumer sowie einen Programming Service Consumer erweitert. Die Steuereinheit wird um einen Programming Service Producer erweitert. Die IDE wird dann über die neu hinzugefügten CrossLab-Services mit dem Compiler und der Steuereinheit verbunden.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{diagrams/experimentkonfigurationen/Experimentkonfiguration-03.drawio.pdf}
+    \caption{Experimentkonfiguration}
+    \label{figure:experimentkonfiguration:kompilierung}
+\end{figure}

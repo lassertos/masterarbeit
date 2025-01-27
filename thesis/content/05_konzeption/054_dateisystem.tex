@@ -58,3 +58,10 @@ Nach \autoref{requirement:Weitere Dateisysteme} soll die IDE die Anbindung weite
 Nach \autoref{requirement:Teilen von Ordnern} soll das Dateisystem das Teilen von Ordnern mit anderen Nutzern innerhalb eines Experiments unterstützen. Dafür soll nach Unteranforderung (d) der bereits vorhandene Collaboration Service der IDE verwendet werden. Beim Erstellen eines Experiments öffnen Nutzer einen Raum zum Teilen ihrer Ordner. Das geteilte JSON-Objekt hat dabei die Kennzeichner der verschiedenen Teilnehmer als Schlüssel mit den geteilten Ordnern des jeweiligen Teilnehmers als den dazugehörigen Wert. Wenn ein Nutzer einen Ordner teilt, soll dieser anderen Nutzern angezeigt werden. Diese können dann den Inhalt einsehen und bearbeiten. Die Implementierung der Synchronisation ist hierbei abhängig von dem verwendeten Code Editor. Weiterhin kann über die Zustandsinformationen von Nutzern auch deren aktuelle Position mit den anderen Nutzern geteilt werden und diesen innerhalb der entsprechenden Datei angezeigt werden.
 
 Für die Einbindung des Filesystem Service in die betrachtete Experimentkonfiguration kann ein Filesystem Service Consumer zur IDE hinzugefügt werden. Für die Bereitstellung von Dateisystemen können Laborgeräte einen entsprechenden Filesystem Service Producer anbieten. Ein Beispiel für ein derartiges Laborgerät ist ein Storage-Server, der es Nutzern ermöglichen könnte, ihre Dateien unabhängig von ihrem verwendeten Browser und Gerät speichern und abrufen zu können. Weiterhin kann die IDE auch einen Filesystem Service Producer zur Bereitstellung ihres integrierten Dateisystems anbieten.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{diagrams/experimentkonfigurationen/Experimentkonfiguration-02.drawio.pdf}
+    \caption{Experimentkonfiguration}
+    \label{figure:experimentkonfiguration:dateisystem}
+\end{figure}
