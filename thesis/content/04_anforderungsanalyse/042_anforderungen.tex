@@ -37,17 +37,17 @@ Im Folgenden werden die Anforderungen an die zu entwickelnde IDE beschrieben. Da
 
 \begin{requirement}{Erweiterbarkeit}
     \reqdescription Die zu entwickelnde IDE soll Schnittstellen zum Hinzufügen von CrossLab-Services und Benutzerinterfaces besitzen. \\
-    \reqrationale Um die Weiterentwicklung der IDE zu vereinfachen sollen entsprechende Schnittstellen zur Verfügung stehen. Dabei sollte mindestens das Hinzufügen neuer CrossLab-Services und Benutzerinterfaces möglich sein. \\
+    \reqrationale Um die Weiterentwicklung der IDE zu vereinfachen, sollen entsprechende Schnittstellen zur Verfügung stehen. Dabei sollte mindestens das Hinzufügen neuer CrossLab-Services und Benutzerinterfaces möglich sein. \\
 \end{requirement}
 
 \begin{requirement}{Keine Kosten für Nutzer}
     \reqdescription Die zu entwickelnde IDE soll keine Kosten für den Nutzer erzeugen. Daher soll für die Implementierung nur quelloffene und frei nutzbare Software verwendet werden.  \\
-    \reqrationale Um die IDE in einer Vielzahl von verschiedenen Szenarien einsetzen zu können ist es vom Vorteil keine assoziierten Kosten für die Nutzung dieser zu haben. Somit kann sie z.B. auch im GOLDi-Remotelab und anderen CrossLab-kompatiblen online Laboren eingesetzt werden. \\
+    \reqrationale Um die IDE in einer Vielzahl von verschiedenen Szenarien einsetzen zu können, ist es von Vorteil, keine assoziierten Kosten für die Nutzung dieser zu haben. Somit kann sie z.B. auch im GOLDi-Remotelab und anderen CrossLab-kompatiblen online Laboren eingesetzt werden. \\
 \end{requirement}
 
 \begin{requirement}{Eigenständig nutzbar}
     \reqdescription Die zu entwickelnde IDE soll als einziges Laborgerät in einem Experiment verwendet werden können. Dabei können die angebotenen Funktionen der IDE eingeschränkt sein. Das Editieren von Quellcode soll stets ermöglicht werden. \\
-    \reqrationale Da Experimente in der CrossLab-Architektur meist aus mehreren verbundenen Laborgeräten bestehen kann es dazu kommen, dass manche dieser ggf. nicht immer verfügbar sind, da sie aktuell von anderen Nutzern verwendet werden. Wenn die IDE eigenständig nutzbar ist können Nutzer dennoch an ihren Programmen weiterarbeiten. \\
+    \reqrationale Da Experimente in der CrossLab-Architektur meist aus mehreren verbundenen Laborgeräten bestehen, kann es dazu kommen, dass manche dieser ggf. nicht immer verfügbar sind, da sie aktuell von anderen Nutzern verwendet werden. Wenn die IDE eigenständig nutzbar ist, können Nutzer dennoch an ihren Programmen weiterarbeiten. \\
 \end{requirement}
 
 \begin{requirement}{Nur CrossLab-Nutzerkonto nötig}
@@ -64,7 +64,7 @@ Im Folgenden werden die Anforderungen an die zu entwickelnde IDE beschrieben. Da
 
 \begin{requirement}{Weitere Dateisysteme}
     \reqdescription Die zu entwickelnde IDE soll die Anbindung weiterer Dateisysteme unterstützen. \\
-    Unteranforderung (a) & Es soll ein CrossLab-Services für die Bereitstellung und Nutzung von Dateisystemen entwickelt werden. \\
+    Unteranforderung (a) & Es soll ein CrossLab-Service für die Bereitstellung und Nutzung von Dateisystemen entwickelt werden. \\
     Unteranforderung (b) & Die zu entwickelnde IDE soll den aus Unteranforderung (a) resultierenden CrossLab-Service zur Anbindung weiterer Dateisysteme nutzen. \\
 \end{requirement}
 
@@ -83,7 +83,7 @@ Im Folgenden werden die Anforderungen an die zu entwickelnde IDE beschrieben. Da
     Unteranforderung (b) & Geteilte Ordner können nur von ihrem Besitzer gelöscht, verschoben oder umbenannt werden. \\
     Unteranforderung (c) & Das Teilen von Ordnern soll von dem Besitzer beendet werden können. \\
     Unteranforderung (d) & Das Teilen von Ordnern soll über die nach \autoref{requirement:Kollaboration}(b) vorhandenen CrossLab-Services der IDE erfolgen. \\
-    \reqrationale Durch das Teilen von Ordnern und den enthaltenen Dateien können Nutzer gemeinsam an diesen arbeiten. Dadurch können z.B. Gruppenarbeiten im Rahmen eines Praktikumsversuch effizienter durchgeführt werden, während die Lernenden gleichzeitig ihre Teamfähigkeit verbessern können. \\
+    \reqrationale Durch das Teilen von Ordnern und den enthaltenen Dateien können Nutzer gemeinsam an diesen arbeiten. Dadurch können u.a. Gruppenarbeiten im Rahmen eines Praktikumsversuch effizienter durchgeführt werden, während die Lernenden gleichzeitig ihre Teamfähigkeit verbessern können. \\
 \end{requirement}
 
 \newpage
@@ -94,7 +94,7 @@ Im Folgenden werden die Anforderungen an die zu entwickelnde IDE beschrieben. Da
     \reqdescription Die zu entwickelnde IDE soll die Kompilierung von Quellcode unterstützen. \\
     Unteranforderung (a) & Es soll ein CrossLab-Service für die Bereitstellung und Nutzung von Compilern entwickelt werden. \\
     Unteranforderung (b) & Die zu entwickelnde IDE soll den aus Unteranforderung (a) resultierenden CrossLab-Service für die Nutzung von Compilern verwenden. \\
-    \reqrationale Die Kompilierung des Quellcodes ist in vielen Programmiersprachen ein wichtiger Schritt um das Programm auf dem Zielsystem ausführen zu können. \\
+    \reqrationale Die Kompilierung des Quellcodes ist in vielen Programmiersprachen ein wichtiger Schritt, um das Programm auf dem Zielsystem ausführen zu können. \\
 \end{requirement}
 
 \vfill
@@ -121,8 +121,8 @@ Im Folgenden werden die Anforderungen an die zu entwickelnde IDE beschrieben. Da
 \vfill
 
 \begin{requirement}{Teilen von Debug-Sitzungen}
-    \reqdescription Die zu entwickelnde IDE soll es Nutzern ermöglichen gleichzeitig an einer Debug-Sitzung teilzunehmen, falls dies mit dem verwendeten Debugger möglich ist. \\
-    Unteranforderung (a) & Nutzer können einer Debug-Sitzung nur beitreten wenn sie Zugriff auf die Dateien des entsprechenden Programms besitzen. (sh. \autoref{requirement:Teilen von Ordnern}) \\
+    \reqdescription Die zu entwickelnde IDE soll es Nutzern ermöglichen, gleichzeitig an einer Debug-Sitzung teilzunehmen, falls dies mit dem verwendeten Debugger möglich ist. \\
+    Unteranforderung (a) & Nutzer können einer Debug-Sitzung nur beitreten, wenn sie Zugriff auf die Dateien des entsprechenden Programms besitzen. (sh. \autoref{requirement:Teilen von Ordnern}) \\
     Unteranforderung (b) & Die Breakpoints aller an einer Debug-Sitzung teilnehmenden Nutzer sollen synchronisiert werden. \\
     Unteranforderung (c) & Pro Steuereinheit soll nur eine Debug-Sitzung gestartet werden können. \\
     Unteranforderung (d) & Nur der Ersteller einer Debug-Sitzung kann diese beenden. \\
@@ -138,7 +138,7 @@ Im Folgenden werden die Anforderungen an die zu entwickelnde IDE beschrieben. Da
     Unteranforderung (b) & Der Consumer des CrossLab-Service soll die Ausführung der bereitgestellten Funktionen ermöglichen. \\
     Unteranforderung (c) & Die Erstellung von Testfällen soll während der Konfiguration eines Experiments erfolgen können. \\
     Unteranforderung (d) & Die zu entwickelnde IDE soll den aus Unteranforderung (a) resultierenden CrossLab-Service zur Ausführung von Testfällen innerhalb eines Experiments verwenden. \\
-    \reqrationale Die Möglichkeit Testfälle für ein Experiment zu konfigurieren erlaubt es z.B. Lehrenden die Ziele ihrer Lehrveranstaltung im Vorhinein festzulegen. Während des Experiments können die Lernenden dann ihre erstellte Lösung überprüfen. \\
+    \reqrationale Die Möglichkeit, Testfälle für ein Experiment zu konfigurieren, erlaubt es z.B. Lehrenden die Ziele ihrer Lehrveranstaltung im Vorhinein festzulegen. Während des Experiments können die Lernenden dann ihre erstellte Lösung überprüfen. \\
 \end{requirement}
 
 \vfill
