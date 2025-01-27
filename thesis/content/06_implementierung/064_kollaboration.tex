@@ -1,21 +1,104 @@
 \section{Kollaboration}\label{section:prototypische-implementierung:kollaboration}
 
-% \begin{note}
-%     \textbf{Notizen:}
-%     \begin{itemize}
-%         \item Kurze Begründung warum Yjs für die Implementierung ausgewählt wurde
-%         \item Beschreibung der Implementierung mit Yjs
-%               \begin{itemize}
-%                   \item CollaborationProvider
-%                   \item CollaborationTypes
-%               \end{itemize}
-%     \end{itemize}
-% \end{note}
+\begin{figure}[tbp]
+    \centering
+    \resizebox{\textwidth}{!}{\begin{tikzpicture}
+            \begin{interface}[text width=4cm]{CollaborationType}{0,0}
+                \operation{+ toJSON()}
+                \operation{+ onUpdate()}
+            \end{interface}
+            \begin{class}[text width=5cm]{CollaborationObject}{-6,2.25}
+                \operation{+ setProperty()}
+                \operation{+ getProperty()}
+                \operation{+ deleteProperty()}
+            \end{class}
+            \begin{class}[text width=5cm]{CollaborationNull}{-6,-0.75}
+            \end{class}
+            \begin{class}[text width=5cm]{CollaborationArray}{-6,-2.25}
+                \operation{+ push()}
+                \operation{+ get()}
+                \operation{+ delete()}
+            \end{class}
+            \begin{class}[text width=5cm]{CollaborationNumber}{6,2.25}
+                \operation{+ set()}
+            \end{class}
+            \begin{class}[text width=5cm]{CollaborationString}{6,0}
+                \operation{+ set()}
+                \operation{+ insert()}
+                \operation{+ delete()}
+            \end{class}
+            \begin{class}[text width=5cm]{CollaborationBoolean}{6,-3.35}
+                \operation{+ set()}
+            \end{class}
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationObject.east) -- ([yshift=5mm] CollaborationType.west);
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationNull.east) -- (CollaborationType.west);
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationArray.east) -- ([yshift=-5mm] CollaborationType.west);
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationNumber.west) -- ([yshift=5mm] CollaborationType.east);
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationString.west) -- (CollaborationType.east);
+            \draw[umlcd style dashed line, -{Triangle[length=2.5mm,open]}] (CollaborationBoolean.west) -- ([yshift=-5mm] CollaborationType.east);
+        \end{tikzpicture}}
+    \caption{Klassendiagramm kollaborative Datentypen}
+    \label{figure:klassendiagramm-kollaborative-datentypen}
+\end{figure}
+
+\begin{figure}[tbp]
+    \centering
+    \begin{tikzpicture}
+        \begin{class}[text width=7cm]{CollaborationServiceProducer}{-4,0}
+        \end{class}
+        \begin{class}[text width=7cm]{CollaborationServiceConsumer}{4,0}
+            \operation{+ getAwareness()}
+            \operation{+ joinRoom()}
+            \operation{+ executeTransaction()}
+            \operation{+ valueToCollaborationType()}
+            \operation{+ getProperty()}
+            \operation{+ onUpdate()}
+        \end{class}
+        \begin{class}[text width=7cm]{Room}{0,-5}
+            \attribute{+ awareness: Awareness}
+            \operation{+ addParticipant()}
+            \operation{+ removeParticipant()}
+            \operation{+ valueToCollaborationType()}
+            \operation{+ executeTransaction()}
+            \operation{+ startSynchronization()}
+            \operation{+ getProperty()}
+            \operation{+ onUpdate()}
+        \end{class}
+        \begin{interface}[text width=7cm]{Awareness}{-4,-14}
+            \operation{+ getLocalState()}
+            \operation{+ setLocalState()}
+            \operation{+ setLocalStateField()}
+            \operation{+ getStates()}
+            \operation{+ onChange()}
+            \operation{+ onUpdate()}
+        \end{interface}
+        \begin{class}[text width=7cm]{AwarenessProvider}{-4,-11}
+            \implement{Awareness}
+            \operation{+ applyUpdate()}
+            \operation{+ encodeStates()}
+        \end{class}
+        \begin{class}[text width=7cm]{CollaborationProvider}{4,-11}
+            \operation{+ handleCollaborationMessage()}
+            \operation{+ startSynchronization()}
+            \operation{+ executeTransaction()}
+            \operation{+ valueToColloraborationType()}
+            \operation{+ getProperty()}
+            \operation{+ onCollaborationMessage()}
+            \operation{+ onUpdate()}
+        \end{class}
+        \draw[stroke] ([xshift=-10mm]CollaborationServiceProducer.south) -- ([xshift=-10mm] CollaborationServiceProducer.south |- , |- Room.west) -- (Room.west) node [above, xshift=-6mm] () {rooms} node [below, xshift=-4mm] () {0..*};
+        \draw[stroke] ([xshift=10mm] CollaborationServiceConsumer.south) -- ([xshift=10mm] CollaborationServiceConsumer.south |- , |- Room.east) -- (Room.east) node [above, xshift=6mm] () {rooms} node [below, xshift=4mm] () {0..*};
+        \draw[stroke] ([xshift=-5mm] Room.south) -- (-0.5,-10.5) -- (-4,-10.5) -- (AwarenessProvider.north) node [left, yshift=2mm] () {awarenessProvider} node [right, yshift=2mm] () {1};
+        \draw[stroke] ([xshift=5mm] Room.south) -- (0.5,-10.5) -- (3.5,-10.5) -- ([xshift=-5mm] CollaborationProvider.north) node [left, yshift=2mm] () {1} node [right, yshift=2mm] () {collaborationProvider};
+    \end{tikzpicture}
+    \caption{Klassendiagramm Collaboration Service}
+    \label{figure:klassendiagramm-collaboration-service}
+\end{figure}
 
 Um das in \autoref{section:konzeption:kollaboration} beschriebene Konzept zur Bereitstellung von Echtzeit-Kollaboration innerhalb von Experimenten umzusetzen, wurden der Collaboration Service und eine Erweiterung für die IDE implementiert. Diese Erweiterung wird im Folgenden als \textit{Collaboration Erweiterung} bezeichnet.
 
-Die Implementierung des Collaboration Service ist nach dem in \autoref{section:konzeption:kollaboration} vorgestellten Konzept erfolgt. Als Synchronisationsmethode wurde die Bibliothek Yjs \cite{noauthor_yjs_nodate} verwendet, welche auf dem Konzept von \acp{CRDT} basiert\todo{Erklärungssatz}. Alle Teilnehmer einer Kollaborationssitzung sind in Yjs gleichberechtig. Das bedeutet, dass alle Nutzer sowohl als Producer als auch als Consumer auftreten. Dementsprechend wurde zunächst nur ein Collaboration Service Prosumer implementiert, der beide Rollen abdeckt. Für die Implementierung der verschiedenen kollaborativen Datentypen wurden die von Yjs angebotenen Datentypen \texttt{Map}, \texttt{Array} und \texttt{Text} verwendet. Dabei können diese direkt auf Objekte, Arrays und Strings abgebildet werden. Für die Implementierung der restlichen kollaborativen Datentypen wurde \texttt{Text} verwendet, wobei der entsprechende Datentyp über ein zusätzliches Attribut festgelegt wird, um die Zuordnung zu ermöglichen. Die Möglichkeit Attribute an den Datentyp \texttt{Text} anzufügen, welche entsprechend synchronisiert werden, wird bereits von Yjs unterstützt.
+Die Implementierung des Collaboration Service ist nach dem in \autoref{section:konzeption:kollaboration} vorgestellten Konzept erfolgt. Dabei wurde die Bibliothek Yjs \cite{noauthor_yjs_nodate} verwendet, welche auf dem Konzept von \acp{CRDT} basiert. Alle Teilnehmer einer Kollaborationssitzung sind in Yjs gleichberechtig. Das bedeutet, dass alle Nutzer sowohl als Producer als auch als Consumer auftreten. Weiterhin wurde JSON als Datenformat für die Zustandsinformationen und das geteilte Objekt ausgewählt. Dementsprechend wurden die in \autoref{figure:klassendiagramm-kollaborative-datentypen} gezeigten kollaborativen Datentypen implementiert. Dafür wurden die von Yjs angebotenen Datentypen \texttt{Map}, \texttt{Array} und \texttt{Text} verwendet. Dabei können diese direkt auf Objekte, Arrays und Strings abgebildet werden. Für die Implementierung der restlichen kollaborativen Datentypen wurde \texttt{Text} verwendet, wobei der entsprechende Datentyp über ein zusätzliches Attribut festgelegt wird, um die Zuordnung zu ermöglichen. Die Möglichkeit Attribute an den Datentyp \texttt{Text} anzufügen, welche entsprechend synchronisiert werden, wird bereits von Yjs unterstützt. In \autoref{figure:klassendiagramm-collaboration-service} sind der Collaboration Service und die dazugehörigen Klassen dargestellt. Hierbei werden neben den bereits vorgestellten Räumen auch die Klassen \texttt{AwarenessProvider} und \texttt{CollaborationProvider} sowie das Interface \texttt{Awareness} definiert. Die Klasse \texttt{AwarenessProvider} ist für die Verwaltung der Zustandsinformationen zuständig, welche in Form des Interfaces \texttt{Awareness} vorliegen, während die Klasse \texttt{CollaborationProvider} die Synchronisation des geteilten Objekts übernimmt. Alle Funktionen, die für die Bearbeitung der eigenen Zustandsinformationen und das geteilte Objekt der Räume benötigt werden, werden entsprechend vom Collaboration Service Consumer angeboten und an den entsprechenden Raum und Provider weitergeleitet.
 
-Die Collaboration Erweiterung bietet einen Collaboration Service Prosumer an. Dieser kann von anderen Erweiterungen verwendet werden, um entsprechende Räumen beizutreten. Dadurch kann die Implementierung von spezifischen kollaborativen Funktionen durch die entsprechenden Erweiterungen vorgenommen werden. Aktuell wird nur Yjs als Synchronisationsmethode unterstützt.
+Die Collaboration Erweiterung bietet einen Collaboration Service Prosumer an. Dieser kann von anderen Erweiterungen verwendet werden, um entsprechenden Räumen beizutreten. Dadurch kann die Implementierung von spezifischen kollaborativen Funktionen durch die entsprechenden Erweiterungen vorgenommen werden. Aktuell wird nur Yjs als Synchronisationsmethode unterstützt.
 
-In der betrachteten Experimentkonfiguration wird zur Veranschaulichung der Kollaboration eine weitere IDE hinzugefügt. Beide IDEs erhalten einen Collaboration Service Prosumer. Es wird eine Verbindung zwischen den beiden IDEs über den Collaboration Service hinzugefügt.
+In der betrachteten Experimentkonfiguration wird zur Veranschaulichung der Kollaboration eine weitere IDE hinzugefügt. Beide IDEs erhalten einen Collaboration Service Prosumer. Es wird eine Verbindung zwischen den beiden IDEs über den Collaboration Service hinzugefügt (sh. \autoref{figure:experimentkonfiguration:kollaboration}).

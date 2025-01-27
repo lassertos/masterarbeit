@@ -1,14 +1,5 @@
 \section{CrossLab-Kompatibilität}\label{section:konzeption:crosslab-kompatibilität}
 
-% \begin{note}
-%     \textbf{Notizen:}
-%     \begin{itemize}
-%         \item Erwähnung \autoref{requirement:Erweiterbarkeit}
-%         \item Vergleich der möglichen Anbindungen der IDE als Laborgerät
-%         \item Grundlegender Kommunikationsmechanismus der entwickelten Services
-%     \end{itemize}
-% \end{note}
-
 Für die verschiedenen Funktionen der zu entwickelnden IDE sollen entsprechende CrossLab-Services entwickelt und von der IDE verwendet werden. \autoref{requirement:Erweiterbarkeit} verlangt zudem die Erweiterbarkeit der IDE um zusätzliche CrossLab-Services. Um dies zu erreichen, gibt es verschiedene Möglichkeiten. Angenommen die IDE unterstützt das Hinzufügen von Erweiterungen. So könnte eine zentrale Komponente genutzt werden, um alle vorhandenen CrossLab-Services zu verwalten. Diese kann von der IDE selbst oder von einer entsprechenden Erweiterung bereitgestellt werden. Diese zentrale Komponente könnte entweder selbst in der Lage sein CrossLab-Services, die von anderen Erweiterungen bereitgestellt werden, zum Laborgerät hinzuzufügen oder sie könnte eine entsprechende Schnittstelle bereitstellen, die es anderen Erweiterungen ermöglicht das Laborgerät um zusätzliche Services zu erweitern. In der ersten Variante könnte die zentrale Komponente einschränken, welche CrossLab-Services zu dem Laborgerät hinzugefügt werden. So könnte z.B. für eine IDE mit verschiedenen Erweiterungen in der Experimentkonfiguration eine Liste von Erweiterungen festgelegt werden, deren CrossLab-Services geladen werden sollen. Somit müssen ggf. nicht alle Erweiterungen für alle Experimente geladen werden. Der beschriebene Ablauf ist in \autoref{abbildung:initialisierung-laborgerät-ide} dargestellt.
 
 \begin{figure}[tbp]
