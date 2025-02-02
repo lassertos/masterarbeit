@@ -1,7 +1,7 @@
 \section{CrossLab Kompatibilität}\label{section:prototypische-implementierung:crosslab-kompatibilität}
 
 Für die Implementierung der in \autoref{section:konzeption:crosslab-kompatibilität} konzipierten Lösung wurde eine entsprechende Erweiterung entwickelt. Diese ist für die Verwaltung der angebotenen CrossLab-Services sowie für die Anmeldung der IDE als Laborgerät innerhalb einer CrossLab-Instanz verantwortlich und wird im Folgenden als \textit{Basis Erweiterung} bezeichnet.
-
+\vspace{-0.15cm}
 \paragraph{Verwaltung der CrossLab-Services}
 Die Basis Erweiterung hat Zugriff auf alle anderen Erweiterungen der IDE und kann deren angebotenen CrossLab-Services einsehen. Dadurch können diese zu dem Laborgerät der IDE hinzugefügt werden. Weiterhin ist die Basis Erweiterung in der Lage, andere Erweiterungen zu aktivieren. Somit ist es möglich, die zu ladenden Erweiterungen über die Experimentkonfiguration zu definieren. Dafür kann eine entsprechende Liste von Kennzeichnern der entsprechenden Erweiterungen bei der Konfiguration der IDE innerhalb eines Experiments angegeben werden. Diese werden dann aktiviert und deren CrossLab-Services zum Laborgerät der IDE hinzugefügt. Die Aktivierung der Erweiterungen muss vor der Erstellung der Verbindungen geschehen. Daher meldet die Basis Erweiterung zunächst die IDE bei der CrossLab-Instanz an und wartet auf die Konfigurationsnachricht für das Experiment. Daraufhin werden die Erweiterungen gestartet und deren CrossLab-Services hinzugefügt. Schließlich werden dann die Verbindungen für das Experiment erstellt.
 
