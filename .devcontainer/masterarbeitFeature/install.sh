@@ -110,4 +110,4 @@ curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.
 runuser -l vscode -c 'arduino-cli core install arduino:avr'
 
 # biblatex
-sudo apt-get install texlive-bibtex-extra biber
+apt-get install -y texlive-bibtex-extra biber
